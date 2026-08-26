@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="learn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EDMGLAB — Energy Devices &amp; Materials Group</title>
+<meta name="description" content="Interactive research and learning platform for energy storage: supercapacitors, batteries, electrode materials, characterisation and electrochemical analysis.">
+
+<!-- Theme applied before first paint to avoid a flash of the wrong theme.
+     Also hides the shell until app.js has resolved the optional PIN gate,
+     with a failsafe so a broken boot can never leave a blank page. -->
+<script>
+(function () {
+  document.documentElement.classList.add('booting');
+  setTimeout(function () { document.documentElement.classList.remove('booting'); }, 4000);
+  try {
+    // Preferences are namespaced per user when the per-user PIN mode is on.
+    var u = localStorage.getItem('edmglab.activeUser');
+    var key = u ? 'edmglab.state.v1__' + u : 'edmglab.state.v1';
+    var s = JSON.parse(localStorage.getItem(key) || '{}');
+    if (s.theme === 'light' || s.theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', s.theme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+    if (s.mode === 'learn' || s.mode === 'research') {
+      document.documentElement.setAttribute('data-mode', s.mode);
+    }
+  } catch (e) { /* storage unavailable — dark default stands */ }
+})();
+</script>
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+<link rel="stylesheet" href="css/animations.css">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f8fa" media="(prefers-color-scheme: light)">
+<link rel="icon" href="pwa/icons/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="pwa/icons/icon-192.png">
+</head>
+
+<body>
+
+<style>.booting .app, .booting .update-banner { visibility: hidden; }</style>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="app">
+
+  <!-- ── Header ─────────────────────────────────────────────── -->
+  <header class="app-header" id="app-header">
+    <button class="icon-btn nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span class="hamburger" aria-hidden="true"></span>
+    </button>
+
+    <a class="brand" href="#/" aria-label="EDMGLAB home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-text">EDMG<span class="brand-accent">LAB</span></span>
+    </a>
+
+    <nav class="breadcrumb" id="breadcrumb" aria-label="Breadcrumb"></nav>
+
+    <div class="header-actions">
+      <button class="icon-btn" id="search-btn" aria-label="Search (press /)" title="Search  /">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      </button>
+
+      <div class="mode-switch" role="group" aria-label="Content depth">
+        <button type="button" data-mode-set="learn" class="mode-btn">Learn</button>
+        <button type="button" data-mode-set="research" class="mode-btn">Research</button>
+      </div>
+
+      <button class="icon-btn" id="theme-btn" aria-label="Switch theme" title="Switch theme">
+        <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+        <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Sidebar (desktop / tablet) ─────────────────────────── -->
+  <aside class="app-sidebar" id="app-sidebar" aria-label="Main navigation"></aside>
+  <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+
+  <!-- ── Main content outlet ────────────────────────────────── -->
+  <main class="app-main" id="main" tabindex="-1">
+    <div class="view-outlet" id="view-outlet" aria-live="polite" aria-busy="false"></div>
+  </main>
+
+  <!-- ── Bottom navigation (mobile) ─────────────────────────── -->
+  <nav class="app-bottomnav" id="app-bottomnav" aria-label="Primary"></nav>
+
+</div>
+
+<!-- Search overlay -->
+<div class="overlay" id="search-overlay" hidden>
+  <div class="overlay-panel" role="dialog" aria-modal="true" aria-label="Search EDMGLAB">
+    <div class="overlay-head">
+      <input type="search" id="search-input" class="search-input" placeholder="Search concepts, formulas, methods…" autocomplete="off" spellcheck="false">
+      <button class="icon-btn" id="search-close" aria-label="Close search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="overlay-body" id="search-results"></div>
+  </div>
+</div>
+
+<!-- Update-available banner (service worker) -->
+<div class="update-banner" id="update-banner" hidden>
+  <span>A new version of EDMGLAB is available.</span>
+  <button type="button" class="btn btn-sm" id="update-reload">Refresh</button>
+</div>
+
+<noscript>
+  <div class="noscript-note">
+    EDMGLAB needs JavaScript to run. It is a single-page application: all content
+    is rendered in the browser and works offline once loaded.
+  </div>
+</noscript>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
