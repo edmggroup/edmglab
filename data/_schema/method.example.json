@@ -1,0 +1,67 @@
+{
+  "_README": "TEMPLATE — copy one item into data/battery-tester/methods.json or data/echem/methods.json and edit. The five blocks instrument / cell / appliedSignal / response / processing / interpretation are the §34 separation made structural: they cannot be accidentally blurred because the renderer reads them separately.",
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "method.example_technique",
+      "module": "echem",
+      "name": "Full name of the technique",
+      "aliases": ["what your instrument's software calls it", "common abbreviation"],
+
+      "_comment_instrument": "THE INSTRUMENT — what the box controls and measures. Never blur this with what happens in the cell.",
+      "instrument": {
+        "controls": "potential | current | nothing",
+        "measures": "current | potential | impedance",
+        "configuration": "two-electrode (device level) | three-electrode (material level) | either, stating which"
+      },
+
+      "_comment_cell": "THE CELL — what physically happens, and what it depends on.",
+      "cell": {
+        "whatHappens": "Plain description of the process at the electrode and in the electrolyte.",
+        "dependsOn": ["electrode material", "electrolyte", "concentration", "geometry", "cell configuration"]
+      },
+
+      "_comment_signal": "THE APPLIED SIGNAL — what is imposed, and the parameters that define it.",
+      "appliedSignal": {
+        "waveform": "e.g. triangular potential sweep, current step, small-amplitude AC",
+        "parameters": [
+          {
+            "name": "Parameter name",
+            "guidance": "What it controls, what happens if it is too high, what happens if it is too low. Give the reasoning, never a bare recommended number — the student should be able to choose it themselves and check their choice."
+          }
+        ]
+      },
+
+      "_comment_response": "THE RESPONSE — what comes back, and what it is plotted as.",
+      "response": {
+        "measured": "e.g. current vs potential",
+        "outputColumns": ["time", "potential", "current"],
+        "plot": "chart type id"
+      },
+
+      "_comment_processing": "DATA PROCESSING — how raw measurements become parameters. Reference formulas by id; never restate an equation here.",
+      "processing": {
+        "steps": ["What you do to the raw data, in order"],
+        "formulaIds": ["formula.some_equation"]
+      },
+
+      "_comment_interpretation": "SCIENTIFIC INTERPRETATION — the Learn/Research pair. Two views of one record.",
+      "interpretation": {
+        "learnMode": "Plain language. What the result tells you, with no unexplained jargon.",
+        "researchMode": "The mathematical treatment, what the parameters mean physically, and how to judge whether the result is trustworthy."
+      },
+
+      "_comment_required": "The health check warns if limitations is empty. Every technique has limits; writing them down is what stops a student over-reading a result.",
+      "limitations": [
+        "Conditions under which this technique does NOT give a meaningful answer",
+        "What it cannot distinguish"
+      ],
+      "commonMistakes": ["The error people actually make, and what it looks like in the data"],
+      "applications": ["What this technique is genuinely good for"],
+
+      "troubleshootingIds": ["troubleshooting.some_symptom"],
+      "relatedIds": ["concept.something", "method.related_technique"],
+      "tags": ["supercapacitor", "battery"]
+    }
+  ]
+}

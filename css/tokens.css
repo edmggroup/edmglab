@@ -1,0 +1,159 @@
+/* ============================================================
+   EDMGLAB — Design tokens
+   ------------------------------------------------------------
+   EVERY colour, spacing step, radius and type size lives here.
+   Changing the look of the whole platform = editing this file.
+   Never hard-code a colour anywhere else.
+
+   Palette intent (Architecture v0.2 §C.10):
+     - Deep graphite surfaces, scientific instrument feel
+     - ONE restrained accent, reserved for interactive elements
+     - Separate hues reserved ONLY for meaning (warn / danger / ok)
+     - Monospace for all numbers, units and equations
+   ============================================================ */
+
+:root {
+  /* ── Surfaces ─────────────────────────────────────────── */
+  --bg:            #0e1116;   /* page background            */
+  --surface:       #161a21;   /* cards, panels              */
+  --surface-2:     #1e242d;   /* raised / hover             */
+  --surface-3:     #272e39;   /* pressed / active           */
+  --border:        #2b333e;
+  --border-strong: #3a4553;
+
+  /* ── Text ─────────────────────────────────────────────── */
+  --text:          #e6edf3;
+  --text-2:        #a3b1c0;
+  --text-muted:    #74828f;
+  --text-on-accent:#04222b;
+
+  /* ── Accent — interactive elements and active state only ─ */
+  --accent:        #4fb3c9;
+  --accent-strong: #7fd0e2;
+  --accent-dim:    #2a5f6d;
+  --accent-wash:   rgba(79, 179, 201, 0.12);
+
+  /* ── Semantic — meaning only, never decoration ────────── */
+  --ok:            #6cbf84;
+  --ok-wash:       rgba(108, 191, 132, 0.12);
+  --warn:          #e0a458;
+  --warn-wash:     rgba(224, 164, 88, 0.12);
+  --danger:        #e0705f;
+  --danger-wash:   rgba(224, 112, 95, 0.12);
+  --info:          #8b9fe8;
+  --info-wash:     rgba(139, 159, 232, 0.12);
+
+  /* ── Provenance badges (Architecture v0.2 §D.3) ───────── */
+  --prov-theoretical: #8b9fe8;
+  --prov-literature:  #6cbf84;
+  --prov-datasheet:   #4fb3c9;
+  --prov-measured:    #e0a458;
+  --prov-user:        #a3b1c0;
+  --prov-illustrative:#c98fd6;   /* simulations — must be visually distinct */
+
+  /* ── Data visualisation series ────────────────────────── */
+  --series-1: #4fb3c9;
+  --series-2: #e0a458;
+  --series-3: #8b9fe8;
+  --series-4: #6cbf84;
+  --series-5: #c98fd6;
+  --series-6: #e0705f;
+  --grid:     #232a34;
+
+  /* ── Typography ───────────────────────────────────────── */
+  --font-ui:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono",
+               Menlo, Consolas, monospace;
+
+  --fs-xs:   0.75rem;
+  --fs-sm:   0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md:   1.0625rem;
+  --fs-lg:   1.25rem;
+  --fs-xl:   1.5rem;
+  --fs-2xl:  1.9rem;
+
+  --lh-tight: 1.25;
+  --lh-base:  1.6;
+
+  /* ── Spacing ──────────────────────────────────────────── */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+
+  /* ── Radii, shadow, motion ────────────────────────────── */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-2: 0 4px 16px rgba(0,0,0,0.45);
+
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Layout ───────────────────────────────────────────── */
+  --sidebar-w: 244px;
+  --sidebar-w-rail: 64px;
+  --header-h: 56px;
+  --bottomnav-h: 60px;
+  --content-max: 1100px;
+  --touch-min: 44px;
+}
+
+/* ============================================================
+   LIGHT THEME — tuned separately for glare and printing,
+   not a naive inversion.
+   ============================================================ */
+:root[data-theme="light"] {
+  --bg:            #f6f8fa;
+  --surface:       #ffffff;
+  --surface-2:     #eef1f5;
+  --surface-3:     #e2e7ed;
+  --border:        #d8dee6;
+  --border-strong: #b8c2ce;
+
+  --text:          #161a21;
+  --text-2:        #4a5563;
+  --text-muted:    #6b7785;
+  --text-on-accent:#ffffff;
+
+  --accent:        #0e7490;
+  --accent-strong: #0a5a70;
+  --accent-dim:    #a8d8e4;
+  --accent-wash:   rgba(14, 116, 144, 0.09);
+
+  --ok:            #2f7d4a;
+  --ok-wash:       rgba(47, 125, 74, 0.10);
+  --warn:          #a86412;
+  --warn-wash:     rgba(168, 100, 18, 0.10);
+  --danger:        #b3402f;
+  --danger-wash:   rgba(179, 64, 47, 0.10);
+  --info:          #41539c;
+  --info-wash:     rgba(65, 83, 156, 0.10);
+
+  --prov-theoretical: #41539c;
+  --prov-literature:  #2f7d4a;
+  --prov-datasheet:   #0e7490;
+  --prov-measured:    #a86412;
+  --prov-user:        #4a5563;
+  --prov-illustrative:#7d3f90;
+
+  --series-1: #0e7490;
+  --series-2: #a86412;
+  --series-3: #41539c;
+  --series-4: #2f7d4a;
+  --series-5: #7d3f90;
+  --series-6: #b3402f;
+  --grid:     #e2e7ed;
+
+  --shadow-1: 0 1px 2px rgba(16,24,40,0.06);
+  --shadow-2: 0 4px 16px rgba(16,24,40,0.10);
+}

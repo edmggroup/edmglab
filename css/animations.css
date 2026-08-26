@@ -1,0 +1,46 @@
+/* ============================================================
+   EDMGLAB — Keyframes and motion
+   ------------------------------------------------------------
+   ALL motion lives here so it can be reviewed and disabled in
+   one place. Scientific animations are driven by JavaScript
+   (js/lib/anim-engine.js), not by these keyframes — these cover
+   UI motion only.
+   ============================================================ */
+
+@keyframes edmg-spin   { to { transform: rotate(360deg); } }
+@keyframes edmg-fade   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes edmg-rise   { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes edmg-pulse  { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+@keyframes edmg-shake  { 0%,100% { transform: translateX(0); }
+                         20% { transform: translateX(-7px); }
+                         40% { transform: translateX(7px); }
+                         60% { transform: translateX(-4px); }
+                         80% { transform: translateX(4px); } }
+
+.view-outlet > * { animation: edmg-rise var(--dur-base) var(--ease); }
+.overlay         { animation: edmg-fade var(--dur-fast) var(--ease); }
+.update-banner   { animation: edmg-rise var(--dur-base) var(--ease); }
+
+/* Marks an animation currently running, for the control UI */
+.anim.is-playing .anim-live-dot { animation: edmg-pulse 1.4s ease-in-out infinite; }
+.anim-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+/* ============================================================
+   REDUCED MOTION
+   ------------------------------------------------------------
+   The animation engine ALSO checks prefers-reduced-motion in JS
+   and renders a static frame instead of running (see
+   anim-engine.js). This block is the CSS half of the same
+   promise — belt and braces, because an animation that ignores
+   this setting can cause real discomfort.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .view-outlet > * { animation: none; }
+}

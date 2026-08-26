@@ -1,0 +1,103 @@
+/* ============================================================
+   EDMGLAB — Responsive layout
+   Mobile-first. style.css defines the mobile layout;
+   this file promotes it for tablet and desktop.
+
+   Breakpoints (Architecture v0.2 §C):
+     < 600px    mobile   — bottom nav, single column
+     600–1023   tablet   — drawer sidebar, two columns
+     >= 1024px  desktop  — persistent sidebar, no bottom nav
+   ============================================================ */
+
+/* ── Tablet ──────────────────────────────────────────────── */
+@media (min-width: 600px) {
+
+  .view-outlet { padding: var(--sp-6) var(--sp-5) var(--sp-7); }
+  .breadcrumb  { display: block; }
+
+  /* Sidebar becomes an off-canvas drawer, opened by the hamburger */
+  .app-sidebar {
+    display: block;
+    position: fixed; top: var(--header-h); bottom: 0; left: 0; z-index: 50;
+    width: var(--sidebar-w);
+    transform: translateX(-100%);
+    transition: transform var(--dur-base) var(--ease);
+  }
+  .app.nav-open .app-sidebar { transform: translateX(0); box-shadow: var(--shadow-2); }
+
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+/* ── Desktop ─────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+
+  .app {
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: var(--header-h) 1fr;
+    grid-template-areas:
+      "header  header"
+      "sidebar main";
+  }
+
+  /* Sidebar is persistent — no drawer, no scrim, no hamburger */
+  .app-sidebar {
+    position: sticky; top: var(--header-h);
+    height: calc(100dvh - var(--header-h));
+    transform: none; box-shadow: none; z-index: 1;
+  }
+  .app.nav-open .app-sidebar { box-shadow: none; }
+  .sidebar-scrim { display: none !important; }
+  .nav-toggle    { display: none; }
+
+  /* Bottom nav is mobile-only */
+  .app-bottomnav { display: none; }
+
+  .update-banner { bottom: var(--sp-5); }
+
+  .view-outlet { padding: var(--sp-6) var(--sp-6) var(--sp-7); }
+}
+
+/* ── Wide desktop: collapse sidebar to a rail on request ─── */
+@media (min-width: 1024px) {
+  .app.rail .app-sidebar { width: var(--sidebar-w-rail); }
+  .app.rail { grid-template-columns: var(--sidebar-w-rail) 1fr; }
+  .app.rail .nav-group-title,
+  .app.rail .nav-link span:not(.nav-ico),
+  .app.rail .nav-phase { display: none; }
+  .app.rail .nav-link { justify-content: center; }
+}
+
+/* ── Small phones: stack dense tables into cards ─────────── */
+@media (max-width: 480px) {
+  :root { --fs-2xl: 1.6rem; --fs-xl: 1.35rem; }
+  .view-outlet { padding: var(--sp-4) var(--sp-3) var(--sp-6); }
+  .card-grid { grid-template-columns: 1fr; }
+
+  table.stackable thead { display: none; }
+  table.stackable tr {
+    display: block; border: 1px solid var(--border);
+    border-radius: var(--r-md); margin-bottom: var(--sp-3); padding: var(--sp-2);
+  }
+  table.stackable td {
+    display: grid; grid-template-columns: 40% 1fr; gap: var(--sp-3);
+    border-bottom: 1px dashed var(--border); padding: var(--sp-2);
+  }
+  table.stackable td:last-child { border-bottom: 0; }
+  /* Chips and badges must not stretch to fill the grid cell */
+  table.stackable td > .chip,
+  table.stackable td > .badge { justify-self: start; }
+  table.stackable td::before {
+    content: attr(data-label);
+    font-size: var(--fs-xs); color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em; font-weight: 650;
+  }
+}
+
+/* ── Print: light, ink-friendly ──────────────────────────── */
+@media print {
+  .app-header, .app-sidebar, .app-bottomnav,
+  .anim-controls, .update-banner, .overlay { display: none !important; }
+  .app { display: block; }
+  .view-outlet { max-width: none; padding: 0; }
+  .card, .panel, .anim, .chart-card { break-inside: avoid; }
+}

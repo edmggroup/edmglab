@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "_note": "SEED CONTENT — three formulas to exercise the schema, search index and health check. The full library is authored in Phase 1. Every entry must state its variables, its valid context and its assumptions before it is used for teaching.",
+  "items": [
+    {
+      "id": "formula.specific_capacitance",
+      "name": "Specific capacitance (galvanostatic)",
+      "plainText": "Cs = I × Δt / (m × ΔV)",
+      "latex": "C_s = \\dfrac{I\\,\\Delta t}{m\\,\\Delta V}",
+      "aliases": ["specific capacitance", "gravimetric capacitance", "Cs"],
+      "variables": [
+        { "symbol": "I",  "name": "Discharge current",       "siUnit": "A",  "commonUnit": "mA" },
+        { "symbol": "Δt", "name": "Discharge time",          "siUnit": "s" },
+        { "symbol": "m",  "name": "Mass of active material", "siUnit": "kg", "commonUnit": "g" },
+        { "symbol": "ΔV", "name": "Voltage window used for the calculation", "siUnit": "V" }
+      ],
+      "siUnit": "F/kg",
+      "commonUnit": "F/g",
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "three-electrode",
+        "deviceConfig": "single electrode",
+        "performanceLevel": "material",
+        "note": "For a symmetric two-electrode device the single-electrode-equivalent value is conventionally reported as 4·I·Δt/(m_total·ΔV). That is a different formula variant, not this equation with different numbers — the factor arises from two electrodes in series each carrying half the device voltage, and from m_total covering both electrodes."
+      },
+      "assumptions": [
+        "The discharge is close to linear in time, as expected for predominantly capacitive behaviour. Battery-type or strongly pseudocapacitive curves are not well described by a single capacitance value.",
+        "ΔV is stated explicitly as either including or excluding the IR drop; the two conventions give different answers and both appear in the literature.",
+        "m is the mass of electroactive material only. Whether binder and conductive additive are included must be stated and kept consistent across any comparison."
+      ],
+      "limitations": [
+        "Not comparable between studies unless cell configuration, mass basis and IR-drop convention all match.",
+        "A single number cannot represent a material whose capacitance varies strongly with potential."
+      ],
+      "measuredBy": [],
+      "relatedFormulaIds": [],
+      "relatedIds": ["concept.specific_capacitance"],
+      "tags": ["supercapacitor", "EDLC", "GCD", "capacitance"]
+    },
+    {
+      "id": "formula.coulombic_efficiency",
+      "name": "Coulombic efficiency",
+      "plainText": "η = Q_discharge / Q_charge × 100",
+      "latex": "\\eta = \\dfrac{Q_{\\mathrm{discharge}}}{Q_{\\mathrm{charge}}}\\times 100",
+      "aliases": ["coulombic efficiency", "CE", "faradaic efficiency"],
+      "variables": [
+        { "symbol": "Q_discharge", "name": "Charge extracted during discharge", "siUnit": "C", "commonUnit": "mAh" },
+        { "symbol": "Q_charge",    "name": "Charge passed during charge",       "siUnit": "C", "commonUnit": "mAh" }
+      ],
+      "siUnit": "dimensionless",
+      "commonUnit": "%",
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "two-electrode or three-electrode",
+        "deviceConfig": "any",
+        "performanceLevel": "device or electrode",
+        "note": "Both quantities must come from the same cycle and be measured over the same voltage window. Reporting an efficiency without stating the cycle number and the rate makes it uninterpretable."
+      },
+      "assumptions": [
+        "Both charge quantities are integrated over complete, comparable steps.",
+        "No significant self-discharge occurs during any rest between the two steps, or if it does, it is accounted for.",
+        "The current recorded by the instrument is the actual current, not the programmed setpoint."
+      ],
+      "limitations": [
+        "A value above 100% is not physically meaningful for an ideal cell and usually signals a soft internal short, a redox shuttle, charge carried over from the previous cycle, or a mass or current entry error. It should be treated as a diagnostic prompt rather than a result.",
+        "First-cycle efficiency is dominated by irreversible processes such as SEI formation and should not be compared with steady-state cycles."
+      ],
+      "measuredBy": [],
+      "relatedFormulaIds": [],
+      "relatedIds": [],
+      "tags": ["battery", "cycling", "efficiency", "GCD"]
+    },
+    {
+      "id": "formula.c_rate",
+      "name": "C-rate",
+      "plainText": "C-rate = I / Q_nominal",
+      "latex": "\\mathrm{C\\text{-}rate} = \\dfrac{I}{Q_{\\mathrm{nominal}}}",
+      "aliases": ["C rate", "C-rate", "charge rate"],
+      "variables": [
+        { "symbol": "I",         "name": "Applied current",                  "siUnit": "A",   "commonUnit": "mA" },
+        { "symbol": "Q_nominal", "name": "Nominal capacity of the electrode or cell", "siUnit": "A·s", "commonUnit": "mAh" }
+      ],
+      "siUnit": "1/h",
+      "commonUnit": "C",
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "electrode or device",
+        "note": "1C nominally means full nominal capacity in one hour. Whether Q_nominal is the theoretical capacity, the manufacturer's rating, or the capacity this particular electrode actually delivered changes the meaning entirely, so the basis must always be stated."
+      },
+      "assumptions": [
+        "Q_nominal is defined on the same basis (per gram of active material, or per cell) as the current is applied.",
+        "The nominal capacity is appropriate to this material and voltage window, not carried over from a different chemistry."
+      ],
+      "limitations": [
+        "C-rate is a convenience, not a physical property. Two laboratories quoting 1C for the same material can be applying different currents if they define the nominal capacity differently.",
+        "For materials with no well-defined nominal capacity — many carbons in supercapacitor use — current density is the clearer quantity to report."
+      ],
+      "measuredBy": [],
+      "relatedFormulaIds": [],
+      "relatedIds": [],
+      "tags": ["battery", "rate capability", "cycling"]
+    }
+  ]
+}

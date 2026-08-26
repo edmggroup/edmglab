@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "_note": "SEED CONTENT — short definitions for terms not already owned by another file. Anything with a full concept, formula or method record lives there instead and is linked from here. Authored properly in Phase 12.",
+  "items": [
+    {
+      "id": "glossary.ir_drop",
+      "term": "IR drop",
+      "shortDef": "The immediate voltage step seen when current starts or stops, equal to the current multiplied by the cell's ohmic resistance.",
+      "tags": ["resistance", "GCD", "diagnostics"]
+    },
+    {
+      "id": "glossary.cccv",
+      "term": "CC-CV",
+      "shortDef": "Constant current until a voltage limit is reached, then constant voltage while the current decays to a termination threshold.",
+      "tags": ["battery tester", "protocol"]
+    },
+    {
+      "id": "glossary.formation",
+      "term": "Formation",
+      "shortDef": "The first cycles of a new cell, usually at low rate, during which interfacial layers such as the SEI develop and irreversible capacity is consumed.",
+      "tags": ["battery", "SEI", "protocol"]
+    },
+    {
+      "id": "glossary.four_wire",
+      "term": "Four-wire (Kelvin) sensing",
+      "shortDef": "Separate leads carry the current and measure the voltage, so lead and contact resistance are excluded from the recorded cell voltage.",
+      "tags": ["instrument", "resistance", "measurement"]
+    },
+    {
+      "id": "glossary.active_mass",
+      "term": "Active material mass",
+      "shortDef": "The mass of electroactive material on an electrode, excluding binder, conductive additive and current collector unless explicitly stated otherwise.",
+      "tags": ["normalisation", "electrode"]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "_note": "SEED CONTENT — one concept record demonstrating the Learn/Research pair required by spec §35. Learn Mode and Research Mode are two views of THIS ONE record, never two separate content sets. The full fundamentals library is authored in Phase 1.",
+  "items": [
+    {
+      "id": "concept.specific_capacitance",
+      "category": "fundamentals",
+      "title": "Specific capacitance",
+      "aliases": ["specific capacitance", "gravimetric capacitance"],
+      "learnMode": {
+        "simpleDefinition": "How much charge-storage capacitance an electrode gives you for each gram of active material.",
+        "physicalMeaning": "Capacitance on its own tells you how much charge a device stores per volt. Dividing by mass lets you compare materials rather than compare the particular electrodes somebody happened to make.",
+        "example": "An electrode discharged at a constant current, over a known voltage window, for a measured time. Multiply current by time to get the charge, then divide by the mass and the voltage window."
+      },
+      "researchMode": {
+        "scientificDefinition": "Capacitance normalised to the mass of electroactive material, most commonly extracted from the discharge branch of a galvanostatic cycle.",
+        "mathematicalTreatment": "For a linear discharge, C = I·Δt/ΔV follows directly from the definition of capacitance with constant current. Normalising by active mass gives the gravimetric quantity. Where the discharge is not linear, the derivative form C(V) = I/(dV/dt) is more honest than a single averaged value.",
+        "experimentalInterpretation": "The number is only meaningful alongside the current density at which it was obtained, the voltage window, the mass loading, and the cell configuration. A high value at very low current density with very low mass loading may not survive at practical loading.",
+        "limitations": [
+          "Comparisons across studies are unreliable unless cell configuration, mass basis and IR-drop convention all match.",
+          "Averaging a strongly potential-dependent capacitance into one number can hide the behaviour that matters."
+        ],
+        "researchConsiderations": [
+          "State the mass basis explicitly: active material only, or the whole electrode including binder and conductive additive.",
+          "State whether ΔV includes or excludes the IR drop.",
+          "Report the areal and, where relevant, volumetric values alongside the gravimetric one — a high gravimetric value at negligible loading can be misleading on its own."
+        ]
+      },
+      "siUnit": "F/kg",
+      "commonResearchUnits": ["F/g", "mF/cm² (areal)", "F/cm³ (volumetric)"],
+      "commonMistakes": [
+        "Using total electrode mass in one measurement and active mass in another, then comparing them.",
+        "Applying the three-electrode single-electrode formula to a two-electrode device measurement.",
+        "Including the IR drop in ΔV without saying so, which inflates the result."
+      ],
+      "equationIds": ["formula.specific_capacitance"],
+      "relatedIds": ["formula.specific_capacitance"],
+      "tags": ["supercapacitor", "EDLC", "capacitance", "GCD"]
+    }
+  ]
+}

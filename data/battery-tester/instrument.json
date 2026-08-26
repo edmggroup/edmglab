@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "_note": "Battery tester channel architecture — Instrumentation spec §3. Every block's detail text is marked _draft:true and must be reviewed by the research group before it is treated as teaching material. No instrument-specific specifications appear here; those belong in instruments.json, filled from your own manuals.",
+  "items": [
+    {
+      "id": "diagram.bt_channel",
+      "title": "Battery tester channel architecture",
+      "viewBox": "0 0 800 250",
+      "blocks": [
+        {
+          "id": "channel",
+          "label": "Tester channel",
+          "sub": "independent unit",
+          "x": 20, "y": 24, "w": 150, "h": 76,
+          "quantity": "both",
+          "detail": {
+            "_draft": true,
+            "function": "One self-contained test unit with its own current source and sink, its own voltage and current measurement, and its own schedule. A multi-channel tester is effectively many of these side by side.",
+            "quantity": "Both — the channel controls one quantity (current or voltage, depending on the step) and measures the other.",
+            "role": "The channel is the boundary of an experiment. Two cells on two channels are two independent measurements, and any comparison between them inherits both channels' calibration.",
+            "problems": [
+              "Channel-to-channel variation on nominally identical cells",
+              "Calibration drift since the last check",
+              "A cell connected to a different channel than the schedule was assigned to",
+              "A current well below the channel's usable range, where resolution is poor"
+            ],
+            "dataEffect": "Systematic offsets between channels can look like real differences between samples. When comparing materials, distributing repeats across channels rather than putting all of one sample on one channel separates the two."
+          }
+        },
+        {
+          "id": "current",
+          "label": "Current control",
+          "sub": "source / sink",
+          "x": 210, "y": 24, "w": 150, "h": 76,
+          "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "Forces the programmed current through the cell — sourcing current on charge, sinking it on discharge. In a constant-voltage step the same circuitry instead holds the voltage and allows the current to decay.",
+            "quantity": "Controlled — in a constant-current step this is the quantity the instrument holds fixed while the cell voltage does whatever it does.",
+            "role": "This is where the distinction between controlled and measured begins. In CC the current is imposed and the voltage is the result; in CV the roles swap.",
+            "problems": [
+              "Requested current below the resolution of the selected range",
+              "Compliance voltage reached, so the demanded current cannot be delivered",
+              "Current-range switching part-way through a step"
+            ],
+            "dataEffect": "If the channel cannot hold the setpoint, the actual current differs from the programmed one — and every capacity value calculated from the nominal current is then wrong. Always check the recorded current column rather than assuming the setpoint."
+          }
+        },
+        {
+          "id": "cell",
+          "label": "Cell and fixture",
+          "sub": "device under test",
+          "x": 400, "y": 24, "w": 150, "h": 76,
+          "quantity": "none",
+          "detail": {
+            "_draft": true,
+            "function": "The cell itself plus its holder — coin-cell fixture, Swagelok cell, pouch clamp — and the contacts between them.",
+            "quantity": "Neither. The cell is the object of study, not an instrument function. Everything else in this chain exists to impose a condition on it or record its response.",
+            "role": "Most unexpected data originates here rather than in the electronics. Before suspecting the instrument, it is usually worth ruling out contact, assembly and wetting.",
+            "problems": [
+              "Insufficient or uneven contact pressure",
+              "Incomplete electrolyte wetting, particularly early in life",
+              "Reversed polarity",
+              "A damaged, swollen or leaking cell",
+              "Fixture-to-fixture variation between repeats"
+            ],
+            "dataEffect": "Poor contact raises the apparent series resistance and inflates the IR drop, which then propagates into any capacitance or energy value derived from the voltage window."
+          }
+        },
+        {
+          "id": "measure",
+          "label": "Voltage and current measurement",
+          "sub": "sense path",
+          "x": 590, "y": 24, "w": 150, "h": 76,
+          "quantity": "measured",
+          "detail": {
+            "_draft": true,
+            "function": "Senses the cell voltage and the actual current flowing. In a four-wire (Kelvin) arrangement, separate force and sense leads mean the voltage is measured at the cell rather than across the leads.",
+            "quantity": "Measured — this is the instrument's record of what the cell did in response to what was imposed on it.",
+            "role": "The accuracy of every downstream calculation rests here. Specific capacity, coulombic efficiency, IR drop and energy are all derived from these two columns.",
+            "problems": [
+              "Two-wire sensing, so lead and contact resistance are included in the measured voltage",
+              "Sense leads clipped at the wrong point",
+              "Current-range switching artefacts",
+              "Electrical noise picked up on long or poorly routed leads"
+            ],
+            "dataEffect": "Two-wire sensing is a common and easily missed cause of an IR drop that looks far too large. The measurement is not wrong — it is measuring the leads as well as the cell."
+          }
+        },
+        {
+          "id": "feedback",
+          "label": "Feedback and control loop",
+          "sub": "compare and correct",
+          "x": 590, "y": 150, "w": 150, "h": 76,
+          "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "Continuously compares the measured quantity with the programmed setpoint and corrects the drive to close the gap. This loop is what makes 'constant current' constant.",
+            "quantity": "Controlled — the loop is the mechanism by which control is actually achieved, rather than merely requested.",
+            "role": "Also evaluates step transition conditions: time elapsed, voltage limit, current threshold, accumulated capacity. When one is met, the schedule advances.",
+            "problems": [
+              "Settling transients immediately after a step change",
+              "A step whose transition condition can never be satisfied, so it runs to its time limit",
+              "Safety limits set too tightly, terminating a step prematurely"
+            ],
+            "dataEffect": "The first points after a step boundary may not yet be at the setpoint. Analyses that read a value straight from the transition — IR drop especially — need to be explicit about which point they take and why."
+          }
+        },
+        {
+          "id": "daq",
+          "label": "Data acquisition",
+          "sub": "sampling and logging",
+          "x": 400, "y": 150, "w": 150, "h": 76,
+          "quantity": "measured",
+          "detail": {
+            "_draft": true,
+            "function": "Samples the measured channels and writes a record whenever a logging condition is met — a time interval, a voltage change, a current change, or a combination.",
+            "quantity": "Measured — this stage decides which measurements survive into the file.",
+            "role": "Sets the resolution of everything you can subsequently do with the data. It is the one setting whose consequences cannot be repaired afterwards.",
+            "problems": [
+              "Logging interval too coarse to resolve the IR drop at the start of discharge",
+              "Sampling too sparse for differential capacity analysis",
+              "Logging so dense that files become unwieldy over long cycling",
+              "Gaps caused by a change-based trigger that never fires on a flat plateau"
+            ],
+            "dataEffect": "Under-sampling is silent and irreversible. A month-long cycling run logged too coarsely cannot be re-analysed for dQ/dV; the information was never recorded."
+          }
+        },
+        {
+          "id": "computer",
+          "label": "Computer and software",
+          "sub": "schedule, mass, export",
+          "x": 210, "y": 150, "w": 150, "h": 76,
+          "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "Where the schedule is written, the active material mass is entered, the cell is assigned to a channel, and the results are exported.",
+            "quantity": "Controlled — every instruction the channel follows originates here.",
+            "role": "The interface between the researcher's intent and what the instrument actually does. Most protocol errors are made at this stage rather than in the hardware.",
+            "problems": [
+              "Active material mass entered incorrectly, or for the wrong cell",
+              "C-rate defined against a nominal capacity that does not apply to this material",
+              "The wrong schedule assigned to a channel",
+              "Voltage window copied from a different chemistry"
+            ],
+            "dataEffect": "An incorrect active mass scales every gravimetric quantity by exactly that error, silently and consistently — which makes it look plausible rather than obviously wrong. Recording the mass independently of the instrument is the only reliable check."
+          }
+        }
+      ],
+      "connections": [
+        { "from": "channel",  "to": "current" },
+        { "from": "current",  "to": "cell" },
+        { "from": "cell",     "to": "measure" },
+        { "from": "measure",  "to": "feedback" },
+        { "from": "feedback", "to": "daq" },
+        { "from": "daq",      "to": "computer" }
+      ]
+    }
+  ]
+}
