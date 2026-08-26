@@ -53,6 +53,31 @@ function tok(name, fallback) {
   return v || fallback;
 }
 
+/**
+ * Resolve a CSS custom property to a real colour.
+ *
+ * Chart.js draws to a canvas, where `var(--series-2)` means nothing — it
+ * silently falls back to black, which is invisible on the dark theme and
+ * indistinguishable from a deliberate choice. Callers may pass design tokens,
+ * so they are resolved here rather than each caller having to remember.
+ */
+export function resolveColor(c) {
+  if (typeof c !== 'string') return c;
+  const m = c.match(/^var\(\s*(--[\w-]+)\s*\)$/);
+  return m ? tok(m[1], '#888') : c;
+}
+
+/** Compact tick labels for a logarithmic frequency axis. */
+function logTick(v) {
+  const a = Math.abs(v);
+  if (a === 0) return '0';
+  if (a >= 1e6) return `${v / 1e6}M`;
+  if (a >= 1e3) return `${v / 1e3}k`;
+  if (a >= 1) return String(+v.toFixed(0));
+  if (a >= 1e-3) return `${+(v * 1e3).toFixed(0)}m`;
+  return v.toExponential(0);
+}
+
 export function palette() {
   return {
     text:   tok('--text-2', '#a3b1c0'),
@@ -133,8 +158,8 @@ export async function chartCard(container, o) {
   const datasets = (o.datasets || []).map((d, i) => ({
     label: d.label || `Series ${i + 1}`,
     data: d.data || [],
-    borderColor: d.color || p.series[i % p.series.length],
-    backgroundColor: d.color || p.series[i % p.series.length],
+    borderColor: resolveColor(d.color) || p.series[i % p.series.length],
+    backgroundColor: resolveColor(d.color) || p.series[i % p.series.length],
     showLine: d.showLine !== false,
     pointRadius: d.pointRadius ?? 0,
     pointHoverRadius: 4,
@@ -164,7 +189,14 @@ export async function chartCard(container, o) {
       scales: {
         x: scaleBase(o.xLabel, {
           type: o.logX ? 'logarithmic' : 'linear',
-          reverse: !!o.xReverse
+          reverse: !!o.xReverse,
+          // A log axis spanning several decades produces far more ticks than
+          // fit, and Chart.js rotates them into an unreadable pile. Cap the
+          // count and format compactly (10m · 1 · 10 · 1k · 100k).
+          ticks: o.logX
+            ? { color: p.muted, padding: 6, maxRotation: 0, autoSkip: true,
+                maxTicksLimit: 8, callback: (v) => logTick(v) }
+            : { color: p.muted, padding: 6 }
         }),
         y: scaleBase(o.yLabel)
       },

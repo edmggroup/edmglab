@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "_README": "Battery tester fundamentals — Instrumentation spec §1 and §2. DRAFT: written to be scientifically defensible and vendor-neutral, but every entry must be reviewed by the research group before it is treated as teaching material. Contains NO instrument specifications: those belong in instruments.json, filled from your own manuals.",
+  "items": [
+    {
+      "id": "concept.bt_controlled_vs_measured",
+      "category": "instrument",
+      "title": "Controlled vs measured parameter",
+      "aliases": ["controlled parameter", "measured parameter", "what does the tester control"],
+      "learnMode": {
+        "simpleDefinition": "In any step, the tester holds one quantity fixed and records whatever the other one does. The one it holds is controlled; the one it records is measured.",
+        "physicalMeaning": "A flat current trace does not mean the cell wanted a flat current — it means the instrument forced it. The voltage trace, by contrast, is the cell answering back. Almost every misreading of battery data starts with confusing the two.",
+        "example": "Constant-current discharge: current is controlled (flat by construction), voltage is measured (its shape carries the chemistry). Constant-voltage hold: the roles swap."
+      },
+      "researchMode": {
+        "scientificDefinition": "Each schedule step defines one independent variable imposed by the instrument's feedback loop, and one or more dependent variables sampled by the measurement path.",
+        "experimentalInterpretation": "Only the dependent variable carries information about the material. Structure in a controlled variable is an instrument artefact — range switching, a settling transient after a step boundary, or a compliance limit being hit — not a property of the cell.",
+        "limitations": [
+          "The recorded current is not necessarily the programmed current. If the channel cannot deliver the setpoint, the two diverge silently, and any capacity computed from the nominal value is wrong.",
+          "Points immediately after a step transition may not yet be at the setpoint."
+        ],
+        "researchConsiderations": [
+          "Integrate capacity from the recorded current column, never from the setpoint you typed in.",
+          "State which quantity was controlled whenever you report a curve."
+        ]
+      },
+      "relatedIds": ["glossary.cccv", "glossary.ir_drop"],
+      "tags": ["instrument", "fundamentals", "battery tester"]
+    },
+    {
+      "id": "concept.bt_channel",
+      "category": "instrument",
+      "title": "Channel",
+      "aliases": ["channel", "test channel", "multi-channel"],
+      "learnMode": {
+        "simpleDefinition": "One self-contained test unit inside the tester: its own current source and sink, its own measurement, its own schedule. A 64-channel tester is effectively 64 of these side by side.",
+        "physicalMeaning": "The channel is the boundary of an experiment. Two cells on two channels are two independent measurements, and any comparison between them carries both channels' calibration with it.",
+        "example": "Comparing three materials? Spread the repeats of each across different channels rather than putting all of material A on one channel — otherwise a channel offset and a material difference look identical."
+      },
+      "researchMode": {
+        "scientificDefinition": "An independent galvanostat/potentiostat unit with its own control loop, current ranges, and voltage and current measurement path, addressable by the scheduling software.",
+        "experimentalInterpretation": "Channel-to-channel scatter on nominally identical cells sets a practical noise floor for any comparison. It is worth measuring that floor once — several identical cells across several channels — rather than assuming it is negligible.",
+        "limitations": [
+          "Current ranges are finite. A current far below a channel's usable range is resolved poorly.",
+          "Calibration drifts between service intervals."
+        ],
+        "researchConsiderations": [
+          "Record which channel each cell was on, in the same place you record its mass.",
+          "Randomise material across channels when the comparison matters."
+        ]
+      },
+      "relatedIds": ["concept.bt_controlled_vs_measured"],
+      "tags": ["instrument", "battery tester"]
+    },
+    {
+      "id": "concept.bt_four_wire",
+      "category": "instrument",
+      "title": "Two-wire vs four-wire (Kelvin) sensing",
+      "aliases": ["four wire", "Kelvin sensing", "4-wire", "sense leads"],
+      "learnMode": {
+        "simpleDefinition": "In four-wire sensing, one pair of leads carries the current and a separate pair measures the voltage right at the cell — so the resistance of the leads and clips is left out of the measurement.",
+        "physicalMeaning": "With only two wires, the instrument measures the cell PLUS everything between it and the cell. Those leads have resistance, and at any appreciable current that shows up as extra voltage.",
+        "example": "An IR drop that looks far too large is very often two-wire sensing, or sense leads clipped at the wrong point — not a bad electrode."
+      },
+      "researchMode": {
+        "scientificDefinition": "Separation of the force and sense paths so the voltage measurement is taken across the cell terminals rather than across the series combination of cell, leads and contacts.",
+        "experimentalInterpretation": "The measurement is not wrong in the two-wire case — it is faithfully measuring a different thing. Deciding which you want is the point: device-level series resistance may legitimately include contacts, whereas a material-level study almost never should.",
+        "limitations": [
+          "Four-wire sensing removes lead resistance, not contact resistance at the electrode/current-collector interface itself.",
+          "Sense leads placed at the wrong point reintroduce exactly the error they were meant to remove."
+        ],
+        "researchConsiderations": [
+          "Check where the sense leads actually attach before blaming the electrode.",
+          "State the sensing configuration when reporting any resistance or IR drop."
+        ]
+      },
+      "relatedIds": ["glossary.four_wire", "glossary.ir_drop"],
+      "tags": ["instrument", "resistance", "measurement"]
+    },
+    {
+      "id": "concept.bt_accuracy_resolution",
+      "category": "instrument",
+      "title": "Accuracy, resolution and precision",
+      "aliases": ["accuracy", "resolution", "precision"],
+      "learnMode": {
+        "simpleDefinition": "Resolution is the smallest change the instrument can show. Accuracy is how close its reading is to the true value. Precision is how repeatable the reading is. They are three different things.",
+        "physicalMeaning": "An instrument can display six decimal places (fine resolution) while being consistently off by 1% (poor accuracy). Fine resolution makes a number look trustworthy; it does not make it true.",
+        "example": "If two samples differ by less than the channel's accuracy, that difference is not evidence — however many digits the software prints."
+      },
+      "researchMode": {
+        "scientificDefinition": "Resolution is the quantisation step of the measurement path; accuracy is the bounded deviation from a traceable reference, usually specified as ± (% of reading + % of range); precision is the dispersion of repeated measurements.",
+        "experimentalInterpretation": "Accuracy specifications quoted as a percentage of RANGE dominate at small signals. A current two orders of magnitude below the selected range may carry an error comparable to the reading itself.",
+        "limitations": [
+          "Specifications apply within a stated calibration interval and temperature range.",
+          "Nothing in the data file signals that a reading is near the bottom of its range."
+        ],
+        "researchConsiderations": [
+          "Take the accuracy figures from your own manual and record them in instruments.json — do not assume them.",
+          "Before claiming a difference between two samples, check it exceeds the channel specification."
+        ]
+      },
+      "relatedIds": ["concept.bt_channel"],
+      "tags": ["instrument", "metrology"]
+    },
+    {
+      "id": "concept.bt_sampling",
+      "category": "instrument",
+      "title": "Sampling and data logging",
+      "aliases": ["sampling rate", "logging interval", "data logging", "recording condition"],
+      "learnMode": {
+        "simpleDefinition": "The tester does not save every measurement. It writes a row when a logging condition is met — a time interval, a voltage change, a current change, or some combination.",
+        "physicalMeaning": "This one setting decides the resolution of everything you can do with the data afterwards. It is also the only setting whose consequences cannot be repaired later.",
+        "example": "Log every 60 s and the IR drop at the start of discharge falls between two rows. It was never recorded, so no amount of reprocessing can recover it."
+      },
+      "researchMode": {
+        "scientificDefinition": "Records are committed on trigger conditions: elapsed time Δt, potential change ΔV, current change ΔI, or a logical combination, usually with a minimum interval to bound file size.",
+        "experimentalInterpretation": "Different analyses need different densities. Differential capacity analysis needs fine voltage sampling through the plateaus; long-term capacity retention needs almost none. A change-based trigger can starve exactly on a flat plateau — where dV/dt is smallest and dQ/dV is most interesting.",
+        "limitations": [
+          "Under-sampling is silent and irreversible.",
+          "Over-dense logging produces files that are slow to handle over months of cycling."
+        ],
+        "researchConsiderations": [
+          "Set the logging condition from the analysis you intend to do, before starting the run.",
+          "For dQ/dV, prefer a ΔV trigger over a pure time trigger.",
+          "Always keep a coarse time trigger as a backstop so a flat region cannot produce a gap."
+        ]
+      },
+      "relatedIds": ["concept.bt_controlled_vs_measured"],
+      "tags": ["instrument", "data", "dQ/dV"]
+    },
+    {
+      "id": "concept.bt_safety_limits",
+      "category": "instrument",
+      "title": "Safety limits and cutoffs",
+      "aliases": ["safety limits", "cutoff", "overvoltage protection"],
+      "learnMode": {
+        "simpleDefinition": "Independent bounds — voltage, current, capacity, time and temperature — that stop a step regardless of what the schedule says.",
+        "physicalMeaning": "Every step needs at least one condition that ends it, and a safety limit as a backstop in case that condition is never met. A step with no time limit can run indefinitely on a cell that never reaches its target.",
+        "example": "A CV hold set to end at C/20 will run forever on a cell whose impedance is too high to get there — unless a time limit stops it."
+      },
+      "researchMode": {
+        "scientificDefinition": "Bounds evaluated by the channel's control loop independently of step transition conditions, triggering step termination or schedule abort.",
+        "experimentalInterpretation": "A run that terminated on a safety limit rather than its intended condition has not produced the experiment you designed. That distinction is recorded in the step/end-reason column and should be checked before analysing anything.",
+        "limitations": [
+          "Limits set too tightly truncate legitimate steps and look like poor performance.",
+          "Temperature limits protect against a thermal excursion; they do not prevent one."
+        ],
+        "researchConsiderations": [
+          "Derive voltage limits from the chemistry and electrolyte stability window, never by copying another system's protocol.",
+          "Check the end-reason for every step before treating a dataset as complete.",
+          "Damaged, swollen, leaking or shorted cells must not be placed on test."
+        ]
+      },
+      "relatedIds": ["concept.bt_controlled_vs_measured"],
+      "tags": ["instrument", "safety"]
+    },
+    {
+      "id": "concept.bt_active_mass",
+      "category": "instrument",
+      "title": "Active material mass",
+      "aliases": ["active mass", "mass loading", "mass entry"],
+      "learnMode": {
+        "simpleDefinition": "The mass of electroactive material on the electrode. You enter it on the instrument, and the software divides by it to give you per-gram numbers.",
+        "physicalMeaning": "Get it wrong and every specific capacity, specific capacitance and energy density you report is wrong by exactly that factor — consistently, and therefore plausibly.",
+        "example": "Enter 2.0 mg for an electrode that actually carries 1.6 mg and every gravimetric value comes out 20% low, with nothing in the data looking unusual."
+      },
+      "researchMode": {
+        "scientificDefinition": "The normalisation basis for all gravimetric performance metrics, conventionally the mass of electroactive material only — excluding binder, conductive additive and current collector unless explicitly stated.",
+        "experimentalInterpretation": "This is the most common and most invisible error in the whole workflow, because the failure mode is a plausible number rather than an obvious fault.",
+        "limitations": [
+          "Whether binder and conductive additive are included varies between publications, making cross-study comparison unreliable unless stated.",
+          "Mass loading itself affects performance — a high gravimetric value at very low loading may not survive at practical loading."
+        ],
+        "researchConsiderations": [
+          "Record the mass independently of the instrument, in a lab book or sheet, so the entered value can be checked afterwards.",
+          "Always state the mass basis alongside any gravimetric result.",
+          "Report areal loading alongside gravimetric performance."
+        ]
+      },
+      "relatedIds": ["glossary.active_mass", "formula.specific_capacitance", "concept.specific_capacitance"],
+      "tags": ["normalisation", "electrode", "battery tester"]
+    },
+    {
+      "id": "concept.bt_cccv",
+      "category": "principle",
+      "title": "CC-CV charging",
+      "aliases": ["CC-CV", "constant current constant voltage", "CCCV"],
+      "learnMode": {
+        "simpleDefinition": "Charge at constant current until the voltage reaches its upper limit, then hold that voltage and let the current fall away until it drops below a cutoff.",
+        "physicalMeaning": "The swap at the transition is an instrument decision, not a change in the cell. Up to that point the tester was controlling current; afterwards it controls voltage.",
+        "example": "Much of the capacity can arrive during the CV tail. A CC-only charge and a CC-CV charge of the same cell are therefore not comparable."
+      },
+      "researchMode": {
+        "scientificDefinition": "A two-stage charge: galvanostatic to a potential limit, then potentiostatic at that limit until the current decays below a termination threshold or a time limit expires.",
+        "experimentalInterpretation": "The termination current sets how 'full' the cell is. Reporting a capacity without stating both the CV cutoff current and the rate makes it uninterpretable, and comparisons across studies that differ in either are not meaningful.",
+        "limitations": [
+          "A cell with high impedance may never reach the cutoff current, so the step ends on its time limit instead.",
+          "The CV stage adds time that is not reflected in the nominal C-rate."
+        ],
+        "researchConsiderations": [
+          "Report the CV termination current alongside every CC-CV capacity.",
+          "Check the step end-reason to confirm the cutoff was actually reached.",
+          "Coulombic efficiency is sensitive to the CV stage — keep it identical across compared cycles."
+        ]
+      },
+      "relatedIds": ["glossary.cccv", "formula.c_rate", "formula.coulombic_efficiency", "concept.bt_controlled_vs_measured"],
+      "tags": ["protocol", "battery", "charging"]
+    }
+  ]
+}

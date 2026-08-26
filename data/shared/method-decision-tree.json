@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "_README": "Method-selection assistant (§30) and which-instrument guidance (§38). Every leaf MUST declare cannotTell — the renderer refuses to show a recommendation without its limits. OrigaMaster technique names are recorded because that is what appears on this group's instrument screen; they come from the OrigaLys OrigaFlex catalogue, not from memory. No instrument specifications are recorded anywhere here.",
+  "root": "start",
+  "nodes": {
+    "start": {
+      "question": "What do you want to investigate?",
+      "hint": "Pick the question you actually have, not the technique you already know how to run. The right method follows from the question — and every method below has real limits, stated on its card.",
+      "options": [
+        {
+          "label": "Charge-storage behaviour",
+          "detail": "How much charge does it store, and by what mechanism?",
+          "next": "q_storage"
+        },
+        {
+          "label": "Resistance or kinetics",
+          "detail": "What is limiting the rate — contact, electrolyte, charge transfer, diffusion?",
+          "next": "leaf_eis"
+        },
+        {
+          "label": "Open-circuit behaviour",
+          "detail": "What does the cell do when nothing is imposed on it?",
+          "next": "leaf_ocp"
+        },
+        {
+          "label": "Long-term cycling performance",
+          "detail": "How does it behave over many cycles, or at different rates?",
+          "next": "leaf_cycler"
+        },
+        {
+          "label": "A time-dependent response to a step",
+          "detail": "Apply a step and watch the system relax.",
+          "next": "q_step"
+        }
+      ]
+    },
+    "q_storage": {
+      "crumb": "Charge storage",
+      "question": "How do you want to look at it?",
+      "hint": "CV and GCD answer different questions about the same electrode. CV maps the response across a potential range; GCD measures what you actually get at a defined current.",
+      "options": [
+        {
+          "label": "Across a potential range",
+          "detail": "Where does current flow, and is it capacitive or faradaic?",
+          "next": "leaf_cv"
+        },
+        {
+          "label": "At a defined current",
+          "detail": "How much capacity or capacitance, and how efficiently?",
+          "next": "leaf_gcd"
+        }
+      ]
+    },
+    "q_step": {
+      "crumb": "Step response",
+      "question": "Which quantity do you want to control?",
+      "options": [
+        {
+          "label": "Control the potential",
+          "detail": "Step the potential, watch the current decay.",
+          "next": "leaf_ca"
+        },
+        {
+          "label": "Control the current",
+          "detail": "Step the current, watch the potential move.",
+          "next": "leaf_cp"
+        }
+      ]
+    },
+    "leaf_cv": {
+      "technique": "Cyclic Voltammetry (CV)",
+      "crumb": "CV",
+      "summary": "Sweep the potential back and forth and record the current. The workhorse for seeing where charge storage happens across a potential range.",
+      "canTell": [
+        "Where in the potential window current flows, and whether it is reversible",
+        "Whether the response looks capacitive (rectangular) or faradaic (peaked)",
+        "How the response scales with scan rate — the basis of b-value analysis",
+        "Whether the electrolyte's stability window is being exceeded at the extremes"
+      ],
+      "cannotTell": [
+        "The capacity or capacitance you would actually get in a device — GCD at a defined current is the honest measure of that",
+        "A mechanism on its own. CV shape depends on electrode material, electrolyte, concentration, geometry, scan rate, cell configuration and background current",
+        "Whether apparent peak separation is slow electron transfer or simply uncompensated resistance, without independent evidence",
+        "Anything about long-term stability"
+      ],
+      "instrument": "Electrochemical workstation",
+      "origalys": "Pot. Cyclic Voltammetry (CV)",
+      "caution": "Peak separation is affected by uncompensated resistance as well as by kinetics. Measure the solution resistance independently — the high-frequency intercept of an impedance spectrum — before reading kinetics into it.",
+      "route": "#/workstation/cv"
+    },
+    "leaf_gcd": {
+      "technique": "Galvanostatic Charge–Discharge (GCD)",
+      "crumb": "GCD",
+      "summary": "Apply a constant current and record the potential. The measurement that most directly answers 'how much does it store, and how efficiently'.",
+      "canTell": [
+        "Capacity or capacitance at a stated current density",
+        "Coulombic efficiency, from the discharge and charge capacities of the same cycle",
+        "The IR drop at each current reversal, and therefore the ohmic loss",
+        "Whether the curve is linear (capacitive) or plateaued (battery-type)"
+      ],
+      "cannotTell": [
+        "Which process is limiting the rate — that needs impedance",
+        "Anything reliable if the active material mass or the voltage window is not accurately known",
+        "A comparable number across studies unless the current density, cell configuration, mass basis and IR-drop convention all match"
+      ],
+      "instrument": "Battery cycler for long runs; workstation for single cycles and small currents",
+      "origalys": "Gal. Charge and Discharge Cycle",
+      "caution": "Whether the IR drop is included in ΔV changes the capacitance you calculate. State the convention every time you report one — the GCD simulator in this module lets you see how much difference it makes.",
+      "route": "#/workstation/gcd"
+    },
+    "leaf_eis": {
+      "technique": "Electrochemical Impedance Spectroscopy (EIS)",
+      "crumb": "EIS",
+      "summary": "Apply a small alternating signal across a range of frequencies and measure the complex impedance. Separates processes by their characteristic timescales.",
+      "canTell": [
+        "The ohmic resistance of the cell, from the high-frequency intercept",
+        "That processes with different time constants are present, and roughly where they sit in frequency",
+        "Whether the low-frequency response looks diffusion-like",
+        "How any of the above changes with state of charge, temperature or cycle number"
+      ],
+      "cannotTell": [
+        "Which physical process an equivalent-circuit element corresponds to. More than one circuit can usually fit the same spectrum, and a good fit is not evidence of physical meaning",
+        "Anything trustworthy if the system drifted during the measurement — the low-frequency points take the longest and are the first to be corrupted",
+        "Anything meaningful if the perturbation was too large for the response to stay linear"
+      ],
+      "instrument": "Electrochemical workstation (some cyclers offer it — check your model)",
+      "origalys": "Pot. Dynamic EIS  /  Gal. Dynamic EIS",
+      "caution": "Check linearity, stationarity and causality before interpreting a spectrum. The practical test for linearity is simple: halve the amplitude and confirm the spectrum does not change.",
+      "route": "#/workstation/eis"
+    },
+    "leaf_ocp": {
+      "technique": "Open Circuit Potential (OCP)",
+      "crumb": "OCP",
+      "summary": "Impose nothing and watch the potential over time. Usually the first measurement of any session.",
+      "canTell": [
+        "Whether the cell has equilibrated and is ready to measure",
+        "Whether the reference electrode is behaving — persistent drift is often a reference problem, not a material one",
+        "Whether the cell is leaking, shorted or still wetting"
+      ],
+      "cannotTell": [
+        "Anything quantitative about capacity, kinetics or resistance",
+        "The equilibrium potential, if the measurement was simply stopped too early — slow drift and true equilibrium look alike over a short window"
+      ],
+      "instrument": "Electrochemical workstation, and most cyclers as a rest step",
+      "origalys": "Open Circuit Potential (OCP)",
+      "caution": "A stable OCP is a precondition for a meaningful measurement, not a formality. Starting a CV or an impedance sweep on a drifting cell breaks the stationarity those methods assume.",
+      "route": "#/workstation"
+    },
+    "leaf_ca": {
+      "technique": "Chronoamperometry (CA)",
+      "crumb": "CA",
+      "summary": "Step the potential and record the current decay.",
+      "canTell": [
+        "How quickly the system responds to a potential change",
+        "Whether the current decay is consistent with diffusion-limited behaviour",
+        "The charge passed, by integrating the current"
+      ],
+      "cannotTell": [
+        "A diffusion coefficient without a model whose assumptions genuinely apply to your geometry and system",
+        "Anything clean in the first instants, where the double-layer charging transient dominates and can swamp the faradaic response"
+      ],
+      "instrument": "Electrochemical workstation",
+      "origalys": "Chrono Amperometry (CA)",
+      "route": "#/workstation"
+    },
+    "leaf_cp": {
+      "technique": "Chronopotentiometry (CP)",
+      "crumb": "CP",
+      "summary": "Step the current and record the potential response. The mirror image of chronoamperometry.",
+      "canTell": [
+        "How the potential responds to an imposed current",
+        "The IR contribution, from the immediate step at the moment the current changes",
+        "Transition times, where the potential moves sharply"
+      ],
+      "cannotTell": [
+        "Anything separating ohmic from kinetic polarisation unless sampling is fine enough to resolve the IR step",
+        "Rate capability on its own — that needs a series of currents"
+      ],
+      "instrument": "Electrochemical workstation, or a cycler for longer steps",
+      "origalys": "Chrono Potentiometry (CP)",
+      "route": "#/workstation"
+    },
+    "leaf_cycler": {
+      "technique": "Battery cycler — rate capability and long-term cycling",
+      "crumb": "Cycling",
+      "summary": "Many channels running constant-current schedules over days to months. The right instrument for anything involving hundreds or thousands of cycles.",
+      "canTell": [
+        "Capacity retention against cycle number",
+        "Rate capability across a series of C-rates",
+        "Coulombic efficiency cycle by cycle",
+        "Formation behaviour and first-cycle irreversible capacity"
+      ],
+      "cannotTell": [
+        "Why performance is fading — that needs impedance, post-mortem characterisation, or both",
+        "Anything about a single electrode, unless the cell was deliberately built with a reference",
+        "Anything trustworthy if the active mass entered on the instrument was wrong"
+      ],
+      "instrument": "Battery cycler",
+      "origalys": "Single Charge or Discharge  /  Gal. Charge and Discharge Cycle",
+      "caution": "GITT and PITT sit between the two instruments: whether you run them on a cycler or a workstation depends on the pulse magnitude, the timescale and what your particular instrument supports. Check your own model rather than assuming.",
+      "route": "#/battery-tester"
+    }
+  },
+  "_kind": "tree"
+}

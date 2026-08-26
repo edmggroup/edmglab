@@ -106,6 +106,14 @@ router.route('/health', () => import('./views/health.js'),    { title: 'Data Hea
 router.route('/menu',   () => import('./views/menu.js'),      { title: 'Menu' });
 router.route('/admin',  () => import('./views/admin.js'),     { title: 'Access Control' });
 
+// ── Battery Tester (Stage 1B) ──
+router.route('/battery-tester',          () => import('./battery-tester/index.js'), { title: 'Battery Tester' });
+router.route('/battery-tester/:section', () => import('./battery-tester/index.js'), { title: 'Battery Tester' });
+
+// ── Electrochemical Workstation (Stage 1B) ──
+router.route('/workstation',          () => import('./echem/index.js'), { title: 'Electrochemical Workstation' });
+router.route('/workstation/:section', () => import('./echem/index.js'), { title: 'Electrochemical Workstation' });
+
 router.start(document.getElementById('view-outlet'));
 
 /* ══════════════════════════════════════════════════════════

@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "_README": "Electrochemical workstation fundamentals — Instrumentation spec §13. DRAFT content, vendor-neutral. The `aliases` fields include the technique names printed in OrigaLys OrigaMaster, taken from the OrigaLys OrigaFlex catalogue, so a student searching the term on the lab instrument's screen finds the right page. NO instrument specifications appear here — ranges, resolution and accuracy belong in instruments.json, filled from your own manual.",
+  "items": [
+    {
+      "id": "concept.ec_potentiostatic_vs_galvanostatic",
+      "category": "instrument",
+      "title": "Potentiostatic vs galvanostatic operation",
+      "aliases": ["potentiostat", "galvanostat", "potentiostatic", "galvanostatic", "Pot.", "Gal."],
+      "learnMode": {
+        "simpleDefinition": "Potentiostatic: the instrument holds the potential and measures the current. Galvanostatic: it holds the current and measures the potential. Same box, same cell — opposite roles.",
+        "physicalMeaning": "Every technique is one or the other, and knowing which tells you immediately what your data means: the flat trace is the instrument's doing, the interesting one is the cell's.",
+        "example": "Your OrigaMaster software makes this explicit — techniques are prefixed 'Pot.' or 'Gal.' precisely because the same measurement can be run either way. 'Pot. Dynamic EIS' and 'Gal. Dynamic EIS' are the same spectroscopy driven from opposite sides."
+      },
+      "researchMode": {
+        "scientificDefinition": "Two configurations of one feedback loop. Potentiostatic control regulates the WE–RE potential difference to a setpoint by adjusting the current through the WE–CE path; galvanostatic control regulates that current by adjusting the applied potential.",
+        "mathematicalTreatment": "Both are negative-feedback loops with the controlled variable as the error signal. The choice determines which variable carries measurement noise and which carries the instrument's control error.",
+        "experimentalInterpretation": "Choose by which variable you can afford to leave free. Studying a redox process at a defined potential requires potentiostatic control; measuring capacity at a defined rate requires galvanostatic.",
+        "limitations": [
+          "Potentiostatic control near a steep current–potential region can be unstable.",
+          "Galvanostatic control at very low currents may sit below the usable range of the selected current range."
+        ],
+        "researchConsiderations": [
+          "State which mode was used whenever you report a measurement.",
+          "The same cell measured both ways gives different-looking data with no change in the material."
+        ]
+      },
+      "relatedIds": ["concept.ec_three_electrode", "concept.bt_controlled_vs_measured"],
+      "tags": ["workstation", "fundamentals", "potentiostat"]
+    },
+    {
+      "id": "concept.ec_three_electrode",
+      "category": "instrument",
+      "title": "Two-, three- and four-electrode configurations",
+      "aliases": ["three electrode", "3-electrode", "two electrode", "cell configuration", "WE RE CE"],
+      "learnMode": {
+        "simpleDefinition": "How many electrodes you wire up decides what your measurement is about. Two electrodes measure a whole device; three isolate a single electrode against a stable reference.",
+        "physicalMeaning": "In a two-electrode cell, one electrode has to both carry the current and act as the potential reference — and it cannot do both well, because carrying current polarises it.",
+        "example": "A capacitance measured in a three-electrode cell is a material-level number for one electrode. The same cell measured with two electrodes gives a device-level number — and the two are not the same quantity."
+      },
+      "researchMode": {
+        "scientificDefinition": "Three-electrode: potential controlled between WE and RE while current flows WE↔CE, isolating the WE interface. Two-electrode: the counter and reference are common, so the measured potential is the whole cell. Four-electrode: separate sensing pairs, used for membrane and interface studies.",
+        "experimentalInterpretation": "This is a wiring decision with a direct consequence for which formula is valid. The three-electrode single-electrode capacitance and the single-electrode-equivalent value from a symmetric two-electrode device differ by a factor conventionally taken as four — and nothing in the raw data announces which situation you are in.",
+        "limitations": [
+          "Reference placement affects how much uncompensated resistance is included in the measured potential.",
+          "Adding a reference to a practical device format (a coin cell, for instance) is often difficult and can perturb what it is measuring."
+        ],
+        "researchConsiderations": [
+          "Record the cell configuration alongside every result — the calculators in this platform ask for it because the answer depends on it.",
+          "Never compare a three-electrode value with a two-electrode value without converting and saying so."
+        ]
+      },
+      "relatedIds": ["concept.ec_potentiostatic_vs_galvanostatic", "formula.specific_capacitance", "concept.specific_capacitance"],
+      "tags": ["workstation", "cell", "configuration"]
+    },
+    {
+      "id": "concept.ec_compliance",
+      "category": "instrument",
+      "title": "Compliance voltage",
+      "aliases": ["compliance", "compliance voltage", "compliance limit"],
+      "learnMode": {
+        "simpleDefinition": "The largest voltage the instrument can apply across the cell in order to drive the current you asked for. Hit that ceiling and it simply cannot deliver.",
+        "physicalMeaning": "The instrument does not fail loudly. It applies what it can and carries on, so the recorded current quietly stops matching the setpoint.",
+        "example": "A highly resistive cell asked for a large current will hit compliance. The data looks superficially fine until you compare the recorded current column against what you programmed."
+      },
+      "researchMode": {
+        "scientificDefinition": "The bound on the potential the control amplifier can apply between the working and counter electrodes, set by the instrument's output stage.",
+        "experimentalInterpretation": "Reaching compliance means the experiment you designed did not run. Any capacity or capacitance calculated from the nominal current is then wrong.",
+        "limitations": ["The compliance value is a property of your specific model — take it from your own manual, not from another instrument."],
+        "researchConsiderations": [
+          "Always integrate from the recorded current, never the setpoint.",
+          "Suspect compliance whenever a highly resistive cell is driven hard.",
+          "Record your instrument's compliance limit in instruments.json so students can check against it."
+        ]
+      },
+      "relatedIds": ["concept.ec_potentiostatic_vs_galvanostatic"],
+      "tags": ["workstation", "limits"]
+    },
+    {
+      "id": "concept.ec_ir_compensation",
+      "category": "instrument",
+      "title": "Uncompensated resistance and iR compensation",
+      "aliases": ["iR compensation", "IR compensation", "uncompensated resistance", "Ru", "HFR", "positive feedback", "current interrupt"],
+      "learnMode": {
+        "simpleDefinition": "Some of the potential you apply is dropped across the electrolyte between the working and reference electrodes rather than at the interface. iR compensation tries to give that part back.",
+        "physicalMeaning": "It makes a real electrode look worse than it is: peaks separate further, curves stretch, and the response looks slower than the chemistry actually is.",
+        "example": "V = IR. If 30 mA flows through 5 Ω of uncompensated solution resistance, 0.15 V of what you applied never reached the interface at all."
+      },
+      "researchMode": {
+        "scientificDefinition": "The uncompensated resistance Ru is the ohmic resistance between the working electrode surface and the reference sensing point. Compensation applies a correction proportional to the measured current — either by positive feedback in real time, or by current interrupt, which measures the ohmic component directly by briefly switching the current off.",
+        "mathematicalTreatment": "The true interfacial potential is E_true = E_applied − i·Ru. Ru is commonly estimated from the high-frequency intercept of an impedance spectrum — the same quantity OrigaMaster reports as HFR.",
+        "experimentalInterpretation": "Uncompensated resistance and slow electron-transfer kinetics produce a similar broadening. Only an independent measurement of Ru separates them, which is why an impedance measurement is worth taking before reading kinetics into peak separation.",
+        "limitations": [
+          "Over-compensation drives the control loop into oscillation and can manufacture features that look like real electrochemistry.",
+          "Compensating the full measured resistance is usually unsafe in practice; a fraction is applied.",
+          "Compensation cannot fix resistance that lies inside the electrode itself."
+        ],
+        "researchConsiderations": [
+          "Measure Ru rather than guessing it.",
+          "Report whether compensation was applied and how much.",
+          "Treat any feature that appears only after compensation is increased as suspect until it survives a lower setting."
+        ]
+      },
+      "relatedIds": ["glossary.ir_drop", "concept.ec_three_electrode"],
+      "tags": ["workstation", "resistance", "artefact"]
+    },
+    {
+      "id": "concept.ec_eis_validity",
+      "category": "instrument",
+      "title": "When an impedance spectrum is interpretable",
+      "aliases": ["linearity", "stationarity", "causality", "Kramers-Kronig", "KK test", "EIS validity"],
+      "learnMode": {
+        "simpleDefinition": "An impedance spectrum only means something if the system behaved linearly, stayed unchanged during the measurement, and responded only to what you applied. Three conditions — routinely skipped.",
+        "physicalMeaning": "A low-frequency sweep can take many minutes. If the cell drifts over that time, different parts of the spectrum describe different systems, and fitting them together is meaningless.",
+        "example": "The linearity test is simple and takes one extra run: halve the amplitude. If the spectrum changes, the perturbation was too large."
+      },
+      "researchMode": {
+        "scientificDefinition": "Impedance analysis assumes linearity (the response scales with the perturbation), stationarity (the system does not change during acquisition) and causality (the response arises only from the applied signal). The Kramers–Kronig relations provide a practical consistency check.",
+        "experimentalInterpretation": "Drift during acquisition is the most common violation in battery and supercapacitor work, and it shows up in the low-frequency points — exactly the region usually used to argue about diffusion.",
+        "limitations": [
+          "Passing a Kramers–Kronig test shows internal consistency, not that any physical interpretation is correct.",
+          "Amplitude small enough for linearity may be too small for a good signal-to-noise ratio; that trade-off has to be made deliberately."
+        ],
+        "researchConsiderations": [
+          "Record an OCP trace first and confirm it is stable before starting a sweep.",
+          "State the amplitude, the frequency range and the DC bias whenever you report a spectrum.",
+          "Run the amplitude-halving check at least once per system rather than assuming a habitual value is fine."
+        ]
+      },
+      "relatedIds": ["concept.ec_ir_compensation"],
+      "tags": ["workstation", "EIS", "validity"]
+    }
+  ]
+}

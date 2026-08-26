@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "_README": "Potentiostat (§14) and galvanostat (§15) block diagrams. Two records, rendered by the shared diagram engine. DRAFT content — review before treating as teaching material.",
+  "items": [
+    {
+      "id": "diagram.potentiostat",
+      "title": "Potentiostat — potential controlled, current measured",
+      "viewBox": "0 0 800 250",
+      "blocks": [
+        {
+          "id": "setpoint", "label": "User-defined potential", "sub": "the setpoint",
+          "x": 20, "y": 24, "w": 150, "h": 76, "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "The potential you asked for — a fixed value, a sweep, a step, or a small alternating signal riding on a DC level.",
+            "quantity": "Controlled. This is the independent variable of the experiment.",
+            "role": "Everything downstream exists to make the working electrode actually sit at this potential and to report what current that costs.",
+            "problems": ["A window outside the electrolyte's stability range", "A scan rate too fast for the instrument's bandwidth or the cell's time constant"],
+            "dataEffect": "A potential window that exceeds electrolyte stability produces rising current at the extremes that is easily mistaken for capacity or capacitance."
+          }
+        },
+        {
+          "id": "control", "label": "Control electronics", "sub": "drive amplifier",
+          "x": 210, "y": 24, "w": 150, "h": 76, "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "Applies whatever potential to the counter electrode is needed to bring the working electrode to the requested potential relative to the reference.",
+            "quantity": "Controlled — this is the actuator of the feedback loop.",
+            "role": "Note what it drives: the CE, not the WE. The instrument cannot set the working electrode's potential directly; it can only push current through the cell until the measured WE–RE difference matches the setpoint.",
+            "problems": ["Compliance voltage reached, so the loop cannot deliver what is required", "Oscillation with a high-impedance reference or long cabling", "Bandwidth set too low for a fast experiment, or too high for a noisy one"],
+            "dataEffect": "Hitting compliance means the cell never reached the requested condition. Oscillation appears as high-frequency ringing superimposed on the response."
+          }
+        },
+        {
+          "id": "cell", "label": "Electrochemical cell", "sub": "WE · RE · CE",
+          "x": 400, "y": 24, "w": 150, "h": 76, "quantity": "none",
+          "detail": {
+            "_draft": true,
+            "function": "Where the electrochemistry happens. The instrument imposes a condition on this system and records how it answers.",
+            "quantity": "Neither. The cell is the object of study.",
+            "role": "Most unexpected data originates here rather than in the electronics — connections, reference condition, wetting, electrolyte.",
+            "problems": ["Leads swapped between electrodes", "Reference drifting or dried out", "Poor contact at the working electrode", "Insufficient counter electrode area"],
+            "dataEffect": "Swapped leads produce a mirrored or nonsensical response. A drifting reference shifts every potential in the dataset without anything happening in the material."
+          }
+        },
+        {
+          "id": "measure", "label": "Current measurement", "sub": "current follower",
+          "x": 590, "y": 24, "w": 150, "h": 76, "quantity": "measured",
+          "detail": {
+            "_draft": true,
+            "function": "Converts the current flowing through the working electrode into a measurable signal, on a selected current range.",
+            "quantity": "Measured. In potentiostatic operation, current is the dependent variable — the answer, not the question.",
+            "role": "Everything you report from a potentiostatic experiment is derived from this signal.",
+            "problems": ["Range too coarse, so a small current is poorly resolved", "Autoranging switching part-way through a sweep", "Signal near the bottom of the selected range, where the accuracy specification is dominated by the range term"],
+            "dataEffect": "Range switching leaves visible steps or glitches in a voltammogram. A current far below the selected range carries an error comparable to the reading itself."
+          }
+        },
+        {
+          "id": "feedback", "label": "Feedback and correction", "sub": "compare · correct",
+          "x": 400, "y": 148, "w": 150, "h": 76, "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "Continuously compares the measured WE–RE potential with the setpoint and adjusts the drive to close the gap.",
+            "quantity": "Controlled — the loop is how control is actually achieved rather than merely requested.",
+            "role": "In Learn terms: the instrument looks at where the electrode is, compares it with where you asked it to be, and pushes. Repeatedly, very fast. That is all a potentiostat is.",
+            "problems": ["Loop instability with a high-impedance reference", "Over-applied iR compensation driving the loop into oscillation", "Settling transients immediately after a step"],
+            "dataEffect": "An unstable loop shows as ringing or noise that is a property of the instrument, not the cell. Over-compensation can manufacture features that look like real electrochemistry."
+          }
+        },
+        {
+          "id": "daq", "label": "Data acquisition", "sub": "sample · record",
+          "x": 210, "y": 148, "w": 150, "h": 76, "quantity": "measured",
+          "detail": {
+            "_draft": true,
+            "function": "Samples the measured signals and writes them to file at the chosen interval.",
+            "quantity": "Measured — this stage decides which measurements survive into the data.",
+            "role": "Sets the resolution of everything you can do afterwards, and cannot be repaired retrospectively.",
+            "problems": ["Sampling too sparse to resolve a sharp peak", "Filtering that smooths away real features", "Files so dense they become unwieldy"],
+            "dataEffect": "Under-sampling a peak lowers its apparent height and shifts its apparent position — which then propagates into any b-value or kinetic analysis built on it."
+          }
+        }
+      ],
+      "connections": [
+        { "from": "setpoint", "to": "control" },
+        { "from": "control", "to": "cell" },
+        { "from": "cell", "to": "measure" },
+        { "from": "measure", "to": "feedback" },
+        { "from": "feedback", "to": "daq" }
+      ]
+    },
+    {
+      "id": "diagram.galvanostat",
+      "title": "Galvanostat — current controlled, potential measured",
+      "viewBox": "0 0 800 250",
+      "blocks": [
+        {
+          "id": "gsetpoint", "label": "User-defined current", "sub": "the setpoint",
+          "x": 20, "y": 24, "w": 150, "h": 76, "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "The current you asked for — constant, stepped, pulsed, or a small alternating signal on a DC level.",
+            "quantity": "Controlled. In galvanostatic operation, current is the independent variable.",
+            "role": "This is the mirror image of the potentiostat. Everything that was controlled there is measured here, and vice versa.",
+            "problems": ["A current the cell cannot sustain without exceeding its safe potential window", "A current far below the selected range, where resolution is poor"],
+            "dataEffect": "Too high a current drives the potential outside the electrolyte's stability window, and decomposition then appears in the data as though it were the material responding."
+          }
+        },
+        {
+          "id": "gcontrol", "label": "Current control", "sub": "source / sink",
+          "x": 210, "y": 24, "w": 150, "h": 76, "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "Forces the requested current through the cell, adjusting the applied potential by whatever amount is needed to achieve it.",
+            "quantity": "Controlled — the actuator of the galvanostatic loop.",
+            "role": "The flat current trace in your data is flat because this block is making it flat, not because the cell chose it.",
+            "problems": ["Compliance voltage reached, so the requested current cannot be delivered", "Range switching during a step"],
+            "dataEffect": "If the current cannot be delivered, the recorded current diverges from the setpoint — and any capacity calculated from the nominal value is wrong."
+          }
+        },
+        {
+          "id": "gcell", "label": "Electrochemical cell", "sub": "WE · RE · CE",
+          "x": 400, "y": 24, "w": 150, "h": 76, "quantity": "none",
+          "detail": {
+            "_draft": true,
+            "function": "The system under study. Identical hardware to the potentiostatic case — only the instrument's role changes.",
+            "quantity": "Neither.",
+            "role": "The same cell can be run potentiostatically or galvanostatically. Which one you choose is an experimental decision, not a property of the cell.",
+            "problems": ["Poor contact", "Reference condition", "Insufficient counter electrode area"],
+            "dataEffect": "Series resistance shows up immediately as an IR step at every current change — the clearest single diagnostic a galvanostatic experiment provides."
+          }
+        },
+        {
+          "id": "gmeasure", "label": "Voltage measurement", "sub": "WE vs RE",
+          "x": 590, "y": 24, "w": 150, "h": 76, "quantity": "measured",
+          "detail": {
+            "_draft": true,
+            "function": "Measures the working electrode's potential against the reference while the requested current flows.",
+            "quantity": "Measured. In galvanostatic operation, potential is the dependent variable — this is the cell answering back.",
+            "role": "The shape of the potential response carries the chemistry: plateaus, slopes, and the IR step at each current change.",
+            "problems": ["Reference drift", "Uncompensated resistance included in the measured potential", "Sampling too coarse to resolve the IR step at a current reversal"],
+            "dataEffect": "Miss the IR step and you cannot separate ohmic loss from genuine polarisation — the two then get reported as one number."
+          }
+        },
+        {
+          "id": "gfeedback", "label": "Feedback and correction", "sub": "compare · correct",
+          "x": 400, "y": 148, "w": 150, "h": 76, "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "Compares the measured current with the setpoint and corrects the drive.",
+            "quantity": "Controlled.",
+            "role": "Structurally identical to the potentiostatic loop, with the roles of current and potential exchanged. Recognising that symmetry is most of what §13 asks a student to understand.",
+            "problems": ["Settling transients after a step", "Instability at very low currents"],
+            "dataEffect": "The first points after a current step may not be at the setpoint, which matters when reading an IR drop from exactly that region."
+          }
+        },
+        {
+          "id": "gdaq", "label": "Data acquisition", "sub": "sample · record",
+          "x": 210, "y": 148, "w": 150, "h": 76, "quantity": "measured",
+          "detail": {
+            "_draft": true,
+            "function": "Samples and records the potential response at the chosen interval.",
+            "quantity": "Measured.",
+            "role": "For galvanostatic work the critical requirement is fine sampling immediately after each current change, where the IR step lives.",
+            "problems": ["Interval too coarse to capture the IR step", "A change-based trigger starving on a flat plateau"],
+            "dataEffect": "A missed IR step is unrecoverable — the information was never written to the file."
+          }
+        }
+      ],
+      "connections": [
+        { "from": "gsetpoint", "to": "gcontrol" },
+        { "from": "gcontrol", "to": "gcell" },
+        { "from": "gcell", "to": "gmeasure" },
+        { "from": "gmeasure", "to": "gfeedback" },
+        { "from": "gfeedback", "to": "gdaq" }
+      ]
+    }
+  ]
+}

@@ -43,6 +43,13 @@ export async function render(outlet) {
     if (payload.schemaVersion === undefined) {
       issues.push(mk('warn', key, '(file)', 'No schemaVersion — future migrations cannot be applied safely.'));
     }
+
+    /* Not every data file is a content collection. A decision tree is a graph
+       of nodes, not a list of records, and demanding an `items` array of it
+       would be the checker misunderstanding the file rather than the file
+       being wrong. Such files declare `_kind` and are structurally exempt. */
+    if (payload._kind && payload._kind !== 'content') continue;
+
     if (!Array.isArray(payload.items)) {
       issues.push(mk('error', key, '(file)', 'Missing an "items" array.'));
       continue;

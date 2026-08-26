@@ -345,6 +345,52 @@ a.card:hover, button.card:hover {
 .page-lede { color: var(--text-2); font-size: var(--fs-base); max-width: 66ch; margin: 0; line-height: 1.55; }
 
 /* ============================================================
+   MODULE TABS + CONCEPT ACCORDIONS
+   ------------------------------------------------------------
+   Used by BOTH instrument modules. These originally lived in one
+   module's inline <style>, which meant the other module silently
+   rendered unstyled links — shared components have to live in the
+   shared stylesheet.
+   ============================================================ */
+
+.tabbar {
+  display: flex; gap: 2px; overflow-x: auto; margin-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--border); scrollbar-width: none;
+}
+.tabbar::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none; padding: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-sm); font-weight: 550; color: var(--text-2);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  white-space: nowrap; min-height: var(--touch-min);
+  display: flex; align-items: center;
+}
+.tab:hover { color: var(--text); text-decoration: none; background: var(--surface-2); }
+.tab.is-active { color: var(--accent-strong); border-bottom-color: var(--accent); }
+
+.anim-block { margin-bottom: var(--sp-5); }
+.anim-block > h3 { font-size: var(--fs-md); margin-bottom: var(--sp-1); }
+.anim-block > .lede { color: var(--text-2); font-size: var(--fs-sm); margin-bottom: var(--sp-3); max-width: 70ch; }
+
+.concept-list { display: grid; gap: var(--sp-2); }
+.concept details { border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); }
+.concept summary {
+  padding: var(--sp-3) var(--sp-4); cursor: pointer; font-weight: 600; font-size: var(--fs-sm);
+  display: flex; align-items: center; gap: var(--sp-2); list-style: none; min-height: var(--touch-min);
+}
+.concept summary::-webkit-details-marker { display: none; }
+.concept summary::before { content: "▸"; color: var(--text-muted); font-size: .8rem; transition: transform var(--dur-fast); }
+.concept details[open] summary::before { transform: rotate(90deg); }
+.concept details[open] summary { border-bottom: 1px solid var(--border); }
+.concept-body { padding: var(--sp-4); display: grid; gap: var(--sp-3); font-size: var(--fs-sm); }
+.concept-body h4 {
+  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-muted); margin: 0 0 var(--sp-1);
+}
+.concept-body ul { margin: 0; padding-left: 1.1rem; }
+.concept-body li { margin-bottom: 3px; }
+
+/* ============================================================
    BADGES / CHIPS
    ============================================================ */
 

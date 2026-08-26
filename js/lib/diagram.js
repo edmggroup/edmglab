@@ -148,7 +148,10 @@ export function renderDiagram(container, spec) {
   return { destroy() { blockEls.clear(); } };
 }
 
-function detailHtml(b) {
+/** Exported so purpose-built diagrams (e.g. the three-electrode cell, which
+ *  is a physical layout rather than a block flow) can reuse exactly the same
+ *  detail panel instead of growing a second implementation. */
+export function detailHtml(b) {
   const d = b.detail || {};
   const rows = [];
 

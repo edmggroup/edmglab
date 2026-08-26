@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "_README": "Three-electrode system — Instrumentation spec §16 and §17. DRAFT content: scientifically defensible and vendor-neutral, but review before treating as teaching material.",
+  "items": [
+    {
+      "id": "diagram.three_electrode",
+      "title": "Three-electrode system",
+      "_note": "Block ids here are local to this diagram and are not part of the platform-wide id graph.",
+      "blocks": [
+        {
+          "id": "we",
+          "label": "Working electrode (WE)",
+          "quantity": "both",
+          "detail": {
+            "_draft": true,
+            "function": "The electrode carrying the reaction you actually care about. Its potential is what the instrument controls (or measures), and the current flowing through it is what the instrument measures (or controls).",
+            "quantity": "Both — the WE sits at the centre of the experiment. In potentiostatic mode its potential is controlled and its current measured; in galvanostatic mode the roles swap.",
+            "role": "Everything reported about the material comes from this interface. The electrode/electrolyte interface here is the object of study; every other part of the cell exists to make measuring it possible.",
+            "problems": [
+              "Poor or intermittent contact between the active layer and the current collector",
+              "Uncertain or unrecorded active material mass, so every normalised value is wrong by that factor",
+              "Incomplete wetting, so the electrochemically accessible area is smaller than the geometric area",
+              "Area not accurately known, which propagates into every areal quantity"
+            ],
+            "dataEffect": "Contact problems raise the apparent series resistance and distort curve shapes. An incorrect area or mass scales every normalised result consistently — which makes it look plausible rather than obviously wrong."
+          }
+        },
+        {
+          "id": "re",
+          "label": "Reference electrode (RE)",
+          "quantity": "measured",
+          "detail": {
+            "_draft": true,
+            "function": "Provides a stable, known potential against which the working electrode's potential is measured. It is a ruler, not a participant.",
+            "quantity": "Measured — the RE defines the zero of the potential scale. Ideally no current passes through it at all.",
+            "role": "Because current through the reference would polarise it and shift its potential, the instrument's voltage-sensing input is deliberately high-impedance. This is exactly why a third electrode is needed: in a two-electrode cell, the same electrode has to both carry current and provide the potential reference, and it cannot do both well.",
+            "problems": [
+              "Drift as the filling solution changes concentration or the frit becomes blocked",
+              "Placement too far from the working electrode, so uncompensated solution resistance is included in the measured potential",
+              "A liquid-junction potential between the reference filling solution and the electrolyte",
+              "Contamination of the cell by leakage from the reference (chloride from Ag/AgCl into a non-aqueous system, for example)",
+              "Allowed to dry out in storage"
+            ],
+            "dataEffect": "A drifting reference shifts every potential in the dataset, so peak positions and onset potentials move without anything happening in the material. An unstable open-circuit potential is often the first visible symptom.",
+            "note": "Converting between reference scales needs the standard potential of YOUR electrode, which depends on filling-solution concentration and temperature — take it from the electrode's own certificate rather than from a remembered number, and state the scale whenever you report a potential."
+          }
+        },
+        {
+          "id": "ce",
+          "label": "Counter electrode (CE)",
+          "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "Completes the current path. Whatever current the experiment demands at the working electrode flows back through here.",
+            "quantity": "Controlled indirectly — the instrument adjusts the potential applied at the CE in order to achieve the requested condition at the WE. That adjustment is the feedback loop in action.",
+            "role": "A supporting part, not an object of study. Its own reaction is not what you are measuring, which is why it should be chosen so as not to interfere: sufficient area that it does not limit the current, and a material that will not contaminate the electrolyte.",
+            "problems": [
+              "Area too small, so the counter reaction limits the achievable current",
+              "Products of the counter reaction diffusing to the working electrode and being mistaken for its behaviour",
+              "Dissolution of the counter electrode material contaminating the cell",
+              "Compliance voltage reached because the counter electrode cannot sustain the demanded current"
+            ],
+            "dataEffect": "An undersized counter electrode can cap the current, so the cell never reaches the requested condition. Contamination from the counter reaction appears as features that are not properties of the material under study."
+          }
+        },
+        {
+          "id": "electrolyte",
+          "label": "Electrolyte",
+          "quantity": "none",
+          "detail": {
+            "_draft": true,
+            "function": "Carries ionic current between the electrodes and sets the potential window within which the measurement is meaningful.",
+            "quantity": "Neither. The electrolyte is part of the system under study, not an instrument function.",
+            "role": "Its conductivity sets the uncompensated resistance between the working and reference electrodes; its stability window bounds the potentials you can usefully apply.",
+            "problems": [
+              "Potential window exceeded, so electrolyte decomposition is recorded as though it were material behaviour",
+              "Low conductivity, giving a large uncompensated resistance and distorted curves",
+              "Insufficient supporting electrolyte where the technique assumes it",
+              "Dissolved oxygen affecting the response in the negative potential range",
+              "Concentration changing over a long measurement, breaking the stationarity that impedance analysis assumes"
+            ],
+            "dataEffect": "High solution resistance stretches and distorts a cyclic voltammogram and shifts the high-frequency intercept of an impedance spectrum. Exceeding the stability window produces rising current at the extremes that is easily mistaken for capacity."
+          }
+        },
+        {
+          "id": "path_potential",
+          "label": "Potential measurement path (WE ↔ RE)",
+          "quantity": "measured",
+          "detail": {
+            "_draft": true,
+            "function": "The high-impedance sensing path along which the instrument measures the working electrode's potential relative to the reference.",
+            "quantity": "Measured — and deliberately carries essentially no current.",
+            "role": "This is half of why the three-electrode configuration exists. Separating the sensing path from the current path means the potential can be measured against a reference that is not being polarised by the cell current.",
+            "problems": [
+              "Reference placed far from the working electrode, so uncompensated solution resistance is included in the measured potential",
+              "A high-impedance or partially blocked reference frit destabilising the control loop",
+              "Long or poorly routed sense leads picking up mains interference"
+            ],
+            "dataEffect": "Uncompensated resistance in this path appears as apparent peak separation in a CV and as an offset in every reported potential — indistinguishable, from the data alone, from slow electron-transfer kinetics."
+          }
+        },
+        {
+          "id": "path_current",
+          "label": "Current path (WE ↔ CE)",
+          "quantity": "controlled",
+          "detail": {
+            "_draft": true,
+            "function": "The path the cell current actually takes: through the working electrode, the electrolyte, and back through the counter electrode.",
+            "quantity": "Controlled in galvanostatic mode, measured in potentiostatic mode — but in both cases this is the path that carries the charge.",
+            "role": "The other half of why three electrodes are used. Current flows here and nowhere near the reference, so the reference can stay at a stable potential while the experiment runs.",
+            "problems": [
+              "Counter electrode area too small to sustain the demanded current",
+              "Compliance voltage reached, so the requested current cannot be delivered",
+              "Long or inductive cabling, which appears as an inductive tail at high frequency in impedance measurements"
+            ],
+            "dataEffect": "If this path cannot carry the requested current, the instrument silently fails to reach the programmed condition — so the recorded current, not the setpoint, is the one worth trusting."
+          }
+        }
+      ]
+    }
+  ]
+}

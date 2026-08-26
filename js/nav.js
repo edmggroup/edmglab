@@ -79,10 +79,10 @@ export const MODULES = [
   { id: 'materials',       label: 'Electrode Materials', route: '#/materials',           icon: 'layers',    tab: 'lab',   group: 'lab',   phase: 7 },
   { id: 'preparation',     label: 'Electrode Prep',      route: '#/preparation',         icon: 'flask',     tab: 'lab',   group: 'lab',   phase: 9 },
   { id: 'characterization',label: 'Characterisation',    route: '#/characterization',    icon: 'scope',     tab: 'lab',   group: 'lab',   phase: 9 },
-  { id: 'battery-tester',  label: 'Battery Tester',      route: '#/battery-tester',      icon: 'battery',   tab: 'lab',   group: 'lab',   phase: 3 },
-  { id: 'workstation',     label: 'Echem Workstation',   route: '#/workstation',         icon: 'wave',      tab: 'lab',   group: 'lab',   phase: 5 },
+  { id: 'battery-tester',  label: 'Battery Tester',      route: '#/battery-tester',      icon: 'battery',   tab: 'lab',   group: 'lab',   phase: 3,  view: 'battery-tester/index' },
+  { id: 'workstation',     label: 'Echem Workstation',   route: '#/workstation',         icon: 'wave',      tab: 'lab',   group: 'lab',   phase: 5,  view: 'echem/index' },
   { id: 'protocols',       label: 'Test Protocols',      route: '#/protocols',           icon: 'clipboard', tab: 'lab',   group: 'lab',   phase: 3 },
-  { id: 'which-instrument',label: 'Which Instrument?',   route: '#/which-instrument',    icon: 'compass',   tab: 'lab',   group: 'lab',   phase: 5 },
+  { id: 'which-instrument',label: 'Which Instrument?',   route: '#/workstation/choose',  icon: 'compass',   tab: 'lab',   group: 'lab',   phase: 5,  view: 'echem/index' },
 
   { id: 'formulas',        label: 'Formula Library',     route: '#/formulas',            icon: 'sigma',     tab: 'tools', group: 'tools', phase: 1 },
   { id: 'calculators',     label: 'Calculators',         route: '#/calculators',         icon: 'calc',      tab: 'tools', group: 'tools', phase: 2 },
