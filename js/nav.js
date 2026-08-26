@@ -87,7 +87,7 @@ export const MODULES = [
   { id: 'formulas',        label: 'Formula Library',     route: '#/formulas',            icon: 'sigma',     tab: 'tools', group: 'tools', phase: 1 },
   { id: 'calculators',     label: 'Calculators',         route: '#/calculators',         icon: 'calc',      tab: 'tools', group: 'tools', phase: 2 },
   { id: 'import',          label: 'Data Import',         route: '#/import',              icon: 'upload',    tab: 'tools', group: 'tools', phase: 4 },
-  { id: 'troubleshooting', label: 'Troubleshooting',     route: '#/troubleshooting',     icon: 'wrench',    tab: 'tools', group: 'tools', phase: 10 },
+  { id: 'troubleshooting', label: 'Troubleshooting',     route: '#/troubleshooting',     icon: 'wrench',    tab: 'tools', group: 'tools', phase: 10, view: 'troubleshooting' },
 
   // Utilities — footer rail, not the main list (see GROUPS above).
   // `shortLabel` is what fits in the narrow rail; `label` is the real name

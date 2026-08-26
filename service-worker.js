@@ -24,7 +24,7 @@
  * after a fix has shipped.
  */
 
-const CACHE_VERSION = 'edmglab-v6';
+const CACHE_VERSION = 'edmglab-v8';
 const DATA_CACHE = 'edmglab-data-v1';
 
 /* Paths are RELATIVE so the app works both at a domain root and at a
@@ -60,6 +60,9 @@ const SHELL = [
   './js/battery-tester/animations.js',
   './js/battery-tester/protocol-builder.js',
   './js/lib/decision-tree.js',
+  './js/lib/method-view.js',
+  './js/views/method.js',
+  './js/views/troubleshooting.js',
   './js/echem/index.js',
   './js/echem/electrodes.js',
   './js/echem/sim/cv.js',

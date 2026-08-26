@@ -22,6 +22,7 @@ import { renderDiagram } from '../lib/diagram.js';
 import { simWrap } from '../lib/sim-label.js';
 import { chartCard } from '../lib/charts.js';
 import { renderTree } from '../lib/decision-tree.js';
+import { renderMethodList } from '../lib/method-view.js';
 import * as SimCV from './sim/cv.js';
 import * as SimGCD from './sim/gcd.js';
 import * as SimEIS from './sim/eis.js';
@@ -31,6 +32,7 @@ const SECTIONS = [
   { id: 'potentiostat', label: 'Potentiostat' },
   { id: 'galvanostat',  label: 'Galvanostat' },
   { id: 'electrodes',   label: 'Three-electrode cell' },
+  { id: 'methods',      label: 'Methods' },
   { id: 'cv',           label: 'CV' },
   { id: 'gcd',          label: 'GCD' },
   { id: 'eis',          label: 'EIS' },
@@ -84,6 +86,7 @@ async function mountSection(id, host) {
     case 'galvanostat':  return diagramSection(host, 'diagram.galvanostat',
       'The same loop with the roles exchanged. Recognising that symmetry is most of what there is to understand about the difference.');
     case 'electrodes':   return sectionElectrodes(host);
+    case 'methods':      return sectionMethods(host);
     case 'cv':           return sectionCV(host);
     case 'gcd':          return sectionGCD(host);
     case 'eis':          return sectionEIS(host);
@@ -517,4 +520,26 @@ async function sectionChoose(host) {
 
   const h = renderTree(host.querySelector('#ec-tree'), tree);
   return { destroy() { h.destroy?.(); } };
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   Method library (§18)
+   ════════════════════════════════════════════════════════════ */
+
+async function sectionMethods(host) {
+  const methods = await data.items('ec/methods');
+  host.innerHTML = `
+    <section class="section">
+      <div class="section-head"><h2>Electrochemical methods</h2>
+        <span class="section-note">§18 · ${methods.length} methods</span></div>
+      <p class="small" style="max-width:72ch;margin-bottom:1rem">
+        Each record follows the same five-layer structure: instrument, cell, applied signal, response,
+        processing, interpretation — kept separate so it is always clear which layer a claim belongs to.
+        Where a method has an OrigaMaster name, the card shows it.
+      </p>
+      <div id="ec-methods"></div>
+    </section>`;
+  return renderMethodList(host.querySelector('#ec-methods'), methods,
+    { emptyMessage: 'The electrochemical method library' });
 }

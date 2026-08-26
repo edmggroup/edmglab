@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "_README": "Battery tester troubleshooting — Instrumentation spec §11. EVERY entry must offer MULTIPLE possible causes: the health check rejects a single-cause entry, because one symptom must never be presented as proving one cause. Diagnostics are ordered cheapest-and-most-likely first. DRAFT — review before treating as teaching material.",
+  "items": [
+    {
+      "id": "troubleshooting.high_ir_drop",
+      "module": "battery-tester",
+      "symptom": "Large IR drop at the start of discharge",
+      "aliases": ["IR drop", "voltage drop", "large IR", "ohmic drop"],
+      "summary": "The voltage steps down sharply the instant the current reverses, and the step is bigger than expected.",
+      "causes": [
+        "Two-wire sensing, so lead and contact resistance are included in the measured voltage",
+        "Poor or uneven contact pressure between the electrode and current collector",
+        "High electrolyte resistance — low conductivity, insufficient volume, or incomplete wetting",
+        "Current collector corrosion or a poor weld/tab connection",
+        "Test current higher than the cell can sustain without large ohmic loss",
+        "Genuinely high internal resistance of the electrode itself"
+      ],
+      "diagnostics": [
+        "Check first whether the channel is using two-wire or four-wire sensing, and where the sense leads actually attach. This is the cheapest check and a very common cause.",
+        "Repeat at a lower current: a purely ohmic drop scales linearly with current, so plot ΔV against I and look for a straight line through the origin.",
+        "Measure the high-frequency intercept of an impedance spectrum and compare with ΔV/I from the step — if they agree, the resistance is real and ohmic.",
+        "Re-assemble the cell with fresh contact and repeat. A large change points to assembly rather than material.",
+        "Compare against another cell on a different channel to rule out a channel fault."
+      ],
+      "fixes": [
+        "Switch to four-wire sensing and attach the sense leads at the cell terminals",
+        "Improve contact pressure and clean the contact surfaces",
+        "Allow longer wetting before starting the test",
+        "Reduce the test current if the ohmic loss is dominating the measurement",
+        "If the resistance is genuine, report it — a high internal resistance is a result, not necessarily a fault"
+      ],
+      "safetyNotes": [
+        "A rising IR drop combined with heating can indicate a developing internal fault. Stop the test and let the cell cool before handling it."
+      ],
+      "relatedIds": ["glossary.ir_drop", "concept.bt_four_wire", "method.cc_charge_discharge", "method.pulse"],
+      "tags": ["battery tester", "resistance", "IR drop"]
+    },
+    {
+      "id": "troubleshooting.low_capacity",
+      "module": "battery-tester",
+      "symptom": "Capacity much lower than expected",
+      "aliases": ["low capacity", "capacity too low", "poor capacity"],
+      "summary": "The measured capacity is well below what the material should deliver.",
+      "causes": [
+        "Active material mass entered incorrectly on the instrument — the most common cause and the hardest to spot, because it scales everything consistently",
+        "C-rate defined against a nominal capacity that does not apply to this material, so the actual current is far higher than intended",
+        "Voltage window too narrow, cutting the measurement short before the material is fully used",
+        "Incomplete electrolyte wetting, so much of the electrode is not electrochemically accessible",
+        "Poor electrode fabrication — inadequate binder, poor adhesion, or excessive thickness",
+        "Poor active-material utilisation at the current used: rate limitation rather than low capacity",
+        "Cell assembly problem such as misalignment or insufficient electrolyte"
+      ],
+      "diagnostics": [
+        "Re-check the mass entered on the instrument against your own independent record. Do this before anything else — it costs nothing and is the most likely culprit.",
+        "Confirm the recorded current matches the intended current density given that mass.",
+        "Repeat at a much lower rate. If the capacity recovers, the problem is rate limitation, not capacity.",
+        "Check the voltage window against the chemistry and confirm the step ended on the voltage limit rather than a time limit.",
+        "Rest the cell longer before cycling and repeat, to rule out incomplete wetting.",
+        "Build and test a second cell — a fabrication or assembly problem usually will not reproduce identically."
+      ],
+      "fixes": [
+        "Correct the mass and recalculate; never re-enter a mass without recording it independently as well",
+        "Define the C-rate against a capacity appropriate to this material",
+        "Widen the window only if the chemistry and electrolyte genuinely support it",
+        "Allow a longer wetting period before the first cycle",
+        "Review the electrode formulation and coating if the problem persists across cells"
+      ],
+      "safetyNotes": [
+        "Do not widen the voltage window beyond the electrolyte's stability range to chase capacity. Decomposition recorded as capacity is both a wrong result and a safety hazard."
+      ],
+      "relatedIds": ["concept.bt_active_mass", "formula.c_rate", "method.cc_charge_discharge", "method.rate_capability"],
+      "tags": ["battery tester", "capacity", "diagnostics"]
+    },
+    {
+      "id": "troubleshooting.poor_cycling",
+      "module": "battery-tester",
+      "symptom": "Poor cycling stability",
+      "aliases": ["capacity fade", "poor cycling", "cycling stability", "degradation"],
+      "summary": "Capacity falls faster than expected over cycling, or the cell fails early.",
+      "causes": [
+        "Structural degradation of the active material over repeated cycling",
+        "Unstable interfacial layer that re-forms each cycle, consuming charge continuously",
+        "Electrolyte decomposition, often because the voltage window is too wide",
+        "Dissolution of active material into the electrolyte",
+        "Loss of electrical contact as the electrode expands and contracts — binder failure or particle detachment",
+        "Current too high for the material, driving mechanical or structural damage",
+        "Temperature excursions during the test"
+      ],
+      "diagnostics": [
+        "Look at coulombic efficiency first. A persistent shortfall points to a continuously consuming process such as electrolyte decomposition or an unstable interface; a sudden drop points to mechanical failure or a short.",
+        "Examine the SHAPE of the fade — linear, square-root-like, or a sudden cliff each suggest different dominant mechanisms.",
+        "Narrow the voltage window and repeat. If retention improves markedly, the original window was likely outside the stable range.",
+        "Reduce the rate and repeat, to test whether the damage is rate-induced.",
+        "Compare the CC and CV capacity fractions over cycle life — a growing CV fraction indicates rising impedance.",
+        "Post-mortem examination of the cycled electrode if the cause still is not clear."
+      ],
+      "fixes": [
+        "Narrow the voltage window to within the electrolyte's stable range",
+        "Reduce the cycling rate if degradation is rate-induced",
+        "Review binder content and electrode adhesion",
+        "Consider electrolyte additives or a different formulation",
+        "Control and record the test temperature"
+      ],
+      "safetyNotes": [
+        "Rapid capacity loss accompanied by swelling, heating or gas evolution means the cell should be taken off test immediately and isolated. Do not continue cycling to 'see what happens'."
+      ],
+      "relatedIds": ["method.long_term_cycling", "method.coulombic_efficiency", "formula.coulombic_efficiency", "method.capacity_retention"],
+      "tags": ["battery tester", "cycling", "degradation"]
+    },
+    {
+      "id": "troubleshooting.abnormal_voltage_curve",
+      "module": "battery-tester",
+      "symptom": "Abnormal or distorted voltage curve",
+      "aliases": ["weird curve", "abnormal voltage", "distorted curve", "strange shape"],
+      "summary": "The charge or discharge curve does not look like it should — unexpected steps, noise, plateaus in the wrong place, or no plateau at all.",
+      "causes": [
+        "Contact resistance varying during the test, producing steps or noise",
+        "Reversed cell polarity",
+        "Voltage limits set for a different chemistry",
+        "Current setting far from what was intended",
+        "Temperature drifting during the measurement",
+        "Cell assembly problem — misalignment, separator issue, or insufficient electrolyte",
+        "Data acquisition artefacts: current-range switching, or logging too coarse to represent the real shape",
+        "Instrument compliance reached, so the requested condition was never achieved"
+      ],
+      "diagnostics": [
+        "Check the recorded current column against the setpoint. If they differ, the instrument was not doing what you asked, and the curve shape follows from that.",
+        "Check the step end-reason for every step — a step that ended on its time limit did not run the experiment you designed.",
+        "Confirm polarity and the voltage limits against the chemistry.",
+        "Re-plot with a finer logging interval on a fresh run: apparent steps are often an artefact of coarse sampling.",
+        "Repeat on a different channel to separate an instrument fault from a cell fault.",
+        "Re-assemble a fresh cell and compare."
+      ],
+      "fixes": [
+        "Correct polarity, limits or current settings and repeat",
+        "Increase the logging density before concluding anything about curve shape",
+        "Improve contact and re-assemble",
+        "Control the test temperature"
+      ],
+      "safetyNotes": [
+        "Reversed polarity can damage a cell and in some chemistries is hazardous. Verify connections before starting rather than diagnosing afterwards."
+      ],
+      "relatedIds": ["concept.bt_sampling", "concept.bt_controlled_vs_measured", "method.cc_charge_discharge", "concept.bt_safety_limits"],
+      "tags": ["battery tester", "curve shape", "diagnostics"]
+    },
+    {
+      "id": "troubleshooting.ce_above_100",
+      "module": "battery-tester",
+      "symptom": "Coulombic efficiency above 100%",
+      "aliases": ["CE over 100", "efficiency above 100", "coulombic efficiency high"],
+      "summary": "More charge comes out than went in — not physically meaningful for an ideal cell, and always worth investigating.",
+      "causes": [
+        "Soft internal short, allowing charge to leak during the charge step so the measured charge capacity is understated",
+        "A redox shuttle in the electrolyte carrying charge without storing it",
+        "Charge carried over from a previous incomplete cycle",
+        "Current or mass entry error affecting the two steps differently",
+        "Measurement resolution at the limit, so the difference is within instrument uncertainty",
+        "Steps that used different voltage windows or protocols, making the ratio meaningless"
+      ],
+      "diagnostics": [
+        "Confirm the charge and discharge capacities come from the SAME cycle and the same window.",
+        "Check the magnitude — a value at 100.05% may simply be instrument resolution, whereas 110% is a fault.",
+        "Look at the open-circuit voltage after a rest: a cell that drifts downwards persistently is self-discharging.",
+        "Check whether the effect grows over cycling, which points to a developing short.",
+        "Compare against a second cell to rule out a channel or setup problem."
+      ],
+      "fixes": [
+        "Investigate and, if confirmed, retire a cell with a soft short — do not continue cycling it",
+        "Review electrolyte formulation if a shuttle is suspected",
+        "Ensure protocols are identical across compared cycles",
+        "Recheck current and mass entries"
+      ],
+      "safetyNotes": [
+        "A developing internal short can escalate. A cell showing persistent efficiency above 100% together with heating should be taken off test and isolated."
+      ],
+      "relatedIds": ["formula.coulombic_efficiency", "method.coulombic_efficiency", "method.ocv"],
+      "tags": ["battery tester", "efficiency", "fault"]
+    }
+  ]
+}

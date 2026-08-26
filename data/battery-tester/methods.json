@@ -1,0 +1,548 @@
+{
+  "schemaVersion": 1,
+  "_README": "Battery tester method library — Instrumentation spec §6. Each record follows the §34 five-layer shape (instrument / cell / appliedSignal / response / processing / interpretation) so the separation cannot be blurred in prose. DRAFT: scientifically defensible and vendor-neutral, but review before treating as teaching material. No instrument specifications appear here.",
+  "items": [
+    {
+      "id": "method.ocv",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Open-circuit voltage (OCV)",
+      "aliases": ["OCV", "open circuit voltage", "rest step", "Open Circuit Potential (OCP)"],
+      "summary": "No current is applied; the cell voltage is recorded as it relaxes. Almost always the first and last step of a schedule.",
+      "instrument": {
+        "controls": "nothing",
+        "measures": "voltage",
+        "configuration": "any",
+        "principle": "The channel disconnects the current path and simply records the terminal voltage over time."
+      },
+      "cell": {
+        "whatHappens": "With no current flowing, concentration gradients relax and the cell drifts towards its equilibrium potential. How fast it gets there says something about internal transport.",
+        "dependsOn": ["state of charge", "temperature", "how long since current last flowed", "wetting", "cell health"]
+      },
+      "appliedSignal": {
+        "waveform": "none — the current is held at zero",
+        "parameters": [
+          { "name": "Duration", "guidance": "Long enough for the drift rate to become small. Too short and slow relaxation is mistaken for a stable value; the two look identical over a short window." },
+          { "name": "Logging interval", "guidance": "Fine at the start where the change is fastest, coarser later. A pure time trigger wastes rows on the flat tail." }
+        ]
+      },
+      "response": { "measured": "voltage vs time", "outputColumns": ["time", "voltage"], "plot": "V vs t" },
+      "processing": { "steps": ["Read the final value and, just as importantly, the drift rate at the end", "Compare with the expected open-circuit value for this chemistry and state of charge"] },
+      "interpretation": {
+        "learnMode": "A steady OCV means the cell has settled and is ready to be measured. A voltage that keeps sliding means something is still changing — it has not finished wetting, it is self-discharging, or there is a soft short.",
+        "researchMode": "Relaxation after a current step reflects the redistribution of concentration gradients and the decay of polarisation. Persistent drift at a rate that does not decrease is diagnostic rather than incidental: distinguish slow equilibration (drift rate falling) from continuous self-discharge (drift rate roughly constant) by looking at the shape, not the endpoint."
+      },
+      "limitations": [
+        "Gives nothing quantitative about capacity, kinetics or resistance.",
+        "A cell stopped too early looks stable when it is not — over a short window, slow drift and true equilibrium are indistinguishable.",
+        "The equilibrium potential is chemistry- and state-of-charge-dependent; there is no universal expected value."
+      ],
+      "commonMistakes": [
+        "Treating the last recorded point as the equilibrium potential without checking whether it was still moving.",
+        "Skipping the rest before an impedance measurement, which breaks the stationarity that analysis assumes."
+      ],
+      "applications": ["Confirming a cell is ready to measure", "Detecting soft shorts and leakage", "Establishing the starting point of a schedule"],
+      "relatedIds": ["concept.bt_controlled_vs_measured", "concept.ec_eis_validity"],
+      "tags": ["battery tester", "rest", "diagnostics"]
+    },
+
+    {
+      "id": "method.cc_charge_discharge",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Constant-current charge / discharge",
+      "aliases": ["CC", "constant current", "GCD", "galvanostatic cycling", "Gal. Charge and Discharge Cycle"],
+      "summary": "A fixed current is forced through the cell and the voltage is recorded. The foundation of nearly every battery measurement.",
+      "instrument": {
+        "controls": "current",
+        "measures": "voltage",
+        "configuration": "usually two-electrode; three-electrode if a reference was built in",
+        "principle": "The feedback loop holds the current on its setpoint and records whatever voltage the cell produces in response."
+      },
+      "cell": {
+        "whatHappens": "Charge is added to or removed from the electrode at a fixed rate. The potential moves as the state of charge changes, and the shape of that movement carries the chemistry — plateaus for phase transitions, slopes for solid-solution behaviour.",
+        "dependsOn": ["active material", "current density", "voltage window", "temperature", "mass loading", "electrolyte"]
+      },
+      "appliedSignal": {
+        "waveform": "constant current, sign reversing between charge and discharge",
+        "parameters": [
+          { "name": "Current or C-rate", "guidance": "State which convention you used. A C-rate is defined against a nominal capacity; if that nominal value is wrong, the current is wrong and every derived quantity moves with it." },
+          { "name": "Voltage limits", "guidance": "Set from the electrolyte's stability window and the chemistry, never copied from a different system. Too wide and you record decomposition as capacity." },
+          { "name": "Logging condition", "guidance": "Fine enough to resolve the IR step at each current reversal. That step is the clearest single measure of ohmic loss the experiment provides, and it cannot be recovered afterwards." }
+        ]
+      },
+      "response": {
+        "measured": "voltage vs time, and capacity by integration",
+        "outputColumns": ["time", "voltage", "current", "charge capacity", "discharge capacity", "cycle index", "step index"],
+        "plot": "V vs t, or V vs capacity"
+      },
+      "processing": {
+        "steps": [
+          "Integrate the RECORDED current (not the setpoint) over the step to get charge",
+          "Normalise by active material mass, area or volume — and state which",
+          "Read the IR drop from the immediate voltage step at each current reversal",
+          "For capacitive systems, take the slope of the linear discharge region"
+        ],
+        "formulaIds": ["formula.specific_capacitance", "formula.coulombic_efficiency", "formula.c_rate"]
+      },
+      "interpretation": {
+        "learnMode": "The flat current line is the instrument doing its job. The voltage curve is the cell answering — that is where the information is. A long discharge means more stored charge; a steep drop right at the start means resistance.",
+        "researchMode": "The V–Q curve is the primary record. Plateau potentials and their widths reflect phase behaviour; sloping regions indicate solid-solution or capacitive storage. Comparing curves across rates separates thermodynamic capacity from rate limitation, and differentiating to dQ/dV resolves features that are hard to see directly — provided the sampling density supports it."
+      },
+      "limitations": [
+        "Says nothing about WHICH process limits the rate — that needs impedance or a rate series.",
+        "A single rate cannot distinguish a material that is intrinsically low-capacity from one that is simply rate-limited at that current.",
+        "Results are not comparable across studies unless current density, voltage window, mass basis and cell configuration all match."
+      ],
+      "commonMistakes": [
+        "Calculating capacity from the programmed current rather than the recorded one.",
+        "Comparing a CC-only charge with a CC-CV charge as though they were equivalent.",
+        "Reporting a gravimetric value without stating whether binder and conductive additive are included in the mass."
+      ],
+      "applications": ["Capacity and capacitance", "Coulombic efficiency", "The basis of rate capability and long-term cycling"],
+      "relatedIds": ["concept.bt_controlled_vs_measured", "concept.bt_active_mass", "concept.specific_capacitance", "glossary.ir_drop"],
+      "tags": ["battery tester", "GCD", "capacity"]
+    },
+
+    {
+      "id": "method.cv_hold",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Constant-voltage hold",
+      "aliases": ["CV hold", "constant voltage", "potentiostatic hold"],
+      "summary": "The voltage is held fixed and the current is allowed to decay. Usually the second half of a CC-CV charge.",
+      "instrument": {
+        "controls": "voltage",
+        "measures": "current",
+        "configuration": "usually two-electrode",
+        "principle": "The roles swap relative to a constant-current step: the loop now regulates voltage and lets the current become whatever the cell demands."
+      },
+      "cell": {
+        "whatHappens": "Held at a fixed potential, the driving force falls as the cell approaches equilibrium at that potential, so the current decays. Charge continues to accumulate throughout the tail.",
+        "dependsOn": ["cell impedance", "state of charge", "temperature", "hold potential"]
+      },
+      "appliedSignal": {
+        "waveform": "constant voltage",
+        "parameters": [
+          { "name": "Hold potential", "guidance": "Normally the upper limit reached during the preceding CC step." },
+          { "name": "Termination current", "guidance": "Commonly something in the region of C/10 to C/20, but this is protocol-dependent and must be reported with any capacity derived from it — it sets how 'full' the cell ends up." },
+          { "name": "Time limit", "guidance": "Essential. A high-impedance cell may never reach the termination current, and without a time limit the step runs indefinitely." }
+        ]
+      },
+      "response": { "measured": "current vs time", "outputColumns": ["time", "voltage", "current", "capacity"], "plot": "I vs t" },
+      "processing": { "steps": ["Integrate the decaying current to get the additional charge delivered during the hold", "Check the step end-reason: terminated on current, or on the time limit?"] },
+      "interpretation": {
+        "learnMode": "The current falls away as the cell fills up. How much charge arrives during this tail can be a large fraction of the total — which is why a CC-only and a CC-CV charge are not the same measurement.",
+        "researchMode": "The decay rate reflects the cell's impedance and the remaining driving force. A hold that consistently terminates on its time limit rather than its current threshold indicates impedance high enough that the chosen cutoff is unreachable — informative in itself, and a reason to check the cutoff is appropriate."
+      },
+      "limitations": [
+        "The capacity obtained depends entirely on the termination current chosen, so it is not an intrinsic property of the material.",
+        "A step that ends on its time limit has not completed the intended experiment."
+      ],
+      "commonMistakes": [
+        "Omitting the time limit, so a step can run indefinitely.",
+        "Reporting CC-CV capacity without stating the termination current."
+      ],
+      "applications": ["Completing a CC-CV charge", "Ensuring a reproducible starting state before a discharge"],
+      "relatedIds": ["concept.bt_cccv", "glossary.cccv", "concept.bt_controlled_vs_measured"],
+      "tags": ["battery tester", "protocol", "charging"]
+    },
+
+    {
+      "id": "method.cccv",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "CC-CV charging",
+      "aliases": ["CC-CV", "CCCV", "constant current constant voltage"],
+      "summary": "Constant current to the voltage limit, then constant voltage until the current falls below a cutoff. The standard charge protocol for most battery chemistries.",
+      "instrument": {
+        "controls": "current, then voltage",
+        "measures": "voltage, then current",
+        "configuration": "usually two-electrode",
+        "principle": "Two steps joined by a transition condition. At the moment of transition nothing changes in the cell — the INSTRUMENT changes which quantity it controls."
+      },
+      "cell": {
+        "whatHappens": "The cell charges at a fixed rate until it reaches its upper potential, then continues to accept charge at a decreasing rate while held there.",
+        "dependsOn": ["chemistry", "impedance", "temperature", "rate", "termination current"]
+      },
+      "appliedSignal": {
+        "waveform": "constant current, then constant voltage",
+        "parameters": [
+          { "name": "Charge rate", "guidance": "Sets how much of the capacity arrives in the CC stage versus the CV tail. At high rates, more arrives in the tail." },
+          { "name": "Upper voltage limit", "guidance": "From the chemistry and electrolyte stability — the single most consequential setting for cycle life." },
+          { "name": "CV termination current", "guidance": "Determines the final state of charge. Must be reported with any capacity, and kept identical across cycles being compared." }
+        ]
+      },
+      "response": { "measured": "voltage then current, and capacity throughout", "outputColumns": ["time", "voltage", "current", "capacity", "step index"], "plot": "V and I vs t" },
+      "processing": {
+        "steps": ["Sum the charge from both stages for total charge capacity", "Note the split between CC and CV contributions — a growing CV fraction over cycle life indicates rising impedance", "Use total charge capacity as the denominator for coulombic efficiency"],
+        "formulaIds": ["formula.coulombic_efficiency", "formula.c_rate"]
+      },
+      "interpretation": {
+        "learnMode": "Charge fast until the cell hits its voltage ceiling, then top it up gently. Watch the moment the instrument swaps which quantity it is controlling — that is the whole idea.",
+        "researchMode": "The ratio of CC to CV capacity is a useful and often-overlooked diagnostic: as impedance grows with cycling, the cell reaches the voltage limit sooner and a larger fraction of the charge arrives during the hold. Tracking that ratio over cycle life can reveal degradation before capacity fade itself becomes obvious."
+      },
+      "limitations": [
+        "Capacity depends on the termination current, so it is not comparable across protocols that differ in it.",
+        "The CV stage adds time not reflected in the nominal C-rate, so a '1C charge' with a CV tail takes considerably longer than an hour."
+      ],
+      "commonMistakes": [
+        "Comparing CC-CV capacity with CC-only capacity.",
+        "Changing the termination current partway through a study.",
+        "Assuming the cutoff was reached without checking the step end-reason."
+      ],
+      "applications": ["Standard charging for lithium-ion and sodium-ion cells", "Establishing a reproducible fully-charged state"],
+      "relatedIds": ["concept.bt_cccv", "glossary.cccv", "method.cv_hold", "method.cc_charge_discharge"],
+      "tags": ["battery tester", "protocol", "charging"]
+    },
+
+    {
+      "id": "method.formation",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Formation cycling",
+      "aliases": ["formation", "formation cycles", "conditioning"],
+      "summary": "The first few cycles of a new cell, usually at low rate, during which interfacial layers form and irreversible capacity is consumed.",
+      "instrument": {
+        "controls": "current (usually CC or CC-CV at low rate)",
+        "measures": "voltage and capacity",
+        "configuration": "usually two-electrode",
+        "principle": "Ordinary cycling steps, distinguished by when they happen and what is being allowed to occur rather than by any special instrument function."
+      },
+      "cell": {
+        "whatHappens": "Interfacial layers such as the SEI develop on the electrode surface, consuming charge that is never recovered. Wetting completes, and the cell settles into its steady-state behaviour.",
+        "dependsOn": ["electrolyte formulation", "rate", "temperature", "voltage window", "electrode surface area"]
+      },
+      "appliedSignal": {
+        "waveform": "constant current, low rate, typically a small number of cycles",
+        "parameters": [
+          { "name": "Rate", "guidance": "Low, so the interfacial layer forms in a controlled way. The specific value depends on the chemistry and is a research decision, not a universal constant." },
+          { "name": "Number of cycles", "guidance": "Enough for the coulombic efficiency to stabilise. Watching CE settle is a better stopping criterion than a fixed count." }
+        ]
+      },
+      "response": { "measured": "voltage, capacity, coulombic efficiency per cycle", "outputColumns": ["cycle index", "charge capacity", "discharge capacity", "voltage"], "plot": "V vs capacity for the first cycles; CE vs cycle" },
+      "processing": { "steps": ["Compute first-cycle coulombic efficiency", "Identify the irreversible capacity loss", "Confirm CE has stabilised before beginning the study proper"], "formulaIds": ["formula.coulombic_efficiency"] },
+      "interpretation": {
+        "learnMode": "The first cycle always loses some capacity permanently, because a protective layer is being built on the electrode. That is expected — what matters is how much, and whether it settles.",
+        "researchMode": "First-cycle irreversible capacity quantifies the charge consumed by interfacial layer formation and other irreversible processes. It is chemistry- and electrolyte-dependent and is a legitimate object of study in its own right. Formation cycles must never be pooled with steady-state cycles when reporting efficiency or capacity."
+      },
+      "limitations": [
+        "Formation-cycle efficiency is not comparable with steady-state efficiency and should never be averaged with it.",
+        "Does not identify WHICH process consumed the irreversible charge — that needs surface characterisation.",
+        "'Formation is complete' is a judgement, not a measurement; different criteria give different answers."
+      ],
+      "commonMistakes": [
+        "Reporting first-cycle CE as though it characterised the material's efficiency.",
+        "Starting a rate-capability study before formation has stabilised, so early points reflect formation rather than rate."
+      ],
+      "applications": ["Conditioning new cells", "Quantifying irreversible capacity", "Comparing electrolyte formulations"],
+      "relatedIds": ["glossary.formation", "formula.coulombic_efficiency", "method.cc_charge_discharge"],
+      "tags": ["battery tester", "SEI", "protocol"]
+    },
+
+    {
+      "id": "method.rate_capability",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Rate capability",
+      "aliases": ["rate capability", "rate test", "C-rate ladder"],
+      "summary": "Capacity measured across a series of increasing currents, then returned to the starting rate. Separates genuine rate limitation from irreversible damage.",
+      "instrument": {
+        "controls": "current, stepped between blocks of cycles",
+        "measures": "voltage and capacity",
+        "configuration": "usually two-electrode",
+        "principle": "A sequence of constant-current blocks at increasing rate, with a return to the initial rate at the end."
+      },
+      "cell": {
+        "whatHappens": "At higher currents, transport and kinetic limitations mean less of the material is accessed within the voltage window, so measured capacity falls. Whether that loss is recoverable is the question the test is designed to answer.",
+        "dependsOn": ["particle size", "electrode thickness and porosity", "electrolyte conductivity", "temperature", "mass loading"]
+      },
+      "appliedSignal": {
+        "waveform": "blocks of constant-current cycles at ascending rates, then a return block",
+        "parameters": [
+          { "name": "Rate sequence", "guidance": "Typically ascending over one to two orders of magnitude. The exact ladder is a research decision." },
+          { "name": "Cycles per rate", "guidance": "Enough for the capacity to stabilise at each rate — the first cycle after a rate change is often not representative." },
+          { "name": "Return block", "guidance": "The most important part of the test, and the most often omitted. Without it you cannot tell reversible rate limitation from permanent degradation." }
+        ]
+      },
+      "response": { "measured": "capacity at each rate", "outputColumns": ["cycle index", "current", "discharge capacity"], "plot": "capacity vs cycle, grouped by rate" },
+      "processing": { "steps": ["Average the stabilised cycles within each rate block", "Express as capacity retention relative to the lowest rate", "Compare the return block with the initial block"], "formulaIds": ["formula.c_rate", "formula.coulombic_efficiency"] },
+      "interpretation": {
+        "learnMode": "Push harder and you get less out. The clever part is the end: go back to the gentle rate. If the capacity comes back, the material was just being rushed. If it does not, something was damaged.",
+        "researchMode": "Capacity loss at high rate that recovers fully on returning to the initial rate indicates transport or kinetic limitation. Loss that does not recover indicates irreversible degradation induced by the high-rate cycling. Reporting rate capability without the return block leaves those two conclusions indistinguishable."
+      },
+      "limitations": [
+        "Identifies THAT the material is rate-limited, not WHICH process limits it — that needs impedance or a diffusion measurement.",
+        "Strongly dependent on electrode thickness and mass loading, so thin-electrode results may not transfer to practical loadings.",
+        "The measured rate capability is a property of the electrode as fabricated, not of the material alone."
+      ],
+      "commonMistakes": [
+        "Omitting the return block.",
+        "Comparing rate capability between studies at different mass loadings.",
+        "Averaging in the first cycle after each rate change."
+      ],
+      "applications": ["Assessing power capability", "Comparing electrode formulations", "Screening particle size or morphology effects"],
+      "relatedIds": ["formula.c_rate", "method.cc_charge_discharge", "concept.bt_active_mass"],
+      "tags": ["battery tester", "rate", "protocol"]
+    },
+
+    {
+      "id": "method.long_term_cycling",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Long-term cycling",
+      "aliases": ["cycle life", "long term cycling", "cycling stability"],
+      "summary": "Repeated charge–discharge at a fixed rate over hundreds to thousands of cycles, tracking how capacity and efficiency evolve.",
+      "instrument": {
+        "controls": "current",
+        "measures": "voltage, capacity and efficiency per cycle",
+        "configuration": "usually two-electrode",
+        "principle": "The same constant-current step repeated in a loop, with per-cycle quantities recorded throughout."
+      },
+      "cell": {
+        "whatHappens": "Over many cycles, structural change, interfacial growth, dissolution, loss of contact and electrolyte consumption accumulate. Capacity typically falls and impedance typically rises.",
+        "dependsOn": ["chemistry", "voltage window", "rate", "temperature", "electrolyte", "electrode adhesion"]
+      },
+      "appliedSignal": {
+        "waveform": "repeated constant-current cycles, sometimes with a CV stage",
+        "parameters": [
+          { "name": "Rate", "guidance": "Fixed for the whole test. Changing it mid-study makes the retention curve uninterpretable." },
+          { "name": "Cycle count", "guidance": "Set by the question. Retention over 100 cycles says little about a system intended for thousands." },
+          { "name": "Temperature", "guidance": "Should be controlled and reported. Ambient laboratory temperature is not constant, and degradation is temperature-sensitive." }
+        ]
+      },
+      "response": { "measured": "capacity and coulombic efficiency per cycle", "outputColumns": ["cycle index", "charge capacity", "discharge capacity", "coulombic efficiency"], "plot": "capacity retention and CE vs cycle number" },
+      "processing": {
+        "steps": ["Normalise capacity to a defined reference cycle — and state which", "Compute per-cycle coulombic efficiency", "Look at the SHAPE of the fade, not only its endpoint"],
+        "formulaIds": ["formula.coulombic_efficiency"]
+      },
+      "interpretation": {
+        "learnMode": "How long does it last? Watch two things: how much capacity is left, and how efficient each cycle is. Efficiency slipping below its usual value often signals trouble before capacity does.",
+        "researchMode": "The shape of the retention curve is more informative than the final number. Linear fade, square-root-like fade and sudden drops suggest different dominant mechanisms. Coulombic efficiency is the more sensitive early indicator: a small persistent shortfall accumulates, and CE consistently above 100% points to a soft short or shuttle rather than good performance."
+      },
+      "limitations": [
+        "Shows THAT capacity fades, not why — attributing a cause requires impedance, post-mortem analysis or both.",
+        "Retention percentages are meaningless without stating the reference cycle, the rate and the cycle count.",
+        "Accelerated conditions (high rate, high temperature) may not reproduce the degradation pathway of normal use."
+      ],
+      "commonMistakes": [
+        "Normalising to the first cycle, which is dominated by formation.",
+        "Comparing retention across studies with different rates or cycle counts.",
+        "Ignoring coulombic efficiency because capacity still looks acceptable."
+      ],
+      "applications": ["Cycle life assessment", "Comparing electrolytes, binders or coatings", "Stability screening"],
+      "relatedIds": ["formula.coulombic_efficiency", "method.cc_charge_discharge", "method.capacity_retention"],
+      "tags": ["battery tester", "cycling", "degradation"]
+    },
+
+    {
+      "id": "method.capacity_retention",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Capacity retention",
+      "aliases": ["capacity retention", "capacity fade"],
+      "summary": "Not a separate experiment — an analysis derived from cycling data, expressing capacity relative to a chosen reference cycle.",
+      "instrument": {
+        "controls": "nothing additional",
+        "measures": "derived from long-term cycling data",
+        "configuration": "as for the underlying cycling test",
+        "principle": "A post-processing step, not an instrument function. It is listed here because it is frequently reported as though it were a measurement in its own right."
+      },
+      "cell": { "whatHappens": "Nothing additional — this is arithmetic applied to data already recorded.", "dependsOn": ["everything that affected the underlying cycling test"] },
+      "appliedSignal": { "waveform": "none", "parameters": [ { "name": "Reference cycle", "guidance": "The single most consequential choice, and the one most often left unstated. Normalising to cycle 1 includes formation losses; normalising to a later cycle does not. The two give materially different retention figures for the same data." } ] },
+      "response": { "measured": "retention as a percentage of the reference cycle", "outputColumns": ["cycle index", "discharge capacity", "retention %"], "plot": "retention vs cycle number" },
+      "processing": { "steps": ["Choose and STATE the reference cycle", "Retention = Q_n / Q_ref × 100", "Report alongside the rate, the cycle count and the temperature"] },
+      "interpretation": {
+        "learnMode": "The percentage of the original capacity still available. Simple arithmetic — but which cycle you call 'original' changes the answer, so it has to be stated.",
+        "researchMode": "Retention is a ratio, and ratios hide their denominators. A retention figure without the reference cycle, rate, cycle count and temperature is not interpretable and cannot be compared with anything."
+      },
+      "limitations": [
+        "A single retention number discards the shape of the fade, which is where the mechanistic information is.",
+        "Not comparable between studies unless every parameter of the underlying test matches.",
+        "Says nothing about the cause of the loss."
+      ],
+      "commonMistakes": [
+        "Quoting a retention percentage without the reference cycle.",
+        "Comparing retention over different cycle counts as though equivalent."
+      ],
+      "applications": ["Summarising cycle-life performance", "Comparing formulations under identical protocols"],
+      "relatedIds": ["method.long_term_cycling"],
+      "tags": ["battery tester", "analysis", "degradation"]
+    },
+
+    {
+      "id": "method.coulombic_efficiency",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Coulombic efficiency",
+      "aliases": ["coulombic efficiency", "CE", "faradaic efficiency"],
+      "summary": "Also an analysis rather than an experiment: the ratio of discharge to charge capacity within a cycle. One of the most sensitive early indicators of trouble.",
+      "instrument": {
+        "controls": "nothing additional",
+        "measures": "derived from charge and discharge capacities of the same cycle",
+        "configuration": "as for the underlying cycling test",
+        "principle": "Post-processing of capacities already recorded."
+      },
+      "cell": { "whatHappens": "Any charge that goes in but does not come out has been consumed irreversibly — interfacial layer growth, electrolyte decomposition, dissolution, or a parasitic pathway.", "dependsOn": ["electrolyte stability", "voltage window", "temperature", "rate", "cell integrity"] },
+      "appliedSignal": { "waveform": "none", "parameters": [ { "name": "Cycle pairing", "guidance": "Charge and discharge must come from the SAME cycle and the same voltage window. Mixing cycles produces a number that means nothing." } ] },
+      "response": { "measured": "efficiency as a percentage", "outputColumns": ["cycle index", "charge capacity", "discharge capacity"], "plot": "CE vs cycle number" },
+      "processing": { "steps": ["η = Q_discharge / Q_charge × 100, within one cycle", "Plot against cycle number rather than quoting a single value", "Investigate any value above 100%"], "formulaIds": ["formula.coulombic_efficiency"] },
+      "interpretation": {
+        "learnMode": "How much of what you put in comes back out. Consistently a little below 100% means something is being consumed each cycle. Above 100% is not good news — it usually means a fault.",
+        "researchMode": "Small persistent inefficiencies compound: 99.5% per cycle leaves roughly 61% after a thousand cycles. CE is therefore a far more sensitive early indicator than capacity itself. Values above 100% are not physically meaningful for an ideal cell and should be treated as a diagnostic prompt — soft internal short, redox shuttle, charge carried over from the previous cycle, or a current or mass entry error."
+      },
+      "limitations": [
+        "Sensitive to measurement resolution — distinguishing 99.9% from 99.95% requires a channel accurate enough to support it.",
+        "Affected by any CV stage, so cycles being compared must use identical protocols.",
+        "Does not identify which process is consuming the charge."
+      ],
+      "commonMistakes": [
+        "Quoting first-cycle CE as characteristic of the material.",
+        "Ignoring values above 100% instead of investigating them.",
+        "Comparing CE between protocols that differ in their CV termination current."
+      ],
+      "applications": ["Early detection of degradation", "Comparing electrolyte stability", "Detecting soft shorts"],
+      "relatedIds": ["formula.coulombic_efficiency", "method.long_term_cycling", "method.formation"],
+      "tags": ["battery tester", "analysis", "efficiency"]
+    },
+
+    {
+      "id": "method.pulse",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "Pulse testing",
+      "aliases": ["pulse test", "current pulse", "DCIR", "HPPC"],
+      "summary": "Short current pulses separated by rest, used to probe resistance and its dependence on state of charge.",
+      "instrument": {
+        "controls": "current, applied in short pulses",
+        "measures": "voltage response during and after each pulse",
+        "configuration": "two- or three-electrode",
+        "principle": "A step change in current produces an immediate ohmic response followed by slower polarisation — separating them in time separates them in origin."
+      },
+      "cell": {
+        "whatHappens": "The instant the current changes, the voltage jumps by I·R — purely ohmic. What follows over the next seconds to minutes is polarisation from charge transfer and transport, which builds and relaxes on slower timescales.",
+        "dependsOn": ["state of charge", "temperature", "pulse magnitude", "pulse duration", "cell impedance"]
+      },
+      "appliedSignal": {
+        "waveform": "current pulse, then rest, repeated across state of charge",
+        "parameters": [
+          { "name": "Pulse magnitude", "guidance": "Large enough for a measurable voltage response, small enough not to change the state of charge appreciably or push the cell outside its window." },
+          { "name": "Pulse duration", "guidance": "Determines which processes are captured. A resistance quoted from a pulse is meaningless without the duration it was measured over." },
+          { "name": "Sampling rate", "guidance": "Must be fast enough to resolve the initial ohmic step, which is the fastest feature in the whole measurement." }
+        ]
+      },
+      "response": { "measured": "voltage vs time through the pulse and relaxation", "outputColumns": ["time", "voltage", "current"], "plot": "V vs t around each pulse" },
+      "processing": { "steps": ["Read the immediate voltage step at pulse onset for the ohmic contribution", "Track the subsequent rise for polarisation", "Compute resistance as ΔV/ΔI, stating the timescale used"] },
+      "interpretation": {
+        "learnMode": "Give the cell a short push and watch how it responds. The instant jump is plain resistance; the slower drift afterwards is the chemistry catching up.",
+        "researchMode": "Pulse resistance is timescale-dependent by construction: a 10 ms value and a 10 s value capture different processes and are not interchangeable. Mapping pulse resistance against state of charge often reveals structure that a single average resistance hides entirely."
+      },
+      "limitations": [
+        "The resistance obtained depends on the pulse duration, so values are only comparable at matched durations.",
+        "Cannot separate individual contributions the way impedance spectroscopy can.",
+        "Requires sampling fast enough to catch the ohmic step; too coarse and the ohmic and polarisation contributions merge."
+      ],
+      "commonMistakes": [
+        "Reporting a pulse resistance without stating the pulse duration.",
+        "Sampling too slowly to resolve the initial step.",
+        "Using pulses large enough to shift the state of charge during the measurement."
+      ],
+      "applications": ["Resistance vs state of charge", "Power capability assessment", "Tracking impedance growth over cycle life"],
+      "relatedIds": ["glossary.ir_drop", "concept.bt_four_wire", "concept.bt_sampling"],
+      "tags": ["battery tester", "resistance", "pulse"]
+    },
+
+    {
+      "id": "method.gitt",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "GITT — galvanostatic intermittent titration",
+      "aliases": ["GITT", "galvanostatic intermittent titration technique", "PITT & GITT"],
+      "summary": "A current pulse followed by a long rest, repeated across the state of charge, used to approach the near-equilibrium potential and probe transport.",
+      "instrument": {
+        "controls": "current, in pulses",
+        "measures": "voltage during the pulse and throughout the relaxation",
+        "configuration": "two- or three-electrode; three-electrode is preferable for material-level conclusions",
+        "principle": "Each pulse moves the cell a small step in state of charge; each rest lets it relax towards equilibrium at that new state."
+      },
+      "cell": {
+        "whatHappens": "During the pulse, concentration gradients build inside the active particles. During the rest, they relax, and the potential approaches the near-equilibrium value for that composition.",
+        "dependsOn": ["particle size and geometry", "diffusion coefficient", "state of charge", "temperature", "electrode structure"]
+      },
+      "appliedSignal": {
+        "waveform": "constant-current pulse, then open-circuit rest, repeated",
+        "parameters": [
+          { "name": "Pulse duration and current", "guidance": "Short and small enough that the assumptions of whatever analysis you intend to apply are not violated." },
+          { "name": "Rest duration", "guidance": "Long enough for the voltage drift to become small. Too short and the 'equilibrium' potential is not equilibrium — this is the most common source of error in GITT." },
+          { "name": "Number of steps", "guidance": "Sets the resolution in state of charge. A full GITT run can take days." }
+        ]
+      },
+      "response": { "measured": "voltage transients and quasi-equilibrium potentials across state of charge", "outputColumns": ["time", "voltage", "current", "capacity"], "plot": "V vs t, and quasi-OCV vs state of charge" },
+      "processing": { "steps": ["Extract the quasi-equilibrium potential at the end of each rest", "Analyse the pulse transient if a diffusion coefficient is wanted", "Check that rest drift had genuinely become small before treating a value as equilibrium"] },
+      "interpretation": {
+        "learnMode": "Nudge the cell a little, then let it settle completely, and repeat. The settled points trace out what the cell looks like when it is not being pushed.",
+        "researchMode": "The quasi-equilibrium potential curve is the most defensible product of GITT. Extracting a diffusion coefficient additionally requires a transport model whose assumptions — particle geometry, single-phase behaviour, known active area — must genuinely hold. Those assumptions are frequently violated in porous composite electrodes, and a diffusion coefficient obtained without checking them can be wrong by orders of magnitude."
+      },
+      "limitations": [
+        "Diffusion coefficients depend entirely on the assumed model and geometry; the number is only as good as those assumptions.",
+        "Very slow — a full run across the state of charge can take days.",
+        "Insufficient rest time systematically biases the quasi-equilibrium potential.",
+        "In a porous composite electrode, the effective diffusion length is not well defined."
+      ],
+      "commonMistakes": [
+        "Treating a still-drifting potential as equilibrium.",
+        "Quoting a diffusion coefficient without stating the model, geometry and assumed particle size.",
+        "Applying a single-particle model to a porous composite electrode without justification."
+      ],
+      "applications": ["Quasi-equilibrium potential curves", "Transport studies", "Comparing particle sizes or morphologies"],
+      "relatedIds": ["method.ocv", "method.pulse", "method.pitt"],
+      "tags": ["battery tester", "diffusion", "GITT"]
+    },
+
+    {
+      "id": "method.pitt",
+      "module": "battery-tester",
+      "_draft": true,
+      "name": "PITT — potentiostatic intermittent titration",
+      "aliases": ["PITT", "potentiostatic intermittent titration technique"],
+      "summary": "The potentiostatic counterpart of GITT: step the potential, let the current decay, repeat across the potential range.",
+      "instrument": {
+        "controls": "potential, in steps",
+        "measures": "current decay after each step",
+        "configuration": "two- or three-electrode; requires potentiostatic capability",
+        "principle": "Each potential step drives the electrode towards a new equilibrium composition; the current decay records how quickly it gets there."
+      },
+      "cell": {
+        "whatHappens": "A small potential step creates a driving force for composition change. The resulting current decays as the electrode approaches the composition corresponding to the new potential.",
+        "dependsOn": ["diffusion coefficient", "particle geometry", "step size", "phase behaviour", "temperature"]
+      },
+      "appliedSignal": {
+        "waveform": "potential steps, each held until the current decays below a threshold",
+        "parameters": [
+          { "name": "Step size", "guidance": "Small enough that the response stays within the regime the analysis assumes. Large steps span multiple processes." },
+          { "name": "Current cutoff", "guidance": "How far each step is allowed to relax. Sets both the total run time and how close to equilibrium each point actually is." }
+        ]
+      },
+      "response": { "measured": "current vs time after each step", "outputColumns": ["time", "voltage", "current", "capacity"], "plot": "I vs t per step; capacity vs potential" },
+      "processing": { "steps": ["Integrate the decay for the charge passed at each step", "Analyse the decay shape if a transport parameter is wanted", "Build the capacity-vs-potential relationship from the step charges"] },
+      "interpretation": {
+        "learnMode": "The mirror image of GITT: instead of pushing a fixed current and watching the voltage, you set a voltage and watch the current fade.",
+        "researchMode": "PITT is well suited to resolving behaviour near phase transitions, where the current response changes character. As with GITT, extracting transport parameters requires a model whose assumptions must be verified rather than assumed — and PITT's assumptions are, if anything, more restrictive."
+      },
+      "limitations": [
+        "Requires potentiostatic capability — check your instrument supports it in the configuration you need.",
+        "Model-dependent for any transport parameter, with restrictive assumptions.",
+        "Slow, and sensitive to the chosen current cutoff.",
+        "Two-phase regions violate the assumptions of the common analyses outright."
+      ],
+      "commonMistakes": [
+        "Applying single-phase diffusion analysis across a two-phase plateau.",
+        "Using steps large enough to span more than one process.",
+        "Assuming an instrument supports it without checking the specific configuration."
+      ],
+      "applications": ["Phase-transition behaviour", "Transport studies", "Capacity vs potential relationships"],
+      "relatedIds": ["method.gitt", "method.cv_hold"],
+      "tags": ["battery tester", "diffusion", "PITT"]
+    }
+  ]
+}

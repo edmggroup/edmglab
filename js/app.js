@@ -114,6 +114,15 @@ router.route('/battery-tester/:section', () => import('./battery-tester/index.js
 router.route('/workstation',          () => import('./echem/index.js'), { title: 'Electrochemical Workstation' });
 router.route('/workstation/:section', () => import('./echem/index.js'), { title: 'Electrochemical Workstation' });
 
+// One route serves methods from BOTH modules — techniques are looked up by
+// name, not by which instrument happens to own them.
+router.route('/method/:id', () => import('./views/method.js'), { title: 'Method' });
+
+// Troubleshooting: ONE engine over both modules' symptom libraries, because a
+// student with a symptom does not know which module it belongs to.
+router.route('/troubleshooting',     () => import('./views/troubleshooting.js'), { title: 'Troubleshooting' });
+router.route('/troubleshooting/:id', () => import('./views/troubleshooting.js'), { title: 'Troubleshooting' });
+
 router.start(document.getElementById('view-outlet'));
 
 /* ══════════════════════════════════════════════════════════

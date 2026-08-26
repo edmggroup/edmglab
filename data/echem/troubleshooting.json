@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "_README": "Electrochemical workstation troubleshooting — Instrumentation spec §33. EVERY entry offers MULTIPLE possible causes; the health check rejects single-cause entries. Diagnostics are ordered cheapest-and-most-likely first, and several deliberately start with 'is it the instrument, the cell, or the processing?' — the §34 separation used as a diagnostic tool. DRAFT — review before treating as teaching material.",
+  "items": [
+    {
+      "id": "troubleshooting.noisy_cv",
+      "module": "echem",
+      "symptom": "Noisy cyclic voltammogram",
+      "aliases": ["noisy CV", "noise", "spiky CV", "scatter"],
+      "summary": "The voltammogram is buried in noise or shows regular oscillation superimposed on the response.",
+      "causes": [
+        "Electrical interference picked up on long or poorly routed leads — mains pickup is the usual suspect",
+        "Poor or intermittent connection at any of the three electrodes",
+        "Control-loop oscillation from a high-impedance or partially blocked reference electrode",
+        "Bandwidth or stability setting inappropriate for the cell",
+        "Over-applied iR compensation driving the loop unstable",
+        "Current range far above the actual signal, so the measurement sits in the noise floor",
+        "Inadequate shielding — no Faraday cage where the currents are small",
+        "A genuinely unstable cell: bubbling, convection, or an evolving surface"
+      ],
+      "diagnostics": [
+        "First separate instrument from cell: is the noise periodic at mains frequency (instrument or shielding) or random and irregular (often the cell)?",
+        "Check every connection physically before changing any settings — intermittent contact is the most common cause and the quickest to rule out.",
+        "Reduce the current range to match the actual signal and repeat.",
+        "Set iR compensation to zero and repeat. If the noise disappears, it was over-compensation.",
+        "Move the cell into a Faraday cage, or simply shorten and re-route the leads.",
+        "Check the reference electrode: a blocked frit raises its impedance and destabilises the loop."
+      ],
+      "fixes": [
+        "Shorten and re-route leads; keep them away from mains cabling and stirrer motors",
+        "Use a Faraday cage for small currents",
+        "Select an appropriate current range",
+        "Reduce or remove iR compensation",
+        "Replace or refresh the reference electrode",
+        "Adjust the bandwidth or stability setting if your instrument exposes one"
+      ],
+      "safetyNotes": [],
+      "relatedIds": ["method.cv", "concept.ec_ir_compensation", "concept.ec_three_electrode"],
+      "tags": ["workstation", "CV", "noise"]
+    },
+    {
+      "id": "troubleshooting.large_semicircle",
+      "module": "echem",
+      "symptom": "Unexpectedly large semicircle in the Nyquist plot",
+      "aliases": ["large semicircle", "high Rct", "big arc", "large impedance"],
+      "summary": "The impedance arc is much larger than expected, implying a high charge-transfer resistance.",
+      "causes": [
+        "Genuinely slow interfacial kinetics",
+        "Poor electrical contact anywhere in the cell, adding resistance that the fit attributes to charge transfer",
+        "Incomplete wetting, so the electrochemically active area is far smaller than assumed",
+        "An unstable or evolving interface — the spectrum is describing a moving target",
+        "Incorrect cell connection, so the measurement is not of the intended interface",
+        "An inappropriate equivalent circuit, so a feature that is not a charge-transfer arc is being fitted as one",
+        "Measurement made at a DC bias where the kinetics genuinely are slow"
+      ],
+      "diagnostics": [
+        "Before interpreting anything, validate the spectrum: check the open-circuit potential was stable, and halve the amplitude to confirm linearity.",
+        "Check the high-frequency intercept. If the ohmic resistance is also unexpectedly high, the problem is more likely contact or electrolyte than kinetics.",
+        "Re-measure after a longer rest — an interface still evolving gives an arc that shrinks or moves between successive spectra.",
+        "Re-assemble the cell and repeat. A large change points to contact rather than kinetics.",
+        "Measure at a different DC bias: charge-transfer resistance is bias-dependent, so a single spectrum is a single operating point.",
+        "Try a simpler circuit. If it fits comparably, the elaborate one was not justified."
+      ],
+      "fixes": [
+        "Improve contact and re-assemble",
+        "Allow full wetting before measuring",
+        "Wait for a stable open-circuit potential before starting the sweep",
+        "Report the DC bias with every spectrum",
+        "Justify the circuit on physical grounds before fitting, not after"
+      ],
+      "safetyNotes": [],
+      "relatedIds": ["method.eis", "method.eis_fitting", "concept.ec_eis_validity"],
+      "tags": ["workstation", "EIS", "impedance"]
+    },
+    {
+      "id": "troubleshooting.unstable_ocp",
+      "module": "echem",
+      "symptom": "Unstable or drifting open-circuit potential",
+      "aliases": ["unstable OCP", "drifting potential", "OCP not settling"],
+      "summary": "The potential will not settle, or keeps sliding in one direction.",
+      "causes": [
+        "Insufficient equilibration time — the cell simply has not finished settling",
+        "Incomplete wetting of a porous electrode",
+        "Reference electrode problem: drying out, a blocked frit, or a changed filling solution",
+        "A genuinely unstable interface, corroding or dissolving",
+        "Cell leakage or evaporation of the electrolyte",
+        "Temperature drift in the laboratory",
+        "Electrical noise picked up on the high-impedance sensing path"
+      ],
+      "diagnostics": [
+        "Look at the SHAPE, not the endpoint. A drift rate that decreases means slow equilibration; a roughly constant drift rate means something is continuously changing.",
+        "Test the reference against a second, known-good reference in the same electrolyte. This is the single most informative check and is often skipped.",
+        "Extend the rest substantially and see whether it eventually settles.",
+        "Check for leakage, evaporation and bubbles at the electrode surface.",
+        "Record the laboratory temperature alongside the potential.",
+        "Swap in a fresh cell with the same reference to separate cell from reference."
+      ],
+      "fixes": [
+        "Allow longer equilibration, judged by drift rate rather than elapsed time",
+        "Refresh, refill or replace the reference electrode",
+        "Seal the cell against evaporation",
+        "Improve shielding of the sensing leads",
+        "Control the laboratory temperature, or at least record it"
+      ],
+      "safetyNotes": [],
+      "relatedIds": ["method.ocp", "concept.ec_three_electrode", "concept.ec_eis_validity"],
+      "tags": ["workstation", "OCP", "reference electrode"]
+    },
+    {
+      "id": "troubleshooting.unexpected_current",
+      "module": "echem",
+      "symptom": "Unexpected or excessive current",
+      "aliases": ["unexpected current", "high current", "leakage current", "background current"],
+      "summary": "Current appears where none was expected, or is much larger than the process being studied should produce.",
+      "causes": [
+        "Potential window outside the electrolyte's stability range, so decomposition current is being recorded",
+        "Side reactions — dissolved oxygen, water in a nominally non-aqueous system, or impurities",
+        "Leakage current through a damaged or contaminated cell",
+        "Background current from the electrode substrate or current collector",
+        "Incorrect connection, so a different interface is being measured than intended",
+        "Instrument compliance reached, giving a response that is not what was requested",
+        "Capacitive charging current mistaken for faradaic current, particularly at high scan rates"
+      ],
+      "diagnostics": [
+        "Run a blank: the same cell and electrolyte with a bare substrate. Whatever current remains is background, not your material. This is the most decisive single test.",
+        "Narrow the potential window and repeat. Current that disappears was window-related.",
+        "Purge the electrolyte and repeat, to test for dissolved oxygen.",
+        "Vary the scan rate: capacitive current scales with v, faradaic peaks with v^b. That difference separates them.",
+        "Verify the lead connections against the intended configuration.",
+        "Check whether compliance was reached at any point during the measurement."
+      ],
+      "fixes": [
+        "Restrict the potential window to the electrolyte's stable range",
+        "Purge dissolved oxygen where the measurement requires it",
+        "Use a clean substrate and record its blank response",
+        "Correct the cell connections",
+        "Report background-corrected data, and state that the correction was applied"
+      ],
+      "safetyNotes": [
+        "Large unexpected currents can cause gas evolution and heating. Stop the measurement and inspect the cell rather than letting it continue."
+      ],
+      "relatedIds": ["method.cv", "method.lsv", "concept.ec_compliance", "method.polarization"],
+      "tags": ["workstation", "current", "background"]
+    },
+    {
+      "id": "troubleshooting.loop_oscillation",
+      "module": "echem",
+      "symptom": "Control loop oscillation or ringing",
+      "aliases": ["oscillation", "ringing", "unstable loop", "instrument oscillating"],
+      "summary": "The response shows regular high-frequency oscillation that is not a property of the cell.",
+      "causes": [
+        "High-impedance reference electrode — a blocked frit or a dried-out reference",
+        "Over-applied iR compensation",
+        "Bandwidth or stability setting too high for the cell",
+        "Long leads adding inductance, particularly in the counter-electrode path",
+        "A very low-impedance cell driven by an instrument configured for a high-impedance one"
+      ],
+      "diagnostics": [
+        "Set iR compensation to zero. If the oscillation stops, it was over-compensation — this is the quickest check and a very common cause.",
+        "Substitute a known-good reference electrode.",
+        "Reduce the bandwidth or stability setting if your instrument exposes one.",
+        "Shorten the leads and re-route them.",
+        "Recognise the signature: oscillation is regular and at a frequency unrelated to your scan rate, which is what distinguishes it from real electrochemistry."
+      ],
+      "fixes": [
+        "Remove or substantially reduce iR compensation",
+        "Replace or refresh the reference electrode",
+        "Lower the bandwidth setting",
+        "Shorten and re-route cabling"
+      ],
+      "safetyNotes": [
+        "A loop oscillating at large amplitude can drive the cell well outside its intended potential window. Stop the measurement rather than letting it run."
+      ],
+      "relatedIds": ["concept.ec_ir_compensation", "method.ir_compensation", "method.cv"],
+      "tags": ["workstation", "instrument", "artefact"]
+    }
+  ]
+}

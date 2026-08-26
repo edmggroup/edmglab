@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 1,
+  "_README": "Electrochemical workstation method library — Instrumentation spec §18, in the §34 five-layer shape. Aliases include the technique names printed in OrigaLys OrigaMaster (from the OrigaFlex catalogue) so a student searching the term on the lab instrument's screen finds the right page. DRAFT — review before treating as teaching material. No instrument specifications appear here.",
+  "items": [
+    {
+      "id": "method.ocp",
+      "module": "echem", "_draft": true,
+      "name": "Open-circuit potential (OCP)",
+      "aliases": ["OCP", "Open Circuit Potential (OCP)", "open circuit potential", "rest potential"],
+      "summary": "No current is imposed; the working electrode's potential against the reference is recorded over time. Normally the first measurement of any session.",
+      "instrument": { "controls": "nothing", "measures": "potential", "configuration": "three-electrode preferred", "principle": "The current path is left open and only the high-impedance sensing path is used." },
+      "cell": { "whatHappens": "The electrode drifts towards the potential at which no net current flows. How it approaches that value says as much as the value itself.", "dependsOn": ["electrode surface state", "electrolyte", "wetting", "temperature", "dissolved oxygen"] },
+      "appliedSignal": { "waveform": "none", "parameters": [
+        { "name": "Duration", "guidance": "Run until the drift rate is small, not for a fixed time. Slow drift and true equilibrium look identical over a short window." },
+        { "name": "Stability criterion", "guidance": "Decide in advance what counts as stable — a drift rate, not a duration — and apply it consistently." } ] },
+      "response": { "measured": "potential vs time", "outputColumns": ["time", "potential"], "plot": "E vs t" },
+      "processing": { "steps": ["Read the final potential and the drift rate at the end", "Record the value; every subsequent measurement is referenced to this starting state"] },
+      "interpretation": {
+        "learnMode": "A settled potential means the cell is ready. A potential that keeps sliding means something is still changing — wetting, a leak, or a reference electrode going wrong.",
+        "researchMode": "Persistent drift is diagnostic. A reference problem, a leak and incomplete wetting produce different drift signatures, and the shape of the trace distinguishes them better than the endpoint. Starting a CV or an impedance sweep on a drifting cell violates the stationarity those methods assume."
+      },
+      "limitations": ["Nothing quantitative about capacity, kinetics or resistance.", "A measurement stopped early looks stable when it is not.", "The expected value is system-specific; there is no universal target."],
+      "commonMistakes": ["Using a fixed rest time regardless of whether the cell settled.", "Skipping it entirely before impedance."],
+      "applications": ["Confirming readiness to measure", "Reference-electrode health checks", "Detecting leaks and shorts"],
+      "relatedIds": ["concept.ec_eis_validity", "method.ocv"],
+      "tags": ["workstation", "OCP", "diagnostics"]
+    },
+
+    {
+      "id": "method.cv",
+      "module": "echem", "_draft": true,
+      "name": "Cyclic voltammetry (CV)",
+      "aliases": ["CV", "Pot. Cyclic Voltammetry (CV)", "Pot. Advanced Cyclic Voltammetry", "Gal. Cyclic Voltammetry", "cyclic voltammogram"],
+      "summary": "The potential is swept back and forth between limits while the current is recorded. The most widely used and most widely over-interpreted electrochemical technique.",
+      "instrument": { "controls": "potential", "measures": "current", "configuration": "three-electrode for material-level results; two-electrode gives device-level", "principle": "A triangular potential waveform is imposed and the resulting current recorded continuously." },
+      "cell": { "whatHappens": "As the potential sweeps, processes become thermodynamically accessible in turn. Capacitive charging gives a roughly rectangular response; faradaic reactions give peaks.", "dependsOn": ["electrode material", "electrolyte", "concentration", "geometry", "scan rate", "cell configuration", "background current"] },
+      "appliedSignal": { "waveform": "triangular potential sweep, repeated for the requested cycles", "parameters": [
+        { "name": "Potential window", "guidance": "Bounded by electrolyte stability. Sweeping beyond it records decomposition current, which is easily mistaken for capacity." },
+        { "name": "Scan rate", "guidance": "Not a free choice — it sets which processes can keep up. Sweeping a series of rates is what makes the data interpretable; a single rate rarely is." },
+        { "name": "Number of cycles", "guidance": "The first cycle is usually not representative. Report which cycle you are showing." },
+        { "name": "Step / sample interval", "guidance": "Fine enough to resolve peaks. Under-sampling lowers apparent peak height and shifts apparent peak position." } ] },
+      "response": { "measured": "current vs potential", "outputColumns": ["potential", "current", "time", "cycle"], "plot": "i vs E" },
+      "processing": { "steps": [
+        "Identify peak potentials and currents, stating the baseline used",
+        "Integrate for charge where appropriate — and state the integration limits",
+        "Repeat across scan rates and fit log(i_p) vs log(v) for a b-value",
+        "Measure the solution resistance independently before reading kinetics into peak separation"],
+        "formulaIds": ["formula.specific_capacitance"] },
+      "interpretation": {
+        "learnMode": "Sweep the voltage up and down and watch where current flows. Peaks mean a reaction is happening at that potential; a flat box means charge is being stored at the surface.",
+        "researchMode": "Shape is only interpretable alongside scan-rate dependence. A b-value near 0.5 indicates diffusion-controlled behaviour and near 1 surface-controlled, but b is an empirical descriptor over a limited window, not a mechanism. Peak separation reflects both electron-transfer kinetics and uncompensated resistance, and the two cannot be separated from a voltammogram alone."
+      },
+      "limitations": [
+        "Does not give the capacity or capacitance obtainable in a device — GCD at a defined current does that.",
+        "Peak separation confounds kinetics with uncompensated resistance without an independent resistance measurement.",
+        "A b-value is meaningless without stating the scan-rate window and the potential at which it was evaluated.",
+        "Says nothing about long-term stability."
+      ],
+      "commonMistakes": ["Reporting a single scan rate and drawing mechanistic conclusions.", "Integrating a CV to a capacitance without stating the window and mass basis.", "Ignoring background and electrolyte decomposition at the window extremes."],
+      "applications": ["Mapping where charge storage occurs", "Distinguishing capacitive from faradaic behaviour", "Screening potential windows"],
+      "relatedIds": ["concept.ec_three_electrode", "concept.ec_ir_compensation", "method.lsv", "method.gcd_ec", "formula.specific_capacitance"],
+      "tags": ["workstation", "CV", "voltammetry"]
+    },
+
+    {
+      "id": "method.lsv",
+      "module": "echem", "_draft": true,
+      "name": "Linear sweep voltammetry (LSV)",
+      "aliases": ["LSV", "Pot. Linear Voltammetry", "linear sweep"],
+      "summary": "The potential is swept once in a single direction. Useful where the return sweep would complicate rather than clarify.",
+      "instrument": { "controls": "potential", "measures": "current", "configuration": "three-electrode", "principle": "A single-direction potential ramp." },
+      "cell": { "whatHappens": "The same physics as CV, without the reverse sweep — so no information about reversibility, but also no interference from products generated on the forward sweep.", "dependsOn": ["electrode material", "electrolyte", "scan rate", "concentration", "geometry"] },
+      "appliedSignal": { "waveform": "single linear potential ramp", "parameters": [
+        { "name": "Potential range", "guidance": "Chosen to include the onset of interest with a clear baseline region before it — you cannot identify an onset without a baseline." },
+        { "name": "Scan rate", "guidance": "Slow enough to approach steady state where that is the intention, and stated in every case." } ] },
+      "response": { "measured": "current vs potential", "outputColumns": ["potential", "current", "time"], "plot": "i vs E" },
+      "processing": { "steps": ["Establish the baseline before the feature of interest", "Define and STATE the criterion used for any onset potential", "Correct for background where appropriate"] },
+      "interpretation": {
+        "learnMode": "One sweep in one direction. Good for asking 'at what voltage does this start happening?'",
+        "researchMode": "Onset potentials are criterion-dependent — a threshold current, a threshold current density, or an extrapolated intercept give different numbers from the same data. The criterion must be stated for the value to be comparable with anything."
+      },
+      "limitations": ["No information about reversibility.", "Onset values depend on the criterion and on the background correction.", "Still subject to uncompensated resistance."],
+      "commonMistakes": ["Reporting an onset without stating the criterion.", "Comparing onsets between studies using different current-density thresholds."],
+      "applications": ["Onset potentials", "Electrolyte stability windows", "Polarisation behaviour"],
+      "relatedIds": ["method.cv", "concept.ec_ir_compensation"],
+      "tags": ["workstation", "LSV", "voltammetry"]
+    },
+
+    {
+      "id": "method.ca",
+      "module": "echem", "_draft": true,
+      "name": "Chronoamperometry (CA)",
+      "aliases": ["CA", "Chrono Amperometry (CA)", "potential step"],
+      "summary": "The potential is stepped and the resulting current decay is recorded against time.",
+      "instrument": { "controls": "potential", "measures": "current", "configuration": "three-electrode", "principle": "A step change in potential, held while the current relaxes." },
+      "cell": { "whatHappens": "The step drives the interface to a new condition. Double-layer charging responds almost immediately; faradaic processes and transport follow more slowly.", "dependsOn": ["step magnitude", "diffusion", "electrode area", "electrolyte", "double-layer capacitance"] },
+      "appliedSignal": { "waveform": "potential step, held", "parameters": [
+        { "name": "Step potential", "guidance": "Chosen relative to the feature of interest, with the starting potential also stated — the step is defined by both ends." },
+        { "name": "Duration", "guidance": "Long enough for the decay to reveal its shape; the first instants are dominated by double-layer charging, not by the faradaic process." },
+        { "name": "Sampling", "guidance": "Fast at the start. The most informative region is also the shortest." } ] },
+      "response": { "measured": "current vs time", "outputColumns": ["time", "current", "potential"], "plot": "i vs t, sometimes i vs t^(−1/2)" },
+      "processing": { "steps": ["Discard or account for the initial charging transient", "Integrate for total charge passed", "Test any diffusion analysis against its own assumptions before applying it"] },
+      "interpretation": {
+        "learnMode": "Jump the voltage and watch how the current dies away. Fast decay means the process finishes quickly; a slow tail means something is limiting it.",
+        "researchMode": "The early current is dominated by double-layer charging and cannot be treated as faradaic. Diffusion analyses assume a geometry and a regime that must be verified — planar semi-infinite diffusion is a common default assumption and a common source of error in porous composite electrodes."
+      },
+      "limitations": ["The initial transient can swamp the faradaic response entirely.", "Diffusion coefficients are model-dependent and geometry-dependent.", "Uncompensated resistance distorts the effective step actually applied."],
+      "commonMistakes": ["Fitting a diffusion model through the charging transient.", "Assuming planar diffusion in a porous electrode."],
+      "applications": ["Charge passed at a defined potential", "Transport studies", "Deposition and dissolution kinetics"],
+      "relatedIds": ["method.cp", "method.pitt", "concept.ec_ir_compensation"],
+      "tags": ["workstation", "CA", "step"]
+    },
+
+    {
+      "id": "method.cp",
+      "module": "echem", "_draft": true,
+      "name": "Chronopotentiometry (CP)",
+      "aliases": ["CP", "Chrono Potentiometry (CP)", "current step"],
+      "summary": "The current is stepped and the potential response is recorded. The mirror image of chronoamperometry.",
+      "instrument": { "controls": "current", "measures": "potential", "configuration": "three-electrode", "principle": "A step change in current, held while the potential responds." },
+      "cell": { "whatHappens": "The instant the current changes, the potential jumps by I·R. What follows is polarisation building on slower timescales as concentration gradients develop.", "dependsOn": ["current magnitude", "uncompensated resistance", "kinetics", "transport", "electrode area"] },
+      "appliedSignal": { "waveform": "current step, held", "parameters": [
+        { "name": "Current magnitude", "guidance": "Large enough to give a measurable response, small enough to keep the potential inside the electrolyte's stability window." },
+        { "name": "Sampling", "guidance": "Fast enough to resolve the immediate IR step — that step is the whole reason to prefer CP for a resistance measurement." } ] },
+      "response": { "measured": "potential vs time", "outputColumns": ["time", "potential", "current"], "plot": "E vs t" },
+      "processing": { "steps": ["Read the ohmic contribution from the immediate step at the current change", "Track the subsequent polarisation separately", "Identify transition times where the potential moves sharply"] },
+      "interpretation": {
+        "learnMode": "Push a fixed current and watch the voltage. The instant jump is resistance; everything after that is the chemistry responding.",
+        "researchMode": "CP separates ohmic from kinetic and transport polarisation in the time domain, which is its main advantage over a steady-state measurement — but only if sampling resolves the step. Too coarse and the two merge into a single number that is neither."
+      },
+      "limitations": ["Requires fast sampling to separate ohmic from kinetic contributions.", "A single current gives no rate information.", "Potential can leave the stable window if the current is too large."],
+      "commonMistakes": ["Sampling too slowly to resolve the IR step.", "Reporting a resistance without stating the timescale it was read over."],
+      "applications": ["Resistance measurement", "Transition-time studies", "Complement to chronoamperometry"],
+      "relatedIds": ["method.ca", "glossary.ir_drop", "concept.ec_ir_compensation"],
+      "tags": ["workstation", "CP", "step"]
+    },
+
+    {
+      "id": "method.gcd_ec",
+      "module": "echem", "_draft": true,
+      "name": "Galvanostatic charge–discharge on a workstation",
+      "aliases": ["GCD", "Single Charge or Discharge", "Gal. Charge and Discharge Cycle", "galvanostatic cycling"],
+      "summary": "Constant-current cycling run on the workstation rather than a cycler — appropriate for small currents, few cycles, or when a reference electrode is needed.",
+      "instrument": { "controls": "current", "measures": "potential", "configuration": "three-electrode for material-level results; two-electrode for device-level", "principle": "The same measurement a cycler performs, with the workstation's finer current resolution and the option of a reference electrode." },
+      "cell": { "whatHappens": "Charge is added or removed at a fixed rate; the potential responds according to how the material stores it.", "dependsOn": ["active material", "current density", "potential window", "mass loading", "cell configuration"] },
+      "appliedSignal": { "waveform": "constant current, reversing at the potential limits", "parameters": [
+        { "name": "Current density", "guidance": "State the normalisation basis — per gram of active material, per area, or absolute." },
+        { "name": "Potential window", "guidance": "For a three-electrode measurement this is the single-electrode window, which is NOT the device window. Confusing the two is a common and consequential error." },
+        { "name": "Sampling", "guidance": "Fine enough to resolve the IR drop at each reversal." } ] },
+      "response": { "measured": "potential vs time", "outputColumns": ["time", "potential", "current", "capacity"], "plot": "E vs t, or E vs capacity" },
+      "processing": { "steps": [
+        "Read the IR drop at each current reversal and decide — explicitly — whether it is included in ΔV",
+        "Take the discharge slope for a capacitance, or integrate for a capacity",
+        "Apply the formula variant matching your cell configuration"],
+        "formulaIds": ["formula.specific_capacitance", "formula.coulombic_efficiency"] },
+      "interpretation": {
+        "learnMode": "Same idea as on the cycler, but with a reference electrode you are watching one electrode rather than the whole device — and those give different numbers.",
+        "researchMode": "The three-electrode single-electrode capacitance and the single-electrode-equivalent value from a symmetric two-electrode device differ by a factor conventionally taken as four. Nothing in the raw data announces which situation you are in, which is why the cell configuration must be recorded alongside every result."
+      },
+      "limitations": [
+        "Not suited to thousands of cycles — that is what a cycler is for.",
+        "Results are not comparable across studies unless current density, window, mass basis, cell configuration and IR convention all match.",
+        "A single capacitance value does not describe a material whose response varies strongly with potential."
+      ],
+      "commonMistakes": ["Applying the three-electrode formula to two-electrode data.", "Not stating whether the IR drop is inside ΔV.", "Comparing a single-electrode window with a device window."],
+      "applications": ["Material-level capacitance and capacity", "Rate studies at small currents", "Single-electrode behaviour within a device"],
+      "relatedIds": ["formula.specific_capacitance", "concept.ec_three_electrode", "concept.specific_capacitance", "method.cc_charge_discharge"],
+      "tags": ["workstation", "GCD", "capacitance"]
+    },
+
+    {
+      "id": "method.eis",
+      "module": "echem", "_draft": true,
+      "name": "Electrochemical impedance spectroscopy (EIS)",
+      "aliases": ["EIS", "Pot. Dynamic EIS", "Gal. Dynamic EIS", "Fixed Frequency EIS", "impedance spectroscopy"],
+      "summary": "A small alternating signal is applied across a range of frequencies and the complex impedance measured, separating processes by their characteristic timescales.",
+      "instrument": { "controls": "a small AC potential (PEIS) or AC current (GEIS) about a DC level", "measures": "complex impedance — magnitude and phase", "configuration": "two-, three- or four-electrode", "principle": "Different processes respond on different timescales, so sweeping frequency separates them in a way no single-timescale measurement can." },
+      "cell": { "whatHappens": "Fast processes (ohmic conduction) dominate at high frequency; interfacial charge transfer in the mid range; transport at low frequency.", "dependsOn": ["electrolyte conductivity", "interfacial kinetics", "electrode structure", "state of charge", "temperature"] },
+      "appliedSignal": { "waveform": "small-amplitude sinusoid swept across frequency, superimposed on a DC bias", "parameters": [
+        { "name": "Amplitude", "guidance": "Small enough that the response stays linear — commonly a few mV to about 10 mV. The correct test is empirical: halve it and confirm the spectrum does not change." },
+        { "name": "Frequency range", "guidance": "High enough to capture the ohmic intercept, low enough to reach the transport regime. Low frequencies take a long time, which is where drift creeps in." },
+        { "name": "Points per decade", "guidance": "Enough to define the features you intend to fit; more points cost time, and time costs stationarity." },
+        { "name": "DC bias", "guidance": "Must be stated. Impedance is bias-dependent, so a spectrum without its bias is not interpretable." } ] },
+      "response": { "measured": "real and imaginary impedance vs frequency", "outputColumns": ["frequency", "Z_real", "Z_imag", "|Z|", "phase"], "plot": "Nyquist (−Z″ vs Z′), Bode magnitude and Bode phase" },
+      "processing": { "steps": [
+        "Check linearity, stationarity and causality BEFORE interpreting anything",
+        "Read the high-frequency intercept for the ohmic resistance",
+        "Fit an equivalent circuit only if one is physically justifiable — and report the fit quality and the parameter correlations",
+        "Cross-check any interpretation against independent evidence"] },
+      "interpretation": {
+        "learnMode": "Wiggle the cell gently at many different speeds. Fast wiggles only feel the easy stuff; slow ones feel everything. The pattern separates the contributions.",
+        "researchMode": "The high-frequency intercept is the most robust quantity a spectrum provides. Everything beyond it involves a model. More than one equivalent circuit can usually fit the same data, so a good fit is evidence of nothing on its own; physical plausibility, parameter correlation and independent corroboration all have to be considered before an element is assigned a physical meaning."
+      },
+      "limitations": [
+        "Equivalent circuits are non-unique. Fit quality is not evidence of physical correctness.",
+        "Drift during acquisition corrupts the low-frequency points — exactly the ones usually used to argue about diffusion.",
+        "Too large an amplitude breaks linearity, and nothing in the spectrum announces that it happened.",
+        "Cable inductance can produce an artefactual high-frequency tail."
+      ],
+      "commonMistakes": ["Skipping the linearity check.", "Starting a sweep on a drifting cell.", "Reporting circuit parameters without the fit quality or the circuit itself.", "Treating a depressed semicircle's diameter read by eye as Rct."],
+      "applications": ["Ohmic resistance", "Separating interfacial from transport limitations", "Tracking impedance growth over cycle life"],
+      "relatedIds": ["concept.ec_eis_validity", "concept.ec_ir_compensation", "method.eis_fitting", "method.ocp"],
+      "tags": ["workstation", "EIS", "impedance"]
+    },
+
+    {
+      "id": "method.polarization",
+      "module": "echem", "_draft": true,
+      "name": "Polarisation curves",
+      "aliases": ["polarization", "polarisation curve", "Polarization for corrosion (Tafel)", "General corrosion (Rp)"],
+      "summary": "Current measured as the potential is moved away from equilibrium, mapping how the system responds to an imposed driving force.",
+      "instrument": { "controls": "potential (or current, for galvanostatic polarisation)", "measures": "the other", "configuration": "three-electrode", "principle": "A slow sweep or a series of held steps away from the open-circuit condition." },
+      "cell": { "whatHappens": "Moving away from equilibrium drives net reaction. Close to equilibrium the response is roughly linear; further away, kinetics and then transport dominate in turn.", "dependsOn": ["kinetics", "transport", "electrode area", "electrolyte", "surface condition"] },
+      "appliedSignal": { "waveform": "slow potential sweep or stepped potentials, symmetric about the open-circuit value", "parameters": [
+        { "name": "Range", "guidance": "Chosen relative to the open-circuit potential, which must therefore be stable and recorded first." },
+        { "name": "Sweep rate or hold time", "guidance": "Slow enough to approach steady state. A fast sweep measures a transient, not a polarisation curve." } ] },
+      "response": { "measured": "current vs potential", "outputColumns": ["potential", "current", "time"], "plot": "i vs E, or log|i| vs overpotential" },
+      "processing": { "steps": ["Reference every potential to the measured open-circuit value", "Correct for uncompensated resistance before any kinetic analysis", "Identify which region is kinetically controlled before fitting anything to it"] },
+      "interpretation": {
+        "learnMode": "Push the system away from its resting point and see how hard it pushes back. Small pushes give a nearly straight-line response; bigger ones do not.",
+        "researchMode": "Only the kinetically-controlled region supports kinetic analysis. Regions affected by mass transport, uncompensated resistance or side reactions do not, and fitting through them produces confident-looking numbers that mean nothing."
+      },
+      "limitations": ["Kinetic parameters are only valid in a genuinely kinetically-controlled region.", "Uncompensated resistance distorts the curve and must be corrected first.", "Slow sweeps can themselves alter the surface being measured."],
+      "commonMistakes": ["Fitting through a mass-transport-limited region.", "Not correcting for uncompensated resistance.", "Sweeping too fast and reporting a transient as steady state."],
+      "applications": ["Corrosion studies", "Electrocatalysis", "Characterising the response to imposed driving force"],
+      "relatedIds": ["method.tafel", "method.lsv", "concept.ec_ir_compensation"],
+      "tags": ["workstation", "polarisation", "corrosion"]
+    },
+
+    {
+      "id": "method.tafel",
+      "module": "echem", "_draft": true,
+      "name": "Tafel analysis",
+      "aliases": ["Tafel", "Tafel slope", "Polarization for corrosion (Tafel)"],
+      "summary": "A conceptual treatment of the linear region of overpotential against log current, used to extract kinetic descriptors — and very easy to misapply.",
+      "instrument": { "controls": "potential or current", "measures": "the other", "configuration": "three-electrode", "principle": "Not a separate instrument function — an analysis applied to polarisation data." },
+      "cell": { "whatHappens": "Where the response is limited purely by interfacial kinetics, the overpotential varies approximately linearly with the logarithm of current.", "dependsOn": ["interfacial kinetics", "surface area", "electrolyte", "whether a genuine Tafel region exists at all"] },
+      "appliedSignal": { "waveform": "as for polarisation", "parameters": [
+        { "name": "Fitting range", "guidance": "The single decision that determines the answer. It must lie inside a genuinely kinetically-controlled, linear region — identified from the data, not chosen for convenience." } ] },
+      "response": { "measured": "overpotential vs log current density", "outputColumns": ["potential", "current", "log|i|"], "plot": "η vs log|i|" },
+      "processing": { "steps": [
+        "Correct for uncompensated resistance FIRST — uncorrected data curves and biases the slope",
+        "Identify a region that is genuinely linear over a meaningful range, ideally more than one decade of current",
+        "Fit only within that region, and report the range used",
+        "State the current normalisation basis"] },
+      "interpretation": {
+        "learnMode": "In a certain range, plotting overpotential against the logarithm of current gives a straight line whose slope says something about how the reaction proceeds. Outside that range it says nothing.",
+        "researchMode": "A Tafel slope is only meaningful within a genuinely kinetically-controlled region. Regions influenced by mass transport, uncompensated resistance, capacitive current or side reactions do not qualify, and a fit through them is not a Tafel slope — it is a straight line drawn through unsuitable data. Reporting one without the fitting range and the iR correction makes it uncheckable."
+      },
+      "limitations": [
+        "Requires a genuine Tafel region, which many systems simply do not have.",
+        "Highly sensitive to the fitting range chosen.",
+        "Invalid where mass transport, capacitive current or side reactions contribute.",
+        "Not applicable to predominantly capacitive systems such as EDLC electrodes — a common misapplication in supercapacitor work."
+      ],
+      "commonMistakes": [
+        "Fitting a non-linear region because it looks approximately straight over a narrow window.",
+        "Omitting the iR correction.",
+        "Applying it to capacitive electrodes where it has no meaning.",
+        "Reporting a slope without the fitting range."
+      ],
+      "applications": ["Electrocatalysis", "Corrosion rate estimation", "Comparing kinetics between catalysts under identical conditions"],
+      "relatedIds": ["method.polarization", "concept.ec_ir_compensation"],
+      "tags": ["workstation", "Tafel", "kinetics"]
+    },
+
+    {
+      "id": "method.ir_compensation",
+      "module": "echem", "_draft": true,
+      "name": "iR compensation",
+      "aliases": ["iR compensation", "IR compensation", "positive feedback", "current interrupt", "HFR (High Frequency Resistance)"],
+      "summary": "Correcting for the potential dropped across the electrolyte between working and reference electrodes, rather than at the interface.",
+      "instrument": { "controls": "a correction proportional to the measured current", "measures": "the uncompensated resistance, and the corrected response", "configuration": "three-electrode", "principle": "Either applied in real time by positive feedback, or measured by briefly interrupting the current and observing the instantaneous voltage change." },
+      "cell": { "whatHappens": "Part of the applied potential is dropped across the electrolyte and never reaches the interface, so the electrode experiences less driving force than the instrument reports.", "dependsOn": ["electrolyte conductivity", "reference electrode placement", "cell geometry", "current magnitude"] },
+      "appliedSignal": { "waveform": "a correction term, not an independent measurement", "parameters": [
+        { "name": "Resistance value", "guidance": "Measure it — commonly from the high-frequency intercept of an impedance spectrum, which OrigaMaster reports as HFR. Do not guess it." },
+        { "name": "Compensation level", "guidance": "Applying the full measured resistance is usually unsafe; a fraction is used. Over-compensation drives the control loop into oscillation." } ] },
+      "response": { "measured": "the corrected potential response", "outputColumns": ["potential", "current", "applied compensation"], "plot": "corrected vs uncorrected overlay" },
+      "processing": { "steps": ["Measure Ru independently", "Apply a fraction and check for oscillation", "Report whether compensation was applied and how much", "Treat any feature that appears only at high compensation as suspect until it survives a lower setting"] },
+      "interpretation": {
+        "learnMode": "Some of the voltage you apply is wasted pushing current through the liquid. Compensation gives that part back — but overdo it and the instrument starts oscillating and inventing features.",
+        "researchMode": "Uncompensated resistance and slow electron-transfer kinetics broaden a response similarly, so an independent Ru measurement is what separates them. Compensation cannot address resistance internal to the electrode itself, and over-compensation is capable of manufacturing peaks that are pure instrument artefact."
+      },
+      "limitations": ["Cannot correct resistance inside the electrode.", "Over-compensation causes oscillation and artefacts.", "The correction is only as good as the resistance measurement behind it."],
+      "commonMistakes": ["Guessing Ru rather than measuring it.", "Applying 100% compensation.", "Not reporting whether compensation was used."],
+      "applications": ["Kinetic studies", "High-current measurements", "Low-conductivity electrolytes"],
+      "relatedIds": ["concept.ec_ir_compensation", "method.eis", "glossary.ir_drop"],
+      "tags": ["workstation", "resistance", "correction"]
+    },
+
+    {
+      "id": "method.eis_fitting",
+      "module": "echem", "_draft": true,
+      "name": "Equivalent-circuit fitting",
+      "aliases": ["EIS fitting", "equivalent circuit fitting", "circuit model"],
+      "summary": "Fitting an impedance spectrum to a circuit model. Powerful, routinely over-trusted, and the place where most impedance work goes wrong.",
+      "instrument": { "controls": "nothing", "measures": "derived from an impedance spectrum", "configuration": "as for the underlying EIS measurement", "principle": "A post-processing step: circuit parameters are adjusted until the model reproduces the measured spectrum." },
+      "cell": { "whatHappens": "Nothing additional. The cell is not involved — this is analysis of data already recorded.", "dependsOn": ["the quality and validity of the underlying spectrum", "the circuit chosen", "the fitting weights"] },
+      "appliedSignal": { "waveform": "none", "parameters": [
+        { "name": "Circuit choice", "guidance": "The most consequential decision by far. It must be justified physically BEFORE fitting, not chosen because it happens to fit best afterwards." },
+        { "name": "Initial values and weighting", "guidance": "Both affect the result. Strongly correlated parameters — CPE parameters and Rct especially — can trade off against each other and still give a good fit." } ] },
+      "response": { "measured": "fitted circuit parameters with uncertainties", "outputColumns": ["element", "value", "error"], "plot": "measured vs fitted overlay, plus residuals" },
+      "processing": { "steps": [
+        "Validate the spectrum first — linearity, stationarity, causality",
+        "Justify the circuit on physical grounds before fitting",
+        "Inspect the RESIDUALS, not just the overall error figure",
+        "Check parameter correlations",
+        "Test whether a simpler circuit fits comparably; if it does, prefer it"] },
+      "interpretation": {
+        "learnMode": "Find a set of electrical components that behaves like your cell. A good match is encouraging — but several different sets can match the same data equally well, so it is not proof of anything.",
+        "researchMode": "Circuit models are non-unique. Adding elements always improves the fit, so fit quality alone cannot justify a more complex circuit. Assigning physical meaning to an element requires the model to have been justified independently, the residuals to be structureless, the parameters to be reasonably uncorrelated, and the values to be physically plausible — and even then it remains an interpretation rather than a measurement."
+      },
+      "limitations": [
+        "Non-unique: more than one circuit typically fits the same spectrum.",
+        "Fit quality is not evidence of physical correctness.",
+        "Strong parameter correlation can make individual values unreliable even when the overall fit looks excellent.",
+        "Fitting an invalid spectrum produces confident numbers from meaningless data."
+      ],
+      "commonMistakes": [
+        "Choosing the circuit after fitting, on the basis of which fits best.",
+        "Reporting parameters without the circuit, the fit quality or the residuals.",
+        "Adding elements until the fit improves and treating that as physical insight."
+      ],
+      "applications": ["Extracting resistance and capacitance descriptors", "Tracking parameter evolution over cycling", "Comparing systems under identical modelling assumptions"],
+      "relatedIds": ["method.eis", "concept.ec_eis_validity"],
+      "tags": ["workstation", "EIS", "modelling"]
+    }
+  ]
+}

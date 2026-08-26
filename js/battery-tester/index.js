@@ -20,10 +20,12 @@ import * as data from '../data.js';
 import { mountScene } from '../lib/anim-engine.js';
 import { renderDiagram } from '../lib/diagram.js';
 import { ccScene, cvScene, ccCvScene, cellScene } from './animations.js';
+import { renderMethodList } from '../lib/method-view.js';
 
 const SECTIONS = [
   { id: 'overview',   label: 'Overview' },
   { id: 'instrument', label: 'Instrument' },
+  { id: 'methods',    label: 'Methods' },
   { id: 'principles', label: 'CC · CV · CC-CV' },
   { id: 'transport',  label: 'Inside the cell' },
   { id: 'protocol',   label: 'Protocol builder' }
@@ -60,6 +62,7 @@ export async function render(outlet, ctx) {
 async function mountSection(id, host) {
   switch (id) {
     case 'instrument': return sectionInstrument(host);
+    case 'methods':    return sectionMethods(host);
     case 'principles': return sectionPrinciples(host);
     case 'transport':  return sectionTransport(host);
     case 'protocol':   return sectionProtocol(host);
@@ -237,4 +240,26 @@ async function sectionProtocol(host) {
     </section>`;
   const mod = await import('./protocol-builder.js');
   return mod.render(host.querySelector('#bt-builder'));
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   Method library (§6)
+   ════════════════════════════════════════════════════════════ */
+
+async function sectionMethods(host) {
+  const methods = await data.items('bt/methods');
+  host.innerHTML = `
+    <section class="section">
+      <div class="section-head"><h2>Battery testing methods</h2>
+        <span class="section-note">§6 · ${methods.length} methods</span></div>
+      <p class="small" style="max-width:72ch;margin-bottom:1rem">
+        Every method states what the instrument <strong>controls</strong> and what it
+        <strong>measures</strong> before anything else, then what happens in the cell, what you set,
+        what comes back, how it is processed, and — always — what it cannot tell you.
+      </p>
+      <div id="bt-methods"></div>
+    </section>`;
+  return renderMethodList(host.querySelector('#bt-methods'), methods,
+    { emptyMessage: 'The battery testing method library' });
 }
