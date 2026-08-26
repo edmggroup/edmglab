@@ -1,0 +1,39 @@
+{
+  "name": "EDMGLAB — Energy Devices & Materials Group",
+  "short_name": "EDMGLAB",
+  "description": "Interactive research and learning platform for supercapacitors, batteries, electrode materials, characterisation and electrochemical analysis.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1116",
+  "theme_color": "#0e1116",
+  "categories": ["education", "science", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "pwa/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Battery Tester",  "url": "./#/battery-tester" },
+    { "name": "Formula Library", "url": "./#/formulas" },
+    { "name": "Calculators",     "url": "./#/calculators" }
+  ]
+}
