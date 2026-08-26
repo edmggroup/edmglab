@@ -26,9 +26,12 @@ const SECTIONS = [
   { id: 'overview',   label: 'Overview' },
   { id: 'instrument', label: 'Instrument' },
   { id: 'methods',    label: 'Methods' },
+  { id: 'cells',      label: 'Cells' },
+  { id: 'workflow',   label: 'Workflow' },
   { id: 'principles', label: 'CC · CV · CC-CV' },
   { id: 'transport',  label: 'Inside the cell' },
-  { id: 'protocol',   label: 'Protocol builder' }
+  { id: 'protocol',   label: 'Protocol builder' },
+  { id: 'safety',     label: 'Safety' }
 ];
 
 export async function render(outlet, ctx) {
@@ -63,6 +66,9 @@ async function mountSection(id, host) {
   switch (id) {
     case 'instrument': return sectionInstrument(host);
     case 'methods':    return sectionMethods(host);
+    case 'cells':      return sectionCells(host);
+    case 'workflow':   return sectionWorkflow(host);
+    case 'safety':     return sectionSafety(host);
     case 'principles': return sectionPrinciples(host);
     case 'transport':  return sectionTransport(host);
     case 'protocol':   return sectionProtocol(host);
@@ -262,4 +268,50 @@ async function sectionMethods(host) {
     </section>`;
   return renderMethodList(host.querySelector('#bt-methods'), methods,
     { emptyMessage: 'The battery testing method library' });
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   Cell formats and configurations (§4)
+   ════════════════════════════════════════════════════════════ */
+
+async function sectionCells(host) {
+  host.innerHTML = `
+    <section class="section">
+      <div class="section-head"><h2>Cells</h2>
+        <span class="section-note">§4 · format vs configuration</span></div>
+      <div id="bt-cells"></div>
+    </section>`;
+  const mod = await import('./cells.js');
+  return mod.render(host.querySelector('#bt-cells'));
+}
+
+/* ════════════════════════════════════════════════════════════
+   Testing workflow (§5)
+   ════════════════════════════════════════════════════════════ */
+
+async function sectionWorkflow(host) {
+  host.innerHTML = `
+    <section class="section">
+      <div class="section-head"><h2>Testing workflow</h2>
+        <span class="section-note">§5 · assembly to completed run</span></div>
+      <div id="bt-workflow"></div>
+    </section>`;
+  const mod = await import('./workflow.js');
+  return mod.renderWorkflow(host.querySelector('#bt-workflow'));
+}
+
+/* ════════════════════════════════════════════════════════════
+   Safety (§12)
+   ════════════════════════════════════════════════════════════ */
+
+async function sectionSafety(host) {
+  host.innerHTML = `
+    <section class="section">
+      <div class="section-head"><h2>Safety</h2>
+        <span class="section-note">§12 · orientation, not procedure</span></div>
+      <div id="bt-safety"></div>
+    </section>`;
+  const mod = await import('./workflow.js');
+  return mod.renderSafety(host.querySelector('#bt-safety'));
 }

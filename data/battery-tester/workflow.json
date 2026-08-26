@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "_README": "Battery testing workflow — Instrumentation spec §5. Every step carries purpose, controlled and measured parameters, expected result, considerations, common mistakes, safety and data output. DRAFT — review before treating as procedure. This is a teaching outline, NOT a laboratory SOP: your group's own written procedure always takes precedence.",
+  "items": [
+    {
+      "id": "wf.assembly", "n": 1, "name": "Cell assembly", "phase": "prepare",
+      "purpose": "Build the cell so that every later measurement is about the material rather than about how the cell was put together.",
+      "controlled": "—", "measured": "—",
+      "expected": "A sealed cell with even contact pressure, full separator coverage and sufficient electrolyte.",
+      "considerations": [
+        "Record the active material mass NOW, independently of the instrument. This is the number every gravimetric result depends on.",
+        "Keep the assembly sequence identical between cells — crimping pressure, spacer choice and spring orientation all affect reproducibility.",
+        "Make the separator overhang the electrode on all sides."
+      ],
+      "mistakes": [
+        "Not recording the mass, or recording it only on the instrument where it cannot be checked later",
+        "Varying assembly details between cells and then attributing the scatter to the material",
+        "Too little electrolyte for the electrode's porosity"
+      ],
+      "safety": ["Assemble air- and moisture-sensitive chemistries in an appropriate controlled atmosphere. Follow your group's written procedure, not this outline."],
+      "dataOutput": "None yet — but the mass recorded here propagates into every result that follows."
+    },
+    {
+      "id": "wf.inspection", "n": 2, "name": "Inspection", "phase": "prepare",
+      "purpose": "Catch a bad cell before spending days of channel time on it.",
+      "controlled": "—", "measured": "visual condition; sometimes open-circuit voltage",
+      "expected": "No deformation, no leakage, an open-circuit voltage in a plausible range for the chemistry and assembled state.",
+      "considerations": [
+        "A freshly built cell has a characteristic starting voltage range for its chemistry. A value far outside it usually means a short or a mis-assembly.",
+        "Check the crimp or seal visually before connecting anything."
+      ],
+      "mistakes": ["Skipping inspection and discovering the fault a week into a cycling run", "Ignoring a voltage reading that does not make sense"],
+      "safety": ["Do not put a deformed, swollen or leaking cell on test. Isolate it and follow your group's disposal procedure."],
+      "dataOutput": "A recorded initial voltage and condition note."
+    },
+    {
+      "id": "wf.connection", "n": 3, "name": "Connection", "phase": "prepare",
+      "purpose": "Connect the cell to the channel so that what the instrument measures is the cell and not the wiring.",
+      "controlled": "—", "measured": "—",
+      "expected": "Firm, correct-polarity contact, with sense leads at the cell terminals where four-wire sensing is available.",
+      "considerations": [
+        "Confirm polarity before starting. Reversed connection can damage a cell and in some chemistries is hazardous.",
+        "Where the channel supports four-wire sensing, use it and check where the sense leads actually attach.",
+        "Record which channel each cell is on, next to its mass."
+      ],
+      "mistakes": ["Reversed polarity", "Two-wire sensing used without realising, so lead resistance is measured as cell resistance", "Cell connected to a different channel than the schedule was assigned to"],
+      "safety": ["Verify polarity before applying any current."],
+      "dataOutput": "Channel assignment record."
+    },
+    {
+      "id": "wf.rest", "n": 4, "name": "Rest", "phase": "settle",
+      "purpose": "Let the cell wet fully and settle before anything is imposed on it.",
+      "controlled": "nothing — current held at zero", "measured": "voltage",
+      "expected": "Voltage drift slowing to a small, decreasing rate.",
+      "considerations": [
+        "Judge readiness by the drift RATE, not by elapsed time. Slow drift and true equilibrium look identical over a short window.",
+        "Porous electrodes and viscous electrolytes may need considerably longer than expected."
+      ],
+      "mistakes": ["Using a fixed rest time regardless of whether the cell settled", "Starting the schedule while the cell is still wetting"],
+      "safety": [],
+      "dataOutput": "Voltage vs time — the baseline every later measurement is referenced to."
+    },
+    {
+      "id": "wf.ocv", "n": 5, "name": "OCV measurement", "phase": "settle",
+      "purpose": "Record the settled open-circuit voltage and confirm the cell is healthy enough to test.",
+      "controlled": "nothing", "measured": "voltage",
+      "expected": "A stable value consistent with the chemistry and assembled state.",
+      "considerations": [
+        "A voltage that continues to slide at a constant rate suggests self-discharge or a soft short rather than slow equilibration.",
+        "Record the value — it is the reference point for interpreting everything that follows."
+      ],
+      "mistakes": ["Treating a still-drifting value as the equilibrium voltage", "Not recording it at all"],
+      "safety": ["A cell whose voltage is falling steadily should be investigated before current is applied."],
+      "dataOutput": "Settled OCV and the drift rate at the end of the rest."
+    },
+    {
+      "id": "wf.formation", "n": 6, "name": "Formation", "phase": "condition",
+      "purpose": "Allow interfacial layers to form under controlled, low-rate conditions before the study proper begins.",
+      "controlled": "current (low rate)", "measured": "voltage and capacity",
+      "expected": "First-cycle coulombic efficiency below later cycles, then efficiency settling.",
+      "considerations": [
+        "Stop when coulombic efficiency has stabilised, not after a fixed number of cycles.",
+        "Formation cycles must never be pooled with steady-state cycles when reporting efficiency or capacity."
+      ],
+      "mistakes": ["Reporting first-cycle efficiency as characteristic of the material", "Starting a rate study before formation has settled"],
+      "safety": [],
+      "dataOutput": "First-cycle irreversible capacity; coulombic efficiency per formation cycle."
+    },
+    {
+      "id": "wf.charge", "n": 7, "name": "Charge", "phase": "cycle",
+      "purpose": "Add charge at a defined rate up to the upper voltage limit.",
+      "controlled": "current", "measured": "voltage",
+      "expected": "Voltage rising to the upper limit; the step ending on that limit rather than on its time limit.",
+      "considerations": [
+        "Take the voltage limits from the chemistry and electrolyte stability, never from another system's protocol.",
+        "Sample finely enough to resolve the IR step at the current change."
+      ],
+      "mistakes": ["Copying a voltage window from a different chemistry", "Calculating capacity from the programmed rather than the recorded current"],
+      "safety": ["Set voltage, current, capacity, time and temperature limits on every step. A step with no time limit can run indefinitely."],
+      "dataOutput": "Charge capacity; the charge branch of the V–Q curve."
+    },
+    {
+      "id": "wf.cvhold", "n": 8, "name": "CV hold (if applicable)", "phase": "cycle",
+      "purpose": "Hold at the upper voltage and let the current decay to a defined cutoff, giving a reproducible fully-charged state.",
+      "controlled": "voltage", "measured": "current",
+      "expected": "Current decaying monotonically below the termination threshold.",
+      "considerations": [
+        "The termination current sets how full the cell ends up — report it with any capacity derived from it.",
+        "Always set a time limit: a high-impedance cell may never reach the cutoff."
+      ],
+      "mistakes": ["Omitting the time limit", "Comparing CC-CV capacity with CC-only capacity", "Changing the cutoff partway through a study"],
+      "safety": [],
+      "dataOutput": "Additional charge during the hold; the CC/CV capacity split."
+    },
+    {
+      "id": "wf.rest2", "n": 9, "name": "Rest", "phase": "cycle",
+      "purpose": "Let the cell relax between charge and discharge so the next step starts from a defined state.",
+      "controlled": "nothing", "measured": "voltage",
+      "expected": "Voltage relaxing towards a quasi-equilibrium value.",
+      "considerations": ["The relaxation shape itself carries information about internal transport.", "Keep the rest duration identical across cycles being compared."],
+      "mistakes": ["Varying rest duration between cycles and then comparing them"],
+      "safety": [],
+      "dataOutput": "Relaxation transient; quasi-equilibrium voltage."
+    },
+    {
+      "id": "wf.discharge", "n": 10, "name": "Discharge", "phase": "cycle",
+      "purpose": "Remove charge at a defined rate down to the lower voltage limit — the step most results are calculated from.",
+      "controlled": "current", "measured": "voltage",
+      "expected": "Voltage falling to the lower limit, with an IR step at the current reversal.",
+      "considerations": [
+        "The discharge branch is where specific capacity, capacitance and IR drop are normally read.",
+        "Decide explicitly whether the IR drop is inside or outside ΔV, and state it."
+      ],
+      "mistakes": ["Not stating the IR convention", "Using total electrode mass in one calculation and active mass in another"],
+      "safety": ["Do not discharge below the lower limit to extract more capacity."],
+      "dataOutput": "Discharge capacity; the discharge branch; IR drop; coulombic efficiency when paired with the charge step."
+    },
+    {
+      "id": "wf.rest3", "n": 11, "name": "Rest", "phase": "cycle",
+      "purpose": "Relax before the next cycle begins.",
+      "controlled": "nothing", "measured": "voltage",
+      "expected": "Voltage recovering towards a quasi-equilibrium value.",
+      "considerations": ["Recovery that shrinks over cycle life can indicate rising impedance."],
+      "mistakes": ["Omitting the rest so each cycle starts from a different state"],
+      "safety": [],
+      "dataOutput": "Post-discharge relaxation."
+    },
+    {
+      "id": "wf.repeat", "n": 12, "name": "Repeat", "phase": "cycle",
+      "purpose": "Loop the cycle block for as many cycles as the question requires.",
+      "controlled": "current (per the loop)", "measured": "voltage, capacity and efficiency per cycle",
+      "expected": "Per-cycle capacity and coulombic efficiency, tracked over the full run.",
+      "considerations": [
+        "Keep every parameter fixed across the loop. Changing the rate mid-study makes the retention curve uninterpretable.",
+        "Check the step end-reason periodically rather than only at the end."
+      ],
+      "mistakes": ["Normalising retention to cycle 1, which is dominated by formation", "Changing protocol partway and comparing across the change"],
+      "safety": ["Check the cell periodically during long runs. Swelling, heating or leakage means stopping the test, not waiting for it to finish."],
+      "dataOutput": "Capacity retention; coulombic efficiency vs cycle number; the full cycling dataset."
+    }
+  ]
+}

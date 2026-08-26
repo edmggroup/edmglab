@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "_kind": "safety",
+  "_README": "Battery tester safety — Instrumentation spec §12. This is ORIENTATION, not a procedure: it explains what each hazard is, how it presents in the data, and what the instrument can and cannot protect against. It deliberately gives NO handling procedure for damaged, leaking, swollen, shorted or otherwise hazardous cells — that must come from your institution's own written safety procedure and training. DRAFT — review with your safety officer.",
+
+  "preamble": "Every limit below is something the instrument can be told to enforce. None of them prevents a hazard — they stop a test once a threshold is crossed. Preventing hazards is a matter of cell selection, assembly, protocol design and the condition of the cell before it ever reaches a channel.",
+
+  "groups": [
+    {
+      "id": "safety.electrical",
+      "title": "Electrical limits",
+      "note": "These are settings on the channel. Each should be set on EVERY step, including rests.",
+      "items": [
+        { "hazard": "Overvoltage", "what": "The cell is driven above its safe upper potential.",
+          "inData": "Charge continuing past the expected plateau, often with rising current acceptance and falling coulombic efficiency.",
+          "limit": "Upper voltage cutoff on every charge and CV step.",
+          "note": "Taken from the chemistry and electrolyte stability window — never copied from another system's protocol to chase capacity." },
+        { "hazard": "Undervoltage", "what": "The cell is discharged below its safe lower potential.",
+          "inData": "Discharge continuing past the expected end, sometimes with an apparent extra capacity that does not return on the next cycle.",
+          "limit": "Lower voltage cutoff on every discharge step.",
+          "note": "Over-discharge can cause irreversible damage that is not visible until later cycles." },
+        { "hazard": "Overcurrent", "what": "More current than the cell or the fixture can carry safely.",
+          "inData": "Large IR drop, heating, and a voltage that reaches its limit almost immediately.",
+          "limit": "Current limit per step, plus a channel-level maximum.",
+          "note": "A C-rate defined against the wrong nominal capacity is a common route to an unintended overcurrent." },
+        { "hazard": "Short circuit", "what": "A direct low-resistance path between the electrodes, internal or external.",
+          "inData": "Voltage collapsing towards zero; coulombic efficiency above 100%; a cell that will not hold its open-circuit voltage.",
+          "limit": "Minimum voltage and maximum current cutoffs will stop the step, but cannot prevent an internal short.",
+          "note": "An internal short is a cell condition, not an instrument setting. Take a suspected shorted cell off test." },
+        { "hazard": "Incorrect polarity", "what": "The cell connected the wrong way round.",
+          "inData": "Immediate voltage error on starting, or a mirrored and physically implausible curve.",
+          "limit": "Voltage limits will usually trip immediately.",
+          "note": "Verify polarity before applying current rather than relying on the trip." },
+        { "hazard": "Compliance limit reached", "what": "The channel cannot supply the voltage needed to drive the requested current.",
+          "inData": "Recorded current diverging silently from the setpoint.",
+          "limit": "A property of the channel, not a setting.",
+          "note": "Not itself dangerous, but it means the experiment did not run as designed — always integrate from the recorded current." }
+      ]
+    },
+    {
+      "id": "safety.thermal",
+      "title": "Thermal",
+      "note": "Temperature is both a safety limit and an experimental variable. It should be controlled and recorded, not merely bounded.",
+      "items": [
+        { "hazard": "Temperature limit exceeded", "what": "The cell or chamber exceeds the safe operating temperature.",
+          "inData": "Auxiliary temperature channel rising; capacity and impedance changing with it.",
+          "limit": "Temperature cutoff, where the channel supports an auxiliary probe.",
+          "note": "A temperature limit protects against an excursion; it does not prevent one." },
+        { "hazard": "Abnormal heating", "what": "The cell becomes warm during normal-rate cycling.",
+          "inData": "Often visible first as a growing IR drop or falling efficiency before any temperature reading moves.",
+          "limit": "Temperature cutoff plus current limits.",
+          "note": "Heating during a rate the cell should tolerate is a signal to stop and investigate, not to continue at a lower rate." }
+      ]
+    },
+    {
+      "id": "safety.cell",
+      "title": "Cell condition",
+      "note": "These are reasons NOT to place a cell on test, or to remove one that is already running. No instrument setting substitutes for inspection.",
+      "items": [
+        { "hazard": "Damaged cell", "what": "Deformed casing, damaged crimp or seal, or a cell that has been dropped.",
+          "inData": "May look normal initially — which is precisely why inspection matters.",
+          "limit": "None. This is a pre-test decision.",
+          "note": "Do not place a damaged cell on test. Follow your institution's procedure for isolation and disposal." },
+        { "hazard": "Swelling", "what": "Gas generation inside the cell, most visible in pouch formats.",
+          "inData": "Rising impedance, loss of contact, falling capacity — often before swelling is obvious.",
+          "limit": "None directly.",
+          "note": "Stop the test. Do not attempt to vent, puncture or compress a swollen cell." },
+        { "hazard": "Leakage", "what": "Electrolyte escaping the casing.",
+          "inData": "Erratic voltage, rising resistance, drifting open-circuit potential.",
+          "limit": "None directly.",
+          "note": "Stop the test and follow your institution's spill and disposal procedure. Leaked electrolyte can damage the fixture and the channel." },
+        { "hazard": "Unstable cell", "what": "A cell whose open-circuit voltage will not settle, or that behaves erratically between cycles.",
+          "inData": "Persistent drift at a roughly constant rate; coulombic efficiency wandering.",
+          "limit": "Voltage limits will eventually trip.",
+          "note": "Investigate rather than continuing to cycle in the hope it settles." }
+      ]
+    },
+    {
+      "id": "safety.setup",
+      "title": "Wiring and fixtures",
+      "note": "Most 'instrument faults' are actually contact faults.",
+      "items": [
+        { "hazard": "Poor or intermittent contact", "what": "Loose clips, oxidised surfaces, or insufficient fixture pressure.",
+          "inData": "Noise, apparent steps in the voltage trace, and an inflated IR drop.",
+          "limit": "None. This is an assembly and connection issue.",
+          "note": "Check contact before suspecting the material — it is the cheapest diagnostic and the most frequent cause." },
+        { "hazard": "Wiring faults", "what": "Damaged leads, wrong sense-lead placement, or crossed connections between channels.",
+          "inData": "Measurements that do not correspond to the cell you think you are testing.",
+          "limit": "None.",
+          "note": "Record which cell is on which channel, and verify it rather than assuming." }
+      ]
+    }
+  ],
+
+  "closing": "This page is orientation, not procedure. It deliberately gives no instructions for handling damaged, leaking, swollen or shorted cells — that must come from your institution's written safety procedure and from training, not from a web page."
+}

@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "_kind": "cells",
+  "_README": "Cell formats and cell configurations — Instrumentation spec §4. NOTE THE SPLIT: format (coin, pouch, cylindrical) is how the cell is physically built; configuration (half, full, symmetric, three-electrode) is what the measurement is ABOUT. Students routinely conflate them — a coin cell can be a half cell or a full cell. DRAFT content, review before use. Dimensions given are naming conventions only, not specifications.",
+
+  "formats": [
+    {
+      "id": "cell.coin",
+      "name": "Coin cell",
+      "subtitle": "CR-type, e.g. CR2032",
+      "summary": "The standard research format: a stack of discs sealed between two metal caps. Quick to build, cheap, and reproducible enough for comparison — provided assembly is consistent.",
+      "note": "The CR number is a size convention, not a chemistry: in CR2032 the '20' is the diameter in mm and the '32' the height in tenths of a mm. It says nothing about what is inside.",
+      "layers": [
+        { "id": "cap_pos", "label": "Positive cap", "t": 4, "fill": "metal",
+          "detail": "Forms the positive terminal and one half of the sealed casing. Also the current collector path for the positive side." },
+        { "id": "cathode", "label": "Positive electrode", "t": 5, "fill": "pos",
+          "detail": "The positive-side active material, usually coated on a foil current collector. In a half cell against lithium this is the electrode under study." },
+        { "id": "separator", "label": "Separator", "t": 4, "fill": "sep",
+          "detail": "Porous membrane soaked in electrolyte. Keeps the electrodes physically apart while letting ions through. Must fully cover the electrode — an overhanging edge is what prevents an edge short." },
+        { "id": "anode", "label": "Negative electrode", "t": 5, "fill": "neg",
+          "detail": "The negative-side active material or, in a half cell, a lithium or sodium metal disc acting as both counter and pseudo-reference." },
+        { "id": "spacer", "label": "Spacer disc", "t": 4, "fill": "metal",
+          "detail": "Stainless steel disc that takes up the remaining height and transmits pressure evenly. Its thickness is part of what makes assembly reproducible." },
+        { "id": "spring", "label": "Wave spring", "t": 4, "fill": "metal",
+          "detail": "Maintains contact pressure as the stack settles and as electrodes breathe during cycling. Inconsistent spring placement is a common source of cell-to-cell scatter." },
+        { "id": "gasket", "label": "Gasket", "t": 3, "fill": "insul",
+          "detail": "Polymer sealing ring. Seals against electrolyte loss AND electrically insulates the two caps from each other — a gasket seated wrongly gives either a leak or a short." },
+        { "id": "cap_neg", "label": "Negative cap", "t": 4, "fill": "metal",
+          "detail": "The negative terminal and the other half of the casing. Crimped onto the gasket to seal the cell." }
+      ],
+      "problems": [
+        "Inconsistent crimping pressure between cells, giving scatter that looks like material variation",
+        "Separator not fully covering the electrode, allowing an edge short",
+        "Too little electrolyte, so the electrode is not fully wetted",
+        "Gasket misseated — leaks, or shorts the two caps together"
+      ]
+    },
+    {
+      "id": "cell.pouch",
+      "name": "Pouch cell",
+      "subtitle": "laminated soft-case",
+      "summary": "Electrode stack or wound jelly-roll sealed in a laminated aluminium foil pouch. Scales to larger capacities and shows swelling directly — which is useful information rather than only a nuisance.",
+      "layers": [
+        { "id": "pouch_top", "label": "Laminate pouch", "t": 3, "fill": "insul",
+          "detail": "Aluminium-polymer laminate. Flexible, so gas generation shows as visible swelling — an early warning a rigid can hides." },
+        { "id": "tab_pos", "label": "Positive tab", "t": 3, "fill": "metal",
+          "detail": "Welded external contact. Weld quality directly sets contact resistance; a poor weld looks exactly like a high-resistance electrode in the data." },
+        { "id": "cathode_p", "label": "Positive electrode", "t": 5, "fill": "pos",
+          "detail": "Coated foil, often double-sided and stacked or wound with multiple layers." },
+        { "id": "sep_p", "label": "Separator", "t": 4, "fill": "sep",
+          "detail": "Between every electrode pair in the stack." },
+        { "id": "anode_p", "label": "Negative electrode", "t": 5, "fill": "neg",
+          "detail": "Usually made slightly larger than the positive electrode so its edges are not left facing bare separator." },
+        { "id": "tab_neg", "label": "Negative tab", "t": 3, "fill": "metal",
+          "detail": "The negative external contact." },
+        { "id": "pouch_bot", "label": "Laminate pouch", "t": 3, "fill": "insul",
+          "detail": "Heat-sealed around the edges, with the tabs passing through a sealed region." }
+      ],
+      "problems": [
+        "Seal failure at the tab crossing, the most common leak point",
+        "Gas generation causing swelling and loss of internal contact",
+        "Uneven stack pressure across a large area",
+        "Tab weld resistance mistaken for electrode resistance"
+      ]
+    },
+    {
+      "id": "cell.cylindrical",
+      "name": "Cylindrical cell",
+      "subtitle": "wound jelly-roll in a rigid can",
+      "summary": "Electrodes and separator wound into a spiral and sealed in a metal can. Mechanically robust and thermally well defined, but almost nothing inside can be inspected without destroying it.",
+      "layers": [
+        { "id": "can", "label": "Metal can", "t": 4, "fill": "metal",
+          "detail": "Rigid casing, usually also the negative terminal. Contains internal pressure rather than deforming — so gas build-up is not visible from outside." },
+        { "id": "roll_pos", "label": "Positive electrode", "t": 5, "fill": "pos",
+          "detail": "Long coated foil, wound spirally with the separator." },
+        { "id": "roll_sep", "label": "Separator", "t": 4, "fill": "sep",
+          "detail": "Wound between the electrodes along the full length of the roll." },
+        { "id": "roll_neg", "label": "Negative electrode", "t": 5, "fill": "neg",
+          "detail": "The counterpart foil in the winding." },
+        { "id": "vent", "label": "Vent / safety device", "t": 3, "fill": "insul",
+          "detail": "Pressure-relief and, in many designs, a current-interrupt device. A safety feature, not a performance one — and not something to defeat or bypass." },
+        { "id": "cap", "label": "Cap assembly", "t": 4, "fill": "metal",
+          "detail": "The positive terminal, insulated from the can." }
+      ],
+      "problems": [
+        "Internal pressure not visible from outside, unlike a pouch",
+        "Non-uniform current distribution along a long wound electrode",
+        "Thermal gradients between the core and the surface",
+        "Almost nothing can be inspected without destructive teardown"
+      ]
+    }
+  ],
+
+  "configurations": [
+    {
+      "id": "config.half",
+      "name": "Half cell",
+      "measures": "One electrode, against a counter that is effectively a reservoir",
+      "typical": "Material under study vs Li or Na metal",
+      "level": "material",
+      "formulaNote": "The measured potential is dominated by the electrode under study, because the metal counter electrode's potential barely moves. It is treated as a pseudo-reference — convenient, but it is not a true reference electrode and it does polarise at higher currents.",
+      "watchFor": "At high rate or over long cycling the metal electrode itself degrades, and that degradation appears in the data as though it belonged to the material under study."
+    },
+    {
+      "id": "config.full",
+      "name": "Full cell",
+      "measures": "The whole device — both electrodes together",
+      "typical": "Two different insertion electrodes, as in a practical cell",
+      "level": "device",
+      "formulaNote": "The measured voltage is the difference between two moving potentials. You cannot attribute a feature to one electrode without a reference, because both are changing at once.",
+      "watchFor": "Capacity is limited by whichever electrode runs out first, so a full-cell result reflects the pairing and the balancing, not either material alone."
+    },
+    {
+      "id": "config.symmetric",
+      "name": "Symmetric cell",
+      "measures": "Two nominally identical electrodes",
+      "typical": "Supercapacitor devices; also diagnostic cells for isolating one interface",
+      "level": "device (convertible to single-electrode equivalent)",
+      "formulaNote": "For a symmetric two-electrode device, the single-electrode-equivalent capacitance is conventionally reported as 4·I·Δt/(m_total·ΔV) — a factor of four arising from two electrodes in series each carrying half the device voltage, with m_total covering both. This is a DIFFERENT formula variant, not the same equation with different numbers.",
+      "watchFor": "Comparing a symmetric-device value directly with a three-electrode single-electrode value, without converting, is one of the most common errors in supercapacitor literature."
+    },
+    {
+      "id": "config.three_electrode",
+      "name": "Three-electrode cell",
+      "measures": "One electrode, against a genuine reference, while current flows elsewhere",
+      "typical": "Mechanistic studies; single-electrode behaviour inside a device",
+      "level": "material",
+      "formulaNote": "Because potential is measured against a stable reference carrying essentially no current, values are attributable to the single electrode under study — this is the configuration the material-level formulas assume.",
+      "watchFor": "Reference placement affects how much uncompensated resistance is included, and adding a reference to a practical format such as a coin cell is difficult and can perturb what it is measuring."
+    }
+  ]
+}
