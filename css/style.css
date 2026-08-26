@@ -200,17 +200,17 @@ code, kbd, samp, .num, .unit, .eqn {
 }
 .nav-scroll {
   flex: 1 1 auto; min-height: 0; overflow-y: auto;
-  padding: var(--sp-3) var(--sp-2);
+  padding: var(--sp-2);
   scrollbar-width: thin;
 }
 .nav-scroll::-webkit-scrollbar { width: 6px; }
 .nav-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 
-.nav-group + .nav-group { margin-top: var(--sp-3); }
+.nav-group + .nav-group { margin-top: var(--sp-2); }
 .nav-group-title {
-  font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.12em;
+  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.12em;
   color: var(--text-muted); font-weight: 650;
-  padding: 0 var(--sp-3) 5px;
+  padding: 0 var(--sp-3) 3px;
 }
 .nav-items { display: grid; gap: 1px; }
 
@@ -219,7 +219,7 @@ code, kbd, samp, .num, .unit, .eqn {
   padding: 0 var(--sp-3);
   min-height: 32px;
   color: var(--text-2); border-radius: var(--r-sm);
-  font-size: 0.8125rem; font-weight: 500;
+  font-size: var(--fs-sm); font-weight: 500;
   position: relative;
   transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
@@ -244,7 +244,7 @@ code, kbd, samp, .num, .unit, .eqn {
 /* Roadmap phase marker — a bare dimmed numeral. A bordered pill on every
    unbuilt module reads as clutter and competes with the labels. */
 .nav-phase {
-  flex: none; font-size: 0.625rem; font-family: var(--font-mono);
+  flex: none; font-size: 0.6875rem; font-family: var(--font-mono);
   color: var(--text-muted); opacity: 0.6; font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -254,14 +254,14 @@ code, kbd, samp, .num, .unit, .eqn {
    scientific modules. */
 .nav-footer {
   flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
-  gap: 2px; padding: 6px;
+  gap: 2px; padding: 4px;
   border-top: 1px solid var(--border);
   background: color-mix(in srgb, var(--bg) 40%, var(--surface));
 }
 .nav-util {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  padding: 5px 2px; border-radius: var(--r-sm);
-  color: var(--text-muted); font-size: 0.6rem; font-weight: 550;
+  padding: 4px 2px; border-radius: var(--r-sm);
+  color: var(--text-muted); font-size: 0.6875rem; font-weight: 550;
   letter-spacing: 0.01em; text-align: center; line-height: 1.2;
 }
 .nav-util:hover { background: var(--surface-2); color: var(--text-2); text-decoration: none; }
@@ -285,7 +285,7 @@ code, kbd, samp, .num, .unit, .eqn {
 .bottomnav-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   min-height: var(--bottomnav-h); padding: var(--sp-2) var(--sp-1);
-  color: var(--text-muted); font-size: 0.6875rem; font-weight: 550;
+  color: var(--text-muted); font-size: 0.75rem; font-weight: 550;
   background: none; border: 0; cursor: pointer; font-family: inherit;
 }
 .bottomnav-item:hover { text-decoration: none; color: var(--text-2); }
@@ -353,19 +353,22 @@ a.card:hover, button.card:hover {
    shared stylesheet.
    ============================================================ */
 
+/* Tabs WRAP onto a second row rather than scrolling sideways. A scrolling
+   tab bar hides destinations off-screen with no visual cue that they exist —
+   on the workstation module that would hide four of nine sections. */
 .tabbar {
-  display: flex; gap: 2px; overflow-x: auto; margin-bottom: var(--sp-5);
-  border-bottom: 1px solid var(--border); scrollbar-width: none;
+  display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--border);
 }
-.tabbar::-webkit-scrollbar { display: none; }
 .tab {
-  flex: none; padding: var(--sp-2) var(--sp-4);
+  flex: 0 1 auto; padding: var(--sp-2) var(--sp-3);
   font-size: var(--fs-sm); font-weight: 550; color: var(--text-2);
   border-bottom: 2px solid transparent; margin-bottom: -1px;
   white-space: nowrap; min-height: var(--touch-min);
   display: flex; align-items: center;
 }
 .tab:hover { color: var(--text); text-decoration: none; background: var(--surface-2); }
+@media (max-width: 620px) { .tab { padding: var(--sp-2); font-size: var(--fs-xs); } }
 .tab.is-active { color: var(--accent-strong); border-bottom-color: var(--accent); }
 
 .anim-block { margin-bottom: var(--sp-5); }
@@ -434,6 +437,9 @@ a.card:hover, button.card:hover {
    TABLES — horizontally scrollable, never breaking the page
    ============================================================ */
 
+/* Tables stack into cards well before they would need horizontal scrolling
+   (see responsive.css). overflow-x remains only as a last-resort guard for
+   content wider than any breakpoint anticipated. */
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: var(--r-md); }
 table { border-collapse: collapse; width: 100%; font-size: var(--fs-sm); }
 th, td { text-align: left; padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--border); }
@@ -541,11 +547,14 @@ td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-
    ============================================================ */
 
 .diagram { display: grid; gap: var(--sp-4); }
+/* No min-width and no overflow: the SVG scales to whatever width it is
+   given. Block diagrams additionally RE-LAYOUT into a single column on narrow
+   screens (see diagram.js) rather than shrinking into illegibility. */
 .diagram-stage {
   border: 1px solid var(--border); border-radius: var(--r-lg);
-  background: var(--bg); padding: var(--sp-3); overflow-x: auto;
+  background: var(--bg); padding: var(--sp-3);
 }
-.diagram-stage svg { display: block; width: 100%; height: auto; min-width: 460px; }
+.diagram-stage svg { display: block; width: 100%; height: auto; }
 
 .dg-block { cursor: pointer; }
 .dg-block rect {
@@ -611,7 +620,10 @@ td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-
 .chart-card { border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
 .chart-head { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--border); font-size: var(--fs-sm); font-weight: 600; }
 .chart-head .spacer { flex: 1 1 auto; }
-.chart-canvas-wrap { position: relative; padding: var(--sp-3); height: 320px; }
+/* Explicit height + maintainAspectRatio:false in charts.js means the canvas
+   always exactly fills this box — the plot can never spill outside it. */
+.chart-canvas-wrap { position: relative; padding: var(--sp-3); height: 360px; }
+@media (max-width: 620px) { .chart-canvas-wrap { height: 300px; } }
 .chart-hint { padding: var(--sp-2) var(--sp-3); border-top: 1px solid var(--border); font-size: var(--fs-xs); color: var(--text-muted); background: var(--surface-2); }
 
 /* ============================================================

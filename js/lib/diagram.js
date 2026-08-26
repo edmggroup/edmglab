@@ -32,6 +32,25 @@ const n = (t, a = {}) => {
  * @param {object} spec  the diagram JSON (see data/_schema/diagram.example.json)
  * @returns {{destroy:Function}}
  */
+/* Below this container width the authored horizontal layout is discarded and
+   the blocks are stacked in a single column instead. Scaling a 800-unit-wide
+   diagram down to a phone would leave 6px text; scrolling sideways hides
+   blocks with no cue that they exist. Re-laying out keeps everything visible
+   and legible, which is the only outcome that actually serves the reader. */
+const NARROW_PX = 660;
+
+/** Stacked single-column layout, generated from the block list. */
+function columnLayout(spec) {
+  const W = 360, PAD = 12, BW = W - PAD * 2, BH = 78, GAP = 34;
+  const blocks = spec.blocks.map((b, i) => ({
+    ...b, x: PAD, y: PAD + i * (BH + GAP), w: BW, h: BH
+  }));
+  return {
+    blocks,
+    viewBox: `0 0 ${W} ${PAD * 2 + blocks.length * (BH + GAP) - GAP}`
+  };
+}
+
 export function renderDiagram(container, spec) {
   if (!spec || !Array.isArray(spec.blocks) || !spec.blocks.length) {
     container.innerHTML = `<div class="callout callout-warn">This diagram has not been authored yet.</div>`;
@@ -41,19 +60,39 @@ export function renderDiagram(container, spec) {
   const wrap = document.createElement('div');
   wrap.className = 'diagram';
 
-  // ── Stage ──
   const stage = document.createElement('div');
   stage.className = 'diagram-stage';
+  wrap.appendChild(stage);
+
+  let selectedId = spec.blocks[0].id;
+  let isNarrow = null;
+  let blockEls = new Map();
+
+  /** (Re)build the SVG for the current width. */
+  function build() {
+    const narrow = (container.clientWidth || 800) < NARROW_PX;
+    if (narrow === isNarrow) return;
+    isNarrow = narrow;
+
+    const layout = narrow ? columnLayout(spec)
+                          : { blocks: spec.blocks, viewBox: spec.viewBox || '0 0 860 320' };
+
+    stage.innerHTML = '';
+    blockEls = new Map();
+    buildSvgInto(stage, spec, layout, blockEls, select);
+    select(selectedId);
+  }
+
+  function buildSvgInto(stageEl, spec, layout, blockEls, onSelect) {
   const svg = n('svg', {
-    viewBox: spec.viewBox || '0 0 860 320',
+    viewBox: layout.viewBox,
     role: 'group',
     'aria-label': spec.title || 'Interactive block diagram'
   });
-  stage.appendChild(svg);
-  wrap.appendChild(stage);
+  stageEl.appendChild(svg);
 
   // Connections first, so blocks paint on top of the lines.
-  const byId = Object.fromEntries(spec.blocks.map((b) => [b.id, b]));
+  const byId = Object.fromEntries(layout.blocks.map((b) => [b.id, b]));
   for (const c of spec.connections || []) {
     const a = byId[c.from], b = byId[c.to];
     if (!a || !b) { console.warn(`[diagram] connection references unknown block: ${c.from} → ${c.to}`); continue; }
@@ -61,8 +100,7 @@ export function renderDiagram(container, spec) {
   }
 
   // ── Blocks ──
-  const blockEls = new Map();
-  spec.blocks.forEach((b, i) => {
+  layout.blocks.forEach((b, i) => {
     const g = n('g', {
       class: 'dg-block',
       'data-id': b.id,
@@ -94,7 +132,7 @@ export function renderDiagram(container, spec) {
     svg.appendChild(g);
     blockEls.set(b.id, g);
 
-    const activate = () => select(b.id);
+    const activate = () => onSelect(b.id);
     g.addEventListener('click', activate);
     g.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
@@ -102,16 +140,17 @@ export function renderDiagram(container, spec) {
       // path through a signal chain.
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         e.preventDefault();
-        const next = spec.blocks[(i + 1) % spec.blocks.length];
+        const next = layout.blocks[(i + 1) % layout.blocks.length];
         blockEls.get(next.id)?.focus();
       }
       if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
         e.preventDefault();
-        const prev = spec.blocks[(i - 1 + spec.blocks.length) % spec.blocks.length];
+        const prev = layout.blocks[(i - 1 + layout.blocks.length) % layout.blocks.length];
         blockEls.get(prev.id)?.focus();
       }
     });
   });
+  }
 
   // ── Legend ──
   if (spec.blocks.some((b) => b.quantity === 'controlled' || b.quantity === 'measured')) {
@@ -134,18 +173,28 @@ export function renderDiagram(container, spec) {
 
   container.appendChild(wrap);
 
+  const specById = Object.fromEntries(spec.blocks.map((b) => [b.id, b]));
+
   function select(id) {
-    const b = byId[id];
+    const b = specById[id];
     if (!b) return;
+    selectedId = id;
     blockEls.forEach((el, key) => el.classList.toggle('is-selected', key === id));
     detail.querySelector('.panel-body').innerHTML = detailHtml(b);
     detail.querySelector('.panel-head').textContent = b.label;
   }
 
-  // Preselect the first block so the panel is never an empty box on load.
-  select(spec.blocks[0].id);
+  build();
 
-  return { destroy() { blockEls.clear(); } };
+  // Re-lay-out when the container crosses the narrow threshold. build() is a
+  // no-op unless the layout mode actually changed, so this is cheap.
+  let ro = null;
+  if ('ResizeObserver' in window) {
+    ro = new ResizeObserver(() => build());
+    ro.observe(container);
+  }
+
+  return { destroy() { ro?.disconnect(); blockEls.clear(); } };
 }
 
 /** Exported so purpose-built diagrams (e.g. the three-electrode cell, which

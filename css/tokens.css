@@ -66,13 +66,16 @@
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono",
                Menlo, Consolas, monospace;
 
-  --fs-xs:   0.75rem;
-  --fs-sm:   0.8125rem;
-  --fs-base: 0.9375rem;
-  --fs-md:   1.0625rem;
-  --fs-lg:   1.25rem;
-  --fs-xl:   1.5rem;
-  --fs-2xl:  1.9rem;
+  /* Type scale — raised one step across the board for bench readability.
+     These are the ONLY place sizes are defined; nothing else hard-codes a
+     font-size, so the whole app moves together if this is tuned again. */
+  --fs-xs:   0.8125rem;   /* 13px */
+  --fs-sm:   0.875rem;    /* 14px */
+  --fs-base: 1rem;        /* 16px */
+  --fs-md:   1.125rem;    /* 18px */
+  --fs-lg:   1.3125rem;   /* 21px */
+  --fs-xl:   1.625rem;    /* 26px */
+  --fs-2xl:  2.05rem;     /* 33px */
 
   --lh-tight: 1.25;
   --lh-base:  1.6;
@@ -100,7 +103,7 @@
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ── Layout ───────────────────────────────────────────── */
-  --sidebar-w: 244px;
+  --sidebar-w: 252px;
   --sidebar-w-rail: 64px;
   --header-h: 56px;
   --bottomnav-h: 60px;

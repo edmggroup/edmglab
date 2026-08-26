@@ -168,12 +168,18 @@ export async function chartCard(container, o) {
     borderDash: d.dashed ? [5, 4] : undefined
   }));
 
+  /* `grace` reserves a margin beyond the data extremes on every linear axis.
+     Without it a curve touches — or is clipped by — the frame, and points
+     drawn with a radius sit half outside it. A plot that runs off its own
+     axes is not just untidy: it hides the extremes, which on a Nyquist or a
+     GCD curve are exactly the points a student is being asked to read. */
   const scaleBase = (label, extra = {}) => ({
     type: extra.type || 'linear',
-    title: { display: !!label, text: label, color: p.text, font: { size: 12 } },
+    title: { display: !!label, text: label, color: p.text, font: { size: 13 } },
     grid: { color: p.grid, drawTicks: false },
-    ticks: { color: p.muted, padding: 6 },
+    ticks: { color: p.muted, padding: 6, font: { size: 12 } },
     border: { color: p.border },
+    grace: extra.type === 'logarithmic' ? undefined : '4%',
     ...extra
   });
 
@@ -183,8 +189,18 @@ export async function chartCard(container, o) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      parsing: false,           // data is already {x,y} — skip Chart.js parsing for speed
-      normalized: true,
+      /* NEITHER `parsing: false` NOR `normalized: true` is set here, and that
+         is deliberate — both are performance options that promise Chart.js the
+         data is sorted ascending by x.
+         `parsing: false` is the subtler of the two: it makes Chart.js mark the
+         dataset `_sorted` internally, after which the axis range is taken from
+         the FIRST AND LAST POINTS ALONE.
+         A cyclic voltammogram sweeps up and then back down, so its first and
+         last x are the same value. The x-axis collapsed to a 0.03 V range on a
+         1 V sweep — and the chart still drew, just wrong. Every hysteresis
+         curve (CV, GCD, any loop) has that shape.
+         Full parsing costs one pass over a few thousand points. A silently
+         incorrect plot costs a student their result. */
       interaction: { mode: 'nearest', intersect: false, axis: 'xy' },
       scales: {
         x: scaleBase(o.xLabel, {
@@ -256,26 +272,50 @@ export async function chartCard(container, o) {
   };
 }
 
+/**
+ * Match the data-units-per-pixel on both axes, so a Nyquist semicircle is
+ * actually semicircular and a Warburg line actually sits at 45°.
+ *
+ * CRITICAL PROPERTY: this only ever EXPANDS a range, never contracts one.
+ * Contracting to match the aspect would push data outside the frame — the
+ * plot would look correct while silently hiding points. Whichever axis is
+ * proportionally too small is the one that grows.
+ *
+ * Runs after layout (chartArea is undefined before the first draw) and is
+ * re-applied on resize, since the pixel aspect changes with the container.
+ */
 function equalizeAspect(chart) {
-  const xs = chart.scales.x, ys = chart.scales.y;
-  if (!xs || !ys) return;
-  const xr = xs.max - xs.min, yr = ys.max - ys.min;
-  const pxRatio = chart.chartArea
-    ? (chart.chartArea.right - chart.chartArea.left) / (chart.chartArea.bottom - chart.chartArea.top)
-    : 1;
-  const target = yr * pxRatio;
-  if (Math.abs(xr - target) / Math.max(xr, target) < 0.02) return;
-  if (xr < target) {
-    const mid = (xs.max + xs.min) / 2;
-    chart.options.scales.x.min = mid - target / 2;
-    chart.options.scales.x.max = mid + target / 2;
-  } else {
-    const mid = (ys.max + ys.min) / 2;
-    const ty = xr / pxRatio;
-    chart.options.scales.y.min = mid - ty / 2;
-    chart.options.scales.y.max = mid + ty / 2;
-  }
-  chart.update('none');
+  const apply = () => {
+    const xs = chart.scales.x, ys = chart.scales.y;
+    const area = chart.chartArea;
+    if (!xs || !ys || !area) return;
+
+    const xr = xs.max - xs.min, yr = ys.max - ys.min;
+    if (!(xr > 0) || !(yr > 0)) return;
+
+    const wPx = area.right - area.left;
+    const hPx = area.bottom - area.top;
+    if (!(wPx > 0) || !(hPx > 0)) return;
+
+    // Units per pixel on each axis. The larger one wins; the other expands.
+    const xPerPx = xr / wPx, yPerPx = yr / hPx;
+    const per = Math.max(xPerPx, yPerPx);
+
+    const newXr = per * wPx, newYr = per * hPx;
+    // Already matched within 1% — leave it alone rather than oscillating.
+    if (Math.abs(newXr - xr) / xr < 0.01 && Math.abs(newYr - yr) / yr < 0.01) return;
+
+    const xMid = (xs.max + xs.min) / 2, yMid = (ys.max + ys.min) / 2;
+    chart.options.scales.x.min = xMid - newXr / 2;
+    chart.options.scales.x.max = xMid + newXr / 2;
+    chart.options.scales.y.min = yMid - newYr / 2;
+    chart.options.scales.y.max = yMid + newYr / 2;
+    chart.update('none');
+  };
+
+  // First pass needs a laid-out chartArea; a second pass settles any
+  // tick-label width change the first pass caused.
+  requestAnimationFrame(() => { apply(); requestAnimationFrame(apply); });
 }
 
 function fmt(v) {

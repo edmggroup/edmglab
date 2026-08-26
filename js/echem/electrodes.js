@@ -58,8 +58,8 @@ export async function render(host) {
       .tec { display:grid; gap:.9rem; }
       .tec-controls { display:flex; flex-wrap:wrap; align-items:center; gap:.4rem; }
       .tec-stage { border:1px solid var(--border); border-radius:var(--r-lg);
-        background:var(--bg); padding:.5rem; overflow-x:auto; }
-      .tec-stage svg { display:block; width:100%; height:auto; min-width:520px; }
+        background:var(--bg); padding:.5rem; }
+      .tec-stage svg { display:block; width:100%; height:auto; }
       .tec-caption { font-size:var(--fs-sm); color:var(--text-2); margin:0; min-height:2.6em; }
       .tec-hot { cursor:pointer; }
       .tec-hot:focus { outline:none; }

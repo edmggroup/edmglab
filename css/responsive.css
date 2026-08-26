@@ -69,12 +69,10 @@
   .app.rail .nav-footer { grid-auto-flow: row; }
 }
 
-/* ── Small phones: stack dense tables into cards ─────────── */
-@media (max-width: 480px) {
-  :root { --fs-2xl: 1.6rem; --fs-xl: 1.35rem; }
-  .view-outlet { padding: var(--sp-4) var(--sp-3) var(--sp-6); }
-  .card-grid { grid-template-columns: 1fr; }
-
+/* ── Stack dense tables into cards ────────────────────────
+   Raised from 480px to 760px so a table never needs horizontal scrolling on
+   a phone or tablet — the stacked form is also easier to read on a bench. */
+@media (max-width: 760px) {
   table.stackable thead { display: none; }
   table.stackable tr {
     display: block; border: 1px solid var(--border);
@@ -93,6 +91,12 @@
     font-size: var(--fs-xs); color: var(--text-muted);
     text-transform: uppercase; letter-spacing: 0.05em; font-weight: 650;
   }
+}
+
+/* ── Small phones ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .view-outlet { padding: var(--sp-4) var(--sp-3) var(--sp-6); }
+  .card-grid { grid-template-columns: 1fr; }
 }
 
 /* ── Print: light, ink-friendly ──────────────────────────── */
