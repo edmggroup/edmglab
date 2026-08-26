@@ -40,12 +40,19 @@ export function iconRaw(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${I[name] || I.grid}</svg>`;
 }
 
-/** Desktop sidebar groups, in display order. */
+/**
+ * Desktop sidebar groups, in display order.
+ *
+ * Utilities (health check, engine demo, access control) deliberately do NOT
+ * appear here. They are maintenance tools, not scientific modules, and mixing
+ * them into the same list both crowds the navigation and misrepresents what
+ * this platform is. They live in a compact footer rail instead — which is also
+ * what lets the whole navigation fit on a laptop screen without scrolling.
+ */
 export const GROUPS = [
   { id: 'learn', title: 'Learn' },
-  { id: 'lab',   title: 'Lab' },
-  { id: 'tools', title: 'Tools' },
-  { id: 'help',  title: 'Support' }
+  { id: 'lab',   title: 'Laboratory' },
+  { id: 'tools', title: 'Analysis' }
 ];
 
 /** Mobile bottom-nav buckets (§C.4). Exactly five, in order. */
@@ -75,16 +82,19 @@ export const MODULES = [
   { id: 'battery-tester',  label: 'Battery Tester',      route: '#/battery-tester',      icon: 'battery',   tab: 'lab',   group: 'lab',   phase: 3 },
   { id: 'workstation',     label: 'Echem Workstation',   route: '#/workstation',         icon: 'wave',      tab: 'lab',   group: 'lab',   phase: 5 },
   { id: 'protocols',       label: 'Test Protocols',      route: '#/protocols',           icon: 'clipboard', tab: 'lab',   group: 'lab',   phase: 3 },
+  { id: 'which-instrument',label: 'Which Instrument?',   route: '#/which-instrument',    icon: 'compass',   tab: 'lab',   group: 'lab',   phase: 5 },
 
   { id: 'formulas',        label: 'Formula Library',     route: '#/formulas',            icon: 'sigma',     tab: 'tools', group: 'tools', phase: 1 },
   { id: 'calculators',     label: 'Calculators',         route: '#/calculators',         icon: 'calc',      tab: 'tools', group: 'tools', phase: 2 },
   { id: 'import',          label: 'Data Import',         route: '#/import',              icon: 'upload',    tab: 'tools', group: 'tools', phase: 4 },
+  { id: 'troubleshooting', label: 'Troubleshooting',     route: '#/troubleshooting',     icon: 'wrench',    tab: 'tools', group: 'tools', phase: 10 },
 
-  { id: 'troubleshooting', label: 'Troubleshooting',     route: '#/troubleshooting',     icon: 'wrench',    tab: 'menu',  group: 'help',  phase: 10 },
-  { id: 'which-instrument',label: 'Which Instrument?',   route: '#/which-instrument',    icon: 'compass',   tab: 'menu',  group: 'help',  phase: 5 },
-  { id: 'demo',            label: 'Engine Demo',         route: '#/demo',                icon: 'grid',      tab: 'menu',  group: 'help',  phase: 0,  view: 'demo' },
-  { id: 'health',          label: 'Data Health Check',   route: '#/health',              icon: 'scope',     tab: 'menu',  group: 'help',  phase: 0,  view: 'health' },
-  { id: 'admin',           label: 'Access Control',      route: '#/admin',               icon: 'lock',      tab: 'menu',  group: 'help',  phase: 0,  view: 'admin' }
+  // Utilities — footer rail, not the main list (see GROUPS above).
+  // `shortLabel` is what fits in the narrow rail; `label` is the real name
+  // used everywhere else, so cards and page titles stay unambiguous.
+  { id: 'demo',   label: 'Engine Demo',       shortLabel: 'Demo',   route: '#/demo',   icon: 'grid',  tab: 'menu', group: null, util: true, phase: 0, view: 'demo' },
+  { id: 'health', label: 'Data Health Check', shortLabel: 'Health', route: '#/health', icon: 'scope', tab: 'menu', group: null, util: true, phase: 0, view: 'health' },
+  { id: 'admin',  label: 'Access Control',    shortLabel: 'Access', route: '#/admin',  icon: 'lock',  tab: 'menu', group: null, util: true, phase: 0, view: 'admin' }
 ];
 
 export function moduleByRoute(hash) {
@@ -94,21 +104,30 @@ export function moduleByRoute(hash) {
 
 /** Render the desktop sidebar into `el`. */
 export function renderSidebar(el) {
-  el.innerHTML = GROUPS.map((g) => {
+  const groups = GROUPS.map((g) => {
     const items = MODULES.filter((m) => m.group === g.id);
     if (!items.length) return '';
     return `<div class="nav-group">
       <div class="nav-group-title">${g.title}</div>
-      ${items.map(navLink).join('')}
+      <div class="nav-items">${items.map(navLink).join('')}</div>
     </div>`;
   }).join('');
+
+  // Compact utility rail, pinned to the bottom.
+  const utils = MODULES.filter((m) => m.util).map((m) => `
+    <a class="nav-util" href="${m.route}" data-module="${m.id}" title="${m.label}">
+      ${iconRaw(m.icon)}<span>${m.shortLabel || m.label}</span>
+    </a>`).join('');
+
+  el.innerHTML = `<nav class="nav-scroll">${groups}</nav>
+    <div class="nav-footer">${utils}</div>`;
 }
 
 function navLink(m) {
   const built = !!m.view;
   return `<a class="nav-link" href="${m.route}" data-module="${m.id}">
-    ${icon(m.icon)}<span>${m.label}</span>
-    ${built ? '' : `<span class="nav-phase" title="Arrives in roadmap phase ${m.phase}">P${m.phase}</span>`}
+    ${icon(m.icon)}<span class="nav-label">${m.label}</span>
+    ${built ? '' : `<span class="nav-phase" title="Not built yet — arrives in roadmap phase ${m.phase}">P${m.phase}</span>`}
   </a>`;
 }
 
@@ -124,7 +143,7 @@ export function renderBottomNav(el) {
 export function setActive(hash) {
   const mod = moduleByRoute(hash);
 
-  document.querySelectorAll('.nav-link').forEach((a) => {
+  document.querySelectorAll('.nav-link, .nav-util').forEach((a) => {
     const on = mod && a.dataset.module === mod.id;
     if (on) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');

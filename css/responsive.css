@@ -17,7 +17,7 @@
 
   /* Sidebar becomes an off-canvas drawer, opened by the hamburger */
   .app-sidebar {
-    display: block;
+    display: flex;
     position: fixed; top: var(--header-h); bottom: 0; left: 0; z-index: 50;
     width: var(--sidebar-w);
     transform: translateX(-100%);
@@ -62,9 +62,11 @@
   .app.rail .app-sidebar { width: var(--sidebar-w-rail); }
   .app.rail { grid-template-columns: var(--sidebar-w-rail) 1fr; }
   .app.rail .nav-group-title,
-  .app.rail .nav-link span:not(.nav-ico),
+  .app.rail .nav-label,
+  .app.rail .nav-util span,
   .app.rail .nav-phase { display: none; }
   .app.rail .nav-link { justify-content: center; }
+  .app.rail .nav-footer { grid-auto-flow: row; }
 }
 
 /* ── Small phones: stack dense tables into cards ─────────── */

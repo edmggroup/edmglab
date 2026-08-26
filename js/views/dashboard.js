@@ -37,6 +37,8 @@ export function render(outlet) {
   const built = MODULES.filter((m) => m.view);
   const recent = store.get('recent') || [];
 
+  // A grid rather than a row of boxes joined by arrows: arrows break badly
+  // when the sequence wraps, and the numerals already carry the order.
   const stages = PATHWAY.map((s, i) => {
     const mod = MODULES.find((m) => m.id === s.module);
     const ready = !!mod?.view;
@@ -45,7 +47,7 @@ export function render(outlet) {
               <span class="pw-n">${String(i + 1).padStart(2, '0')}</span>
               <span class="pw-l">${esc(s.label)}</span>
             </a>`;
-  }).join('<span class="pw-arrow" aria-hidden="true">→</span>');
+  }).join('');
 
   outlet.innerHTML = `
     ${pageHead('EDMGLAB',
@@ -88,17 +90,40 @@ export function render(outlet) {
       'from the development roadmap')}
 
     <style>
-      .pathway { display:flex; flex-wrap:wrap; align-items:stretch; gap:.4rem; }
-      .pw-stage { display:flex; flex-direction:column; gap:2px; min-width:104px; flex:1 1 104px;
-        padding:.55rem .7rem; background:var(--surface); border:1px solid var(--border);
-        border-radius:var(--r-md); color:var(--text); text-decoration:none;
-        transition:border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease); }
-      .pw-stage:hover { border-color:var(--accent); background:var(--surface-2); text-decoration:none; }
-      .pw-stage.is-pending { opacity:.55; }
-      .pw-n { font-family:var(--font-mono); font-size:.68rem; color:var(--accent); font-weight:600; }
-      .pw-l { font-size:var(--fs-sm); font-weight:550; line-height:1.25; }
-      .pw-arrow { display:flex; align-items:center; color:var(--text-muted); font-size:.85rem; }
-      @media (max-width:600px){ .pw-arrow{ display:none; } .pw-stage{ flex:1 1 calc(50% - .4rem); } }
+      /* Column counts are fixed to divisors of 12 rather than auto-fill.
+         auto-fill leaves ragged empty cells on the last row — which read as
+         a rendering fault, not a design. 12 = 6x2 = 4x3 = 3x4 = 2x6. */
+      .pathway {
+        display:grid; gap:1px;
+        grid-template-columns:repeat(6, 1fr);
+        background:var(--border); border:1px solid var(--border);
+        border-radius:var(--r-md); overflow:hidden;
+      }
+      @media (max-width:1180px){ .pathway { grid-template-columns:repeat(4, 1fr); } }
+      @media (max-width:820px) { .pathway { grid-template-columns:repeat(3, 1fr); } }
+      /* 1px gaps over a border-coloured background give clean hairline rules
+         between tiles without doubling borders where they meet. */
+      .pw-stage {
+        display:flex; flex-direction:column; gap:3px;
+        padding:.6rem .75rem; background:var(--surface);
+        color:var(--text); text-decoration:none; position:relative;
+        transition:background var(--dur-fast) var(--ease);
+      }
+      .pw-stage:hover { background:var(--surface-2); text-decoration:none; }
+      .pw-stage:hover .pw-l { color:var(--accent-strong); }
+      .pw-stage::after {
+        content:""; position:absolute; left:0; top:0; bottom:0; width:2px;
+        background:var(--accent); opacity:0;
+        transition:opacity var(--dur-fast) var(--ease);
+      }
+      .pw-stage:hover::after { opacity:1; }
+      .pw-stage.is-pending { background:color-mix(in srgb, var(--surface) 72%, var(--bg)); }
+      .pw-stage.is-pending .pw-n { color:var(--text-muted); }
+      .pw-stage.is-pending .pw-l { color:var(--text-muted); }
+      .pw-n { font-family:var(--font-mono); font-size:.65rem; color:var(--accent);
+        font-weight:650; letter-spacing:.06em; }
+      .pw-l { font-size:.8125rem; font-weight:550; line-height:1.3; }
+      @media (max-width:560px){ .pathway { grid-template-columns:repeat(2, 1fr); } }
     </style>`;
 
   return { destroy() {} };
@@ -107,7 +132,8 @@ export function render(outlet) {
 const DESCRIPTIONS = {
   dashboard: 'This page — the research pathway and current build status.',
   demo: 'Proves the shared animation engine, diagram engine, simulation labelling and chart layer.',
-  health: 'Validates every data file: schemas, cross-references, provenance and troubleshooting rules.'
+  health: 'Validates every data file: schemas, cross-references, provenance and troubleshooting rules.',
+  admin: 'Optional 4-digit PIN gate for shared lab machines. Off by default — and a soft gate, not security.'
 };
 
 const NEXT_UP = [

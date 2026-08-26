@@ -88,13 +88,15 @@ code, kbd, samp, .num, .unit, .eqn {
   border-bottom: 1px solid var(--border);
 }
 
-.brand { display: flex; align-items: center; gap: var(--sp-2); color: var(--text); font-weight: 650; letter-spacing: 0.01em; }
+/* The mark repeats the app-icon motif — two electrodes, a separator, ions in
+   transit — so the browser tab, the home-screen icon and the header all read
+   as the same product rather than three unrelated shapes. */
+.brand { display: flex; align-items: center; gap: var(--sp-2); color: var(--text); font-weight: 650; letter-spacing: -0.01em; }
 .brand:hover { text-decoration: none; color: var(--text); }
-.brand-mark {
-  width: 20px; height: 20px; border-radius: 5px; flex: none;
-  background: linear-gradient(140deg, var(--accent) 0%, var(--accent-dim) 100%);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-strong) 60%, transparent);
-}
+.brand-mark { width: 22px; height: 22px; flex: none; display: block; }
+.brand-mark svg { width: 100%; height: 100%; display: block; }
+.brand-mark rect, .brand-mark circle { fill: var(--accent); }
+.brand-mark .sep { fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linecap: round; }
 .brand-text { font-size: var(--fs-md); }
 .brand-accent { color: var(--accent); }
 
@@ -103,7 +105,11 @@ code, kbd, samp, .num, .unit, .eqn {
   font-size: var(--fs-sm); color: var(--text-muted);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   display: none;
+  padding-left: var(--sp-3);
+  margin-left: var(--sp-1);
+  border-left: 1px solid var(--border);
 }
+.breadcrumb:empty { border-left: 0; }
 .breadcrumb a { color: var(--text-2); }
 .breadcrumb .sep { margin: 0 var(--sp-2); opacity: 0.5; }
 
@@ -180,37 +186,87 @@ code, kbd, samp, .num, .unit, .eqn {
    NAVIGATION
    ============================================================ */
 
+/* Sidebar is a column: a navigation region that can flex, and a utility rail
+   pinned to the bottom. Dense enough that the full module list fits on a
+   laptop screen without scrolling — a navigation you have to scroll to see
+   hides the shape of the platform from a new student. */
 .app-sidebar {
   grid-area: sidebar;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  overflow-y: auto;
-  display: none;
+  display: none;                 /* responsive.css promotes this to flex */
+  flex-direction: column;
+  min-height: 0;
 }
-.nav-group { padding: var(--sp-4) var(--sp-3) var(--sp-2); }
+.nav-scroll {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  padding: var(--sp-3) var(--sp-2);
+  scrollbar-width: thin;
+}
+.nav-scroll::-webkit-scrollbar { width: 6px; }
+.nav-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+.nav-group + .nav-group { margin-top: var(--sp-3); }
 .nav-group-title {
-  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.09em;
-  color: var(--text-muted); font-weight: 650; padding: 0 var(--sp-3) var(--sp-2);
+  font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-muted); font-weight: 650;
+  padding: 0 var(--sp-3) 5px;
 }
+.nav-items { display: grid; gap: 1px; }
+
 .nav-link {
   display: flex; align-items: center; gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-3); margin-bottom: 2px;
-  min-height: 40px;
-  color: var(--text-2); border-radius: var(--r-md);
-  font-size: var(--fs-sm); font-weight: 500;
+  padding: 0 var(--sp-3);
+  min-height: 32px;
+  color: var(--text-2); border-radius: var(--r-sm);
+  font-size: 0.8125rem; font-weight: 500;
+  position: relative;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 .nav-link:hover { background: var(--surface-2); color: var(--text); text-decoration: none; }
 .nav-link[aria-current="page"] {
   background: var(--accent-wash); color: var(--accent-strong); font-weight: 600;
-  box-shadow: inset 2px 0 0 var(--accent);
 }
-.nav-link .nav-ico { width: 18px; height: 18px; flex: none; opacity: 0.85; }
+/* A 2px accent rail marks the active item — a quieter signal than a filled
+   block, and it survives both themes without needing a second colour. */
+.nav-link[aria-current="page"]::before {
+  content: ""; position: absolute; left: 0; top: 6px; bottom: 6px;
+  width: 2px; border-radius: 0 2px 2px 0; background: var(--accent);
+}
+.nav-link[aria-current="page"] .nav-ico { opacity: 1; }
+
+.nav-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.nav-link .nav-ico { width: 17px; height: 17px; flex: none; opacity: 0.7; }
 .nav-link .nav-ico svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.nav-link:hover .nav-ico { opacity: 0.95; }
+
+/* Roadmap phase marker — a bare dimmed numeral. A bordered pill on every
+   unbuilt module reads as clutter and competes with the labels. */
 .nav-phase {
-  margin-left: auto; font-size: 0.65rem; font-family: var(--font-mono);
-  color: var(--text-muted); background: var(--surface-2);
-  padding: 1px 5px; border-radius: var(--r-sm); border: 1px solid var(--border);
+  flex: none; font-size: 0.625rem; font-family: var(--font-mono);
+  color: var(--text-muted); opacity: 0.6; font-weight: 600;
+  letter-spacing: 0.02em;
 }
+.nav-link:hover .nav-phase { opacity: 0.9; }
+
+/* Utility rail — maintenance tools, kept visually separate from the
+   scientific modules. */
+.nav-footer {
+  flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  gap: 2px; padding: 6px;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 40%, var(--surface));
+}
+.nav-util {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  padding: 5px 2px; border-radius: var(--r-sm);
+  color: var(--text-muted); font-size: 0.6rem; font-weight: 550;
+  letter-spacing: 0.01em; text-align: center; line-height: 1.2;
+}
+.nav-util:hover { background: var(--surface-2); color: var(--text-2); text-decoration: none; }
+.nav-util[aria-current="page"] { background: var(--accent-wash); color: var(--accent-strong); }
+.nav-util svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
 .sidebar-scrim {
   position: fixed; inset: 0; z-index: 45;
@@ -242,15 +298,20 @@ code, kbd, samp, .num, .unit, .eqn {
 
 .card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: var(--sp-4);
-  transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  border-radius: var(--r-md); padding: var(--sp-4);
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
 }
 a.card, button.card { display: block; text-align: left; width: 100%; font: inherit; color: inherit; cursor: pointer; }
-a.card:hover, button.card:hover { border-color: var(--accent-dim); text-decoration: none; transform: translateY(-1px); }
+/* No lift on hover. A card that jumps under the cursor reads as a marketing
+   page; a border and background shift is the quieter, more instrument-like
+   signal and does not shuffle the layout. */
+a.card:hover, button.card:hover {
+  border-color: var(--accent-dim); background: var(--surface-2); text-decoration: none;
+}
 
-.card-title { font-size: var(--fs-md); font-weight: 600; margin: 0 0 var(--sp-1); color: var(--text); }
-.card-sub   { font-size: var(--fs-sm); color: var(--text-2); margin: 0; }
-.card-grid  { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.card-title { font-size: var(--fs-base); font-weight: 600; margin: 0 0 var(--sp-1); color: var(--text); letter-spacing: -0.005em; }
+.card-sub   { font-size: var(--fs-sm); color: var(--text-2); margin: 0; line-height: 1.5; }
+.card-grid  { display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 
 .panel {
   background: var(--surface); border: 1px solid var(--border);
@@ -265,17 +326,23 @@ a.card:hover, button.card:hover { border-color: var(--accent-dim); text-decorati
 .panel-body { padding: var(--sp-4); }
 
 .section { margin-bottom: var(--sp-6); }
-.section-head { display: flex; align-items: baseline; gap: var(--sp-3); margin-bottom: var(--sp-4); flex-wrap: wrap; }
-.section-head h2 { margin: 0; }
+/* A hairline under each section heading gives the page a clear structural
+   rhythm — closer to a technical document than a marketing layout. */
+.section-head {
+  display: flex; align-items: baseline; gap: var(--sp-3);
+  margin-bottom: var(--sp-3); flex-wrap: wrap;
+  padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border);
+}
+.section-head h2 { margin: 0; font-size: var(--fs-lg); }
 .section-note { font-size: var(--fs-sm); color: var(--text-muted); }
 
 /* A top-level callout sitting between the page head and the first section
    needs its own breathing room — otherwise it collides with the heading. */
 .view-outlet > .callout { margin-bottom: var(--sp-6); }
 
-.page-head { margin-bottom: var(--sp-6); }
+.page-head { margin-bottom: var(--sp-5); }
 .page-head h1 { margin-bottom: var(--sp-2); }
-.page-lede { color: var(--text-2); font-size: var(--fs-md); max-width: 62ch; margin: 0; }
+.page-lede { color: var(--text-2); font-size: var(--fs-base); max-width: 66ch; margin: 0; line-height: 1.55; }
 
 /* ============================================================
    BADGES / CHIPS

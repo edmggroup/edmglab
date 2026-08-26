@@ -24,7 +24,7 @@
  * after a fix has shipped.
  */
 
-const CACHE_VERSION = 'edmglab-v2';
+const CACHE_VERSION = 'edmglab-v3';
 const DATA_CACHE = 'edmglab-data-v1';
 
 /* Paths are RELATIVE so the app works both at a domain root and at a
