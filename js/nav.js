@@ -84,8 +84,8 @@ export const MODULES = [
   { id: 'protocols',       label: 'Test Protocols',      route: '#/protocols',           icon: 'clipboard', tab: 'lab',   group: 'lab',   phase: 3 },
   { id: 'which-instrument',label: 'Which Instrument?',   route: '#/workstation/choose',  icon: 'compass',   tab: 'lab',   group: 'lab',   phase: 5,  view: 'echem/index' },
 
-  { id: 'formulas',        label: 'Formula Library',     route: '#/formulas',            icon: 'sigma',     tab: 'tools', group: 'tools', phase: 1 },
-  { id: 'calculators',     label: 'Calculators',         route: '#/calculators',         icon: 'calc',      tab: 'tools', group: 'tools', phase: 2 },
+  { id: 'formulas',        label: 'Formula Library',     route: '#/formulas',            icon: 'sigma',     tab: 'tools', group: 'tools', view: 'formulas' },
+  { id: 'calculators',     label: 'Calculators',         route: '#/calculators',         icon: 'calc',      tab: 'tools', group: 'tools', view: 'calculators' },
   { id: 'import',          label: 'Data Import',         route: '#/import',              icon: 'upload',    tab: 'tools', group: 'tools', phase: 4 },
   { id: 'troubleshooting', label: 'Troubleshooting',     route: '#/troubleshooting',     icon: 'wrench',    tab: 'tools', group: 'tools', phase: 10, view: 'troubleshooting' },
 
@@ -125,9 +125,14 @@ export function renderSidebar(el) {
 
 function navLink(m) {
   const built = !!m.view;
+  /* The phase badge marks a module that is navigable but not yet built. Guard
+     on `m.phase` as well as on `built`: a module with neither is a data error,
+     and printing "Pundefined" in the sidebar is a worse way to surface it than
+     printing nothing. */
   return `<a class="nav-link" href="${m.route}" data-module="${m.id}">
     ${icon(m.icon)}<span class="nav-label">${m.label}</span>
-    ${built ? '' : `<span class="nav-phase" title="Not built yet — arrives in roadmap phase ${m.phase}">P${m.phase}</span>`}
+    ${built || m.phase === undefined ? ''
+      : `<span class="nav-phase" title="Not built yet — arrives in roadmap phase ${m.phase}">P${m.phase}</span>`}
   </a>`;
 }
 

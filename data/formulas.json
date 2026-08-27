@@ -1,106 +1,3173 @@
 {
   "schemaVersion": 1,
-  "_note": "SEED CONTENT — three formulas to exercise the schema, search index and health check. The full library is authored in Phase 1. Every entry must state its variables, its valid context and its assumptions before it is used for teaching.",
+  "_README": "EDMGLAB formula library. Every record is BOTH the reference page and the calculator — the calculator is generated from `expression`, `variables[].units` and `result.units`, so adding a formula is a JSON edit and never a code change. Expressions are evaluated by js/lib/expr.js, a real parser (no eval), entirely in SI: each unit's `f` converts that unit TO SI, and `o` is an additive offset used only for temperature. Symbols used in `expression` MUST all be declared in `variables` — the health check enforces this. DRAFT — pending review by the research group.",
+  "_conventions": {
+    "domain": "supercapacitor | battery | kinetics | shared — used to group the library",
+    "derivedFrom": "which measurement supplies the inputs: GCD | CV | EIS | cycling | GITT | geometry | literature",
+    "performanceLevel": "material (per gram of active material) | electrode | device (whole cell)",
+    "note": "Where two conventions exist for the same quantity, they are separate records with distinct names rather than one record with a footnote. Which measurement you made decides which equation is valid — that decision should not be left to a note somebody skips."
+  },
   "items": [
     {
       "id": "formula.specific_capacitance",
-      "name": "Specific capacitance (galvanostatic)",
+      "name": "Specific capacitance — three-electrode (from GCD)",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
       "plainText": "Cs = I × Δt / (m × ΔV)",
       "latex": "C_s = \\dfrac{I\\,\\Delta t}{m\\,\\Delta V}",
-      "aliases": ["specific capacitance", "gravimetric capacitance", "Cs"],
-      "variables": [
-        { "symbol": "I",  "name": "Discharge current",       "siUnit": "A",  "commonUnit": "mA" },
-        { "symbol": "Δt", "name": "Discharge time",          "siUnit": "s" },
-        { "symbol": "m",  "name": "Mass of active material", "siUnit": "kg", "commonUnit": "g" },
-        { "symbol": "ΔV", "name": "Voltage window used for the calculation", "siUnit": "V" }
+      "expression": "I*Δt/(m*ΔV)",
+      "aliases": [
+        "specific capacitance",
+        "gravimetric capacitance",
+        "Cs",
+        "single electrode capacitance"
       ],
-      "siUnit": "F/kg",
-      "commonUnit": "F/g",
+      "variables": [
+        {
+          "symbol": "I",
+          "name": "Discharge current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            },
+            {
+              "u": "µA",
+              "f": 1e-06
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "Δt",
+          "name": "Discharge time",
+          "siUnit": "s",
+          "units": [
+            {
+              "u": "s",
+              "f": 1
+            },
+            {
+              "u": "min",
+              "f": 60
+            },
+            {
+              "u": "h",
+              "f": 3600
+            }
+          ],
+          "default": 100
+        },
+        {
+          "symbol": "m",
+          "name": "Mass of active material",
+          "siUnit": "kg",
+          "units": [
+            {
+              "u": "mg",
+              "f": 1e-06
+            },
+            {
+              "u": "g",
+              "f": 0.001
+            }
+          ],
+          "default": 2,
+          "note": "Active material only. Whether binder and conductive additive are included must be stated and kept consistent."
+        },
+        {
+          "symbol": "ΔV",
+          "name": "Voltage window used for the calculation",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            },
+            {
+              "u": "mV",
+              "f": 0.001
+            }
+          ],
+          "default": 1,
+          "note": "State explicitly whether the IR drop is inside or outside this window. Both conventions appear in the literature and they give different answers."
+        }
+      ],
+      "result": {
+        "name": "Specific capacitance",
+        "siUnit": "F/kg",
+        "units": [
+          {
+            "u": "F/g",
+            "f": 1000
+          },
+          {
+            "u": "F/kg",
+            "f": 1
+          },
+          {
+            "u": "mF/g",
+            "f": 1
+          }
+        ]
+      },
       "normalizationBasis": "gravimetric",
       "validContext": {
         "cellType": "three-electrode",
         "deviceConfig": "single electrode",
         "performanceLevel": "material",
-        "note": "For a symmetric two-electrode device the single-electrode-equivalent value is conventionally reported as 4·I·Δt/(m_total·ΔV). That is a different formula variant, not this equation with different numbers — the factor arises from two electrodes in series each carrying half the device voltage, and from m_total covering both electrodes."
+        "note": "This equation is for a single electrode measured against a reference. For a symmetric two-electrode device use the separate symmetric-device record — the factor of four there is not a correction to this equation, it comes from two electrodes in series each carrying half the cell voltage, and from a mass that covers both."
       },
       "assumptions": [
-        "The discharge is close to linear in time, as expected for predominantly capacitive behaviour. Battery-type or strongly pseudocapacitive curves are not well described by a single capacitance value.",
-        "ΔV is stated explicitly as either including or excluding the IR drop; the two conventions give different answers and both appear in the literature.",
-        "m is the mass of electroactive material only. Whether binder and conductive additive are included must be stated and kept consistent across any comparison."
+        "The discharge is close to linear in time, as expected of predominantly capacitive behaviour. Battery-type or strongly pseudocapacitive curves are not well described by a single capacitance.",
+        "ΔV is stated explicitly as either including or excluding the IR drop.",
+        "m is the mass of electroactive material only, on a basis kept consistent across every comparison."
       ],
       "limitations": [
         "Not comparable between studies unless cell configuration, mass basis and IR-drop convention all match.",
-        "A single number cannot represent a material whose capacitance varies strongly with potential."
+        "A single number cannot represent a material whose capacitance varies strongly with potential.",
+        "Values quoted at very low mass loading are systematically flattering and are not transferable to a practical electrode."
+      ],
+      "measuredBy": [
+        "method.gcd_ec"
+      ],
+      "relatedFormulaIds": [
+        "formula.specific_capacitance_symmetric",
+        "formula.cell_capacitance",
+        "formula.capacitance_from_cv"
+      ],
+      "relatedIds": [
+        "concept.specific_capacitance"
+      ],
+      "tags": [
+        "supercapacitor",
+        "EDLC",
+        "GCD",
+        "capacitance"
+      ],
+      "provides": "Cs",
+      "variant": {
+        "group": "capacitance-config",
+        "option": "three-electrode"
+      }
+    },
+    {
+      "id": "formula.specific_capacitance_symmetric",
+      "name": "Specific capacitance — symmetric two-electrode device (from GCD)",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
+      "plainText": "Cs,electrode = 4 × I × Δt / (m_total × ΔV_cell)",
+      "latex": "C_{s,\\mathrm{electrode}} = \\dfrac{4\\,I\\,\\Delta t}{m_{\\mathrm{total}}\\,\\Delta V_{\\mathrm{cell}}}",
+      "expression": "4*I*Δt/(m_total*ΔV)",
+      "aliases": [
+        "symmetric cell capacitance",
+        "two electrode specific capacitance",
+        "factor of four"
+      ],
+      "variables": [
+        {
+          "symbol": "I",
+          "name": "Discharge current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "Δt",
+          "name": "Discharge time",
+          "siUnit": "s",
+          "units": [
+            {
+              "u": "s",
+              "f": 1
+            },
+            {
+              "u": "min",
+              "f": 60
+            }
+          ],
+          "default": 100
+        },
+        {
+          "symbol": "m_total",
+          "name": "Total active mass of BOTH electrodes",
+          "siUnit": "kg",
+          "units": [
+            {
+              "u": "mg",
+              "f": 1e-06
+            },
+            {
+              "u": "g",
+              "f": 0.001
+            }
+          ],
+          "default": 4,
+          "note": "Both electrodes, not one. Using a single electrode's mass here doubles the reported value."
+        },
+        {
+          "symbol": "ΔV",
+          "name": "Cell voltage window",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 1
+        }
+      ],
+      "result": {
+        "name": "Single-electrode-equivalent specific capacitance",
+        "siUnit": "F/kg",
+        "units": [
+          {
+            "u": "F/g",
+            "f": 1000
+          },
+          {
+            "u": "F/kg",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "two-electrode",
+        "deviceConfig": "symmetric device (two nominally identical electrodes)",
+        "performanceLevel": "material (single-electrode-equivalent)",
+        "note": "Where the factor of four comes from: two identical capacitors in series give C_cell = C_electrode/2, so C_electrode = 2·C_cell; and each electrode carries half the total mass, so dividing by m_total/2 doubles it again. Two × two = four. It is NOT valid for an asymmetric device, where the two electrodes have different capacitances and masses."
+      },
+      "assumptions": [
+        "The two electrodes are genuinely identical in mass, thickness and composition. Any imbalance makes the single-electrode-equivalent value meaningless.",
+        "The discharge is close to linear.",
+        "ΔV is the CELL voltage, and the IR-drop convention is stated."
+      ],
+      "limitations": [
+        "Invalid for asymmetric devices — there the two electrodes must be characterised separately, usually in a three-electrode arrangement.",
+        "A device-level number derived this way is a material figure of merit, not a device figure of merit. Report the cell capacitance separately if the device is the point.",
+        "The factor of four is the single most common source of a 4× discrepancy between papers reporting the same material."
+      ],
+      "measuredBy": [
+        "method.gcd_ec"
+      ],
+      "relatedFormulaIds": [
+        "formula.specific_capacitance",
+        "formula.cell_capacitance"
+      ],
+      "relatedIds": [
+        "concept.specific_capacitance"
+      ],
+      "tags": [
+        "supercapacitor",
+        "symmetric",
+        "GCD",
+        "capacitance",
+        "two-electrode"
+      ],
+      "provides": "Cs",
+      "variant": {
+        "group": "capacitance-config",
+        "option": "symmetric"
+      }
+    },
+    {
+      "id": "formula.cell_capacitance",
+      "name": "Cell capacitance (device level, from GCD)",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
+      "plainText": "C_cell = I × Δt / ΔV",
+      "latex": "C_{\\mathrm{cell}} = \\dfrac{I\\,\\Delta t}{\\Delta V}",
+      "expression": "I*Δt/ΔV",
+      "aliases": [
+        "cell capacitance",
+        "device capacitance",
+        "C cell"
+      ],
+      "variables": [
+        {
+          "symbol": "I",
+          "name": "Discharge current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "Δt",
+          "name": "Discharge time",
+          "siUnit": "s",
+          "units": [
+            {
+              "u": "s",
+              "f": 1
+            },
+            {
+              "u": "min",
+              "f": 60
+            }
+          ],
+          "default": 100
+        },
+        {
+          "symbol": "ΔV",
+          "name": "Cell voltage window",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 1
+        }
+      ],
+      "result": {
+        "name": "Cell capacitance",
+        "siUnit": "F",
+        "units": [
+          {
+            "u": "F",
+            "f": 1
+          },
+          {
+            "u": "mF",
+            "f": 0.001
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "two-electrode",
+        "deviceConfig": "symmetric or asymmetric",
+        "performanceLevel": "device",
+        "note": "This is what the device actually does, normalised to nothing. It is the honest number for a device claim, and it is the number every device-level energy and power figure should be built from."
+      },
+      "assumptions": [
+        "Close to linear discharge over the window used.",
+        "The IR-drop convention is stated."
+      ],
+      "limitations": [
+        "Says nothing about the material — a large cell capacitance can come from a large mass rather than a good material.",
+        "Not comparable between devices of different size unless normalised."
+      ],
+      "measuredBy": [
+        "method.gcd_ec"
+      ],
+      "relatedFormulaIds": [
+        "formula.specific_capacitance_symmetric",
+        "formula.specific_energy_capacitor"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "supercapacitor",
+        "device",
+        "GCD",
+        "capacitance"
+      ],
+      "provides": "C_cell"
+    },
+    {
+      "id": "formula.areal_capacitance",
+      "name": "Areal capacitance (from GCD)",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
+      "plainText": "C_A = I × Δt / (A × ΔV)",
+      "latex": "C_A = \\dfrac{I\\,\\Delta t}{A\\,\\Delta V}",
+      "expression": "I*Δt/(A*ΔV)",
+      "aliases": [
+        "areal capacitance",
+        "capacitance per area",
+        "mF/cm2"
+      ],
+      "variables": [
+        {
+          "symbol": "I",
+          "name": "Discharge current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "Δt",
+          "name": "Discharge time",
+          "siUnit": "s",
+          "units": [
+            {
+              "u": "s",
+              "f": 1
+            },
+            {
+              "u": "min",
+              "f": 60
+            }
+          ],
+          "default": 100
+        },
+        {
+          "symbol": "A",
+          "name": "Electrode area",
+          "siUnit": "m²",
+          "units": [
+            {
+              "u": "cm²",
+              "f": 0.0001
+            },
+            {
+              "u": "mm²",
+              "f": 1e-06
+            },
+            {
+              "u": "m²",
+              "f": 1
+            }
+          ],
+          "default": 1,
+          "note": "Geometric footprint, not BET surface area, unless you say otherwise — and if you use BET the number is not comparable with anyone quoting geometric area."
+        },
+        {
+          "symbol": "ΔV",
+          "name": "Voltage window",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 1
+        }
+      ],
+      "result": {
+        "name": "Areal capacitance",
+        "siUnit": "F/m²",
+        "units": [
+          {
+            "u": "mF/cm²",
+            "f": 10
+          },
+          {
+            "u": "F/cm²",
+            "f": 10000
+          },
+          {
+            "u": "F/m²",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "areal",
+      "validContext": {
+        "cellType": "three-electrode or two-electrode",
+        "deviceConfig": "state which — the factor-of-four rule applies here too for symmetric devices",
+        "performanceLevel": "electrode",
+        "note": "The most useful normalisation for thin films, flexible and micro-devices, where mass is small and hard to measure but area is well defined."
+      },
+      "assumptions": [
+        "The area is the geometric footprint actually participating, stated explicitly.",
+        "Close to linear discharge."
+      ],
+      "limitations": [
+        "Rewards thick electrodes: a thicker coating on the same footprint gives a larger areal capacitance without the material being any better.",
+        "Should be reported alongside the mass loading, or it cannot be interpreted."
+      ],
+      "measuredBy": [
+        "method.gcd_ec"
+      ],
+      "relatedFormulaIds": [
+        "formula.specific_capacitance",
+        "formula.mass_loading"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "supercapacitor",
+        "areal",
+        "thin film",
+        "GCD"
+      ],
+      "provides": "C_A"
+    },
+    {
+      "id": "formula.capacitance_from_cv",
+      "name": "Capacitance from a cyclic voltammogram",
+      "domain": "supercapacitor",
+      "derivedFrom": "CV",
+      "plainText": "C = (∮ i dE) / (2 × v × ΔV × m)",
+      "latex": "C = \\dfrac{\\oint i\\,\\mathrm{d}E}{2\\,v\\,\\Delta V\\,m}",
+      "expression": "Aint/(2*v*ΔV*m)",
+      "aliases": [
+        "CV integration",
+        "capacitance from CV",
+        "integrated area"
+      ],
+      "variables": [
+        {
+          "symbol": "Aint",
+          "name": "Enclosed area of the full CV loop (∮ i dE)",
+          "siUnit": "A·V",
+          "units": [
+            {
+              "u": "A·V",
+              "f": 1
+            },
+            {
+              "u": "mA·V",
+              "f": 0.001
+            }
+          ],
+          "default": 0.002,
+          "note": "The area enclosed by the complete cycle, anodic and cathodic branches together. Dividing by two then gives the average of the two branches."
+        },
+        {
+          "symbol": "v",
+          "name": "Scan rate",
+          "siUnit": "V/s",
+          "units": [
+            {
+              "u": "mV/s",
+              "f": 0.001
+            },
+            {
+              "u": "V/s",
+              "f": 1
+            }
+          ],
+          "default": 10
+        },
+        {
+          "symbol": "ΔV",
+          "name": "Potential window swept",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "m",
+          "name": "Mass of active material",
+          "siUnit": "kg",
+          "units": [
+            {
+              "u": "mg",
+              "f": 1e-06
+            },
+            {
+              "u": "g",
+              "f": 0.001
+            }
+          ],
+          "default": 2
+        }
+      ],
+      "result": {
+        "name": "Specific capacitance",
+        "siUnit": "F/kg",
+        "units": [
+          {
+            "u": "F/g",
+            "f": 1000
+          },
+          {
+            "u": "F/kg",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "three-electrode",
+        "deviceConfig": "single electrode",
+        "performanceLevel": "material",
+        "note": "Set m = 1 g and drop the mass term to get the electrode capacitance instead. For a symmetric two-electrode device the same factor-of-four reasoning applies as for GCD."
+      },
+      "assumptions": [
+        "The scan rate is constant over the window integrated.",
+        "The full cycle is integrated, and the division by two is what turns that into an average of the two branches — integrating only the discharge branch and still dividing by two halves the answer.",
+        "The response is capacitive enough for a single capacitance to mean anything."
+      ],
+      "limitations": [
+        "A CV-derived capacitance and a GCD-derived capacitance are generally NOT equal, and the difference grows with how non-capacitive the material is. Quoting whichever is larger, without saying which method produced it, is not reportable.",
+        "Strongly rate-dependent: a value from one scan rate says little about another.",
+        "Faradaic peaks inflate the integral without the material behaving as a capacitor."
+      ],
+      "measuredBy": [
+        "method.cv"
+      ],
+      "relatedFormulaIds": [
+        "formula.specific_capacitance",
+        "formula.b_value"
+      ],
+      "relatedIds": [
+        "concept.specific_capacitance"
+      ],
+      "tags": [
+        "supercapacitor",
+        "CV",
+        "capacitance",
+        "integration"
+      ],
+      "provides": "Cs"
+    },
+    {
+      "id": "formula.esr_from_ir_reversal",
+      "name": "ESR from the IR drop at a current REVERSAL",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
+      "plainText": "R_ESR = ΔV_IR / (2 × I)",
+      "latex": "R_{\\mathrm{ESR}} = \\dfrac{\\Delta V_{IR}}{2I}",
+      "expression": "ΔV_IR/(2*I)",
+      "aliases": [
+        "ESR",
+        "equivalent series resistance",
+        "IR drop resistance",
+        "iR drop"
+      ],
+      "variables": [
+        {
+          "symbol": "ΔV_IR",
+          "name": "Voltage step at the current reversal",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "mV",
+              "f": 0.001
+            },
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 50
+        },
+        {
+          "symbol": "I",
+          "name": "Magnitude of the applied current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 1
+        }
+      ],
+      "result": {
+        "name": "Equivalent series resistance",
+        "siUnit": "Ω",
+        "units": [
+          {
+            "u": "Ω",
+            "f": 1
+          },
+          {
+            "u": "mΩ",
+            "f": 0.001
+          },
+          {
+            "u": "kΩ",
+            "f": 1000
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "device or electrode",
+        "note": "Use THIS record when the step is measured across a charge-to-discharge reversal, where the current swings from +I to −I. The total current change is 2I, hence the two. If your step is measured from rest (current 0 → −I) use the other ESR record instead — mixing the two conventions is a clean factor-of-two error in a resistance."
+      },
+      "assumptions": [
+        "The step is read at the instant of reversal, before any relaxation. Reading it a few seconds later includes diffusion and inflates the resistance.",
+        "The sampling interval is fine enough to resolve the step at all — a coarse interval truncates it and understates the resistance.",
+        "Contact and cable resistance are included in the number unless four-wire sensing is used."
+      ],
+      "limitations": [
+        "This is a lumped resistance at one operating point, not the same quantity as the high-frequency intercept of an impedance spectrum, though the two are often quoted interchangeably.",
+        "Strongly affected by contact quality; a rising ESR over a cycling run is as often a fixture problem as a material one."
+      ],
+      "measuredBy": [
+        "method.gcd_ec",
+        "method.cc_charge_discharge"
+      ],
+      "relatedFormulaIds": [
+        "formula.esr_from_ir_rest",
+        "formula.max_power_capacitor"
+      ],
+      "relatedIds": [
+        "glossary.ir_drop",
+        "concept.ec_ir_compensation"
+      ],
+      "tags": [
+        "supercapacitor",
+        "battery",
+        "resistance",
+        "ESR",
+        "GCD"
+      ],
+      "provides": "R_ESR",
+      "variant": {
+        "group": "ir-convention",
+        "option": "reversal"
+      }
+    },
+    {
+      "id": "formula.esr_from_ir_rest",
+      "name": "ESR from the IR drop at the START of a step (from rest)",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
+      "plainText": "R_ESR = ΔV_IR / I",
+      "latex": "R_{\\mathrm{ESR}} = \\dfrac{\\Delta V_{IR}}{I}",
+      "expression": "ΔV_IR/I",
+      "aliases": [
+        "ESR from rest",
+        "IR drop from OCV",
+        "internal resistance"
+      ],
+      "variables": [
+        {
+          "symbol": "ΔV_IR",
+          "name": "Voltage step at the start of the step",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "mV",
+              "f": 0.001
+            },
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 25
+        },
+        {
+          "symbol": "I",
+          "name": "Applied current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 1
+        }
+      ],
+      "result": {
+        "name": "Equivalent series resistance",
+        "siUnit": "Ω",
+        "units": [
+          {
+            "u": "Ω",
+            "f": 1
+          },
+          {
+            "u": "mΩ",
+            "f": 0.001
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "device or electrode",
+        "note": "Use THIS record when the cell was at rest and the current stepped from 0 to I. The current change is I, so there is no factor of two. Which record is right is decided by your protocol, not by preference."
+      },
+      "assumptions": [
+        "The cell was genuinely at rest, with the voltage settled, before the step.",
+        "The step is read at the first sample after the current change."
+      ],
+      "limitations": [
+        "Same lumped-resistance caveats as the reversal record.",
+        "If the rest was too short, part of what is read as an IR step is unfinished relaxation."
+      ],
+      "measuredBy": [
+        "method.gcd_ec",
+        "method.pulse"
+      ],
+      "relatedFormulaIds": [
+        "formula.esr_from_ir_reversal"
+      ],
+      "relatedIds": [
+        "glossary.ir_drop"
+      ],
+      "tags": [
+        "supercapacitor",
+        "battery",
+        "resistance",
+        "ESR",
+        "pulse"
+      ],
+      "provides": "R_ESR",
+      "variant": {
+        "group": "ir-convention",
+        "option": "rest"
+      }
+    },
+    {
+      "id": "formula.specific_energy_capacitor",
+      "name": "Specific energy of a capacitor",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
+      "plainText": "E = ½ × Cs × ΔV²",
+      "latex": "E = \\tfrac{1}{2}C_s\\,\\Delta V^{2}",
+      "expression": "0.5*Cs*ΔV^2",
+      "aliases": [
+        "energy density",
+        "specific energy",
+        "Wh/kg"
+      ],
+      "variables": [
+        {
+          "symbol": "Cs",
+          "name": "Specific capacitance",
+          "siUnit": "F/kg",
+          "units": [
+            {
+              "u": "F/g",
+              "f": 1000
+            },
+            {
+              "u": "F/kg",
+              "f": 1
+            }
+          ],
+          "default": 200,
+          "note": "On the SAME normalisation basis as the energy you intend to report — device-level energy needs device-level capacitance."
+        },
+        {
+          "symbol": "ΔV",
+          "name": "Operating voltage window",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 1
+        }
+      ],
+      "result": {
+        "name": "Specific energy",
+        "siUnit": "J/kg",
+        "units": [
+          {
+            "u": "Wh/kg",
+            "f": 3600
+          },
+          {
+            "u": "J/g",
+            "f": 1000
+          },
+          {
+            "u": "J/kg",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "two-electrode for a device claim",
+        "deviceConfig": "state which — material or device",
+        "performanceLevel": "material or device",
+        "note": "Because energy goes as ΔV², the voltage window dominates this number. An energy density quoted without its voltage window and its normalisation basis is not a result."
+      },
+      "assumptions": [
+        "Ideal capacitor behaviour, so that energy is ½CV². A battery-type or strongly pseudocapacitive electrode stores energy that this expression does not describe — integrate ∫V dQ instead.",
+        "ΔV is the window actually usable, not the widest window the cell survived once."
+      ],
+      "limitations": [
+        "Material-level energy densities calculated from three-electrode data are routinely an order of magnitude above what the packaged device delivers, because they exclude the counter electrode, electrolyte, separator, collectors and packaging.",
+        "A number computed from a symmetric-cell capacitance that was itself derived with the factor of four is a material-level figure, not a device one — combining the two silently inflates the result by four."
+      ],
+      "measuredBy": [
+        "method.gcd_ec"
+      ],
+      "relatedFormulaIds": [
+        "formula.specific_capacitance",
+        "formula.cell_capacitance",
+        "formula.specific_power_capacitor"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "supercapacitor",
+        "energy density",
+        "Ragone"
+      ],
+      "provides": "E"
+    },
+    {
+      "id": "formula.specific_power_capacitor",
+      "name": "Specific power from a discharge",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
+      "plainText": "P = E / Δt",
+      "latex": "P = \\dfrac{E}{\\Delta t}",
+      "expression": "E/Δt",
+      "aliases": [
+        "power density",
+        "specific power",
+        "W/kg"
+      ],
+      "variables": [
+        {
+          "symbol": "E",
+          "name": "Specific energy delivered in the discharge",
+          "siUnit": "J/kg",
+          "units": [
+            {
+              "u": "Wh/kg",
+              "f": 3600
+            },
+            {
+              "u": "J/kg",
+              "f": 1
+            }
+          ],
+          "default": 27.8
+        },
+        {
+          "symbol": "Δt",
+          "name": "Discharge time",
+          "siUnit": "s",
+          "units": [
+            {
+              "u": "s",
+              "f": 1
+            },
+            {
+              "u": "min",
+              "f": 60
+            },
+            {
+              "u": "h",
+              "f": 3600
+            }
+          ],
+          "default": 100
+        }
+      ],
+      "result": {
+        "name": "Specific power",
+        "siUnit": "W/kg",
+        "units": [
+          {
+            "u": "W/kg",
+            "f": 1
+          },
+          {
+            "u": "kW/kg",
+            "f": 1000
+          }
+        ]
+      },
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "same as the energy used",
+        "deviceConfig": "same as the energy used",
+        "performanceLevel": "same basis as the energy used",
+        "note": "This is the AVERAGE power over the discharge, which is what a Ragone plot point should be. It is not the peak or matched-load power."
+      },
+      "assumptions": [
+        "E and Δt come from the same discharge, on the same normalisation basis.",
+        "The discharge ran to the stated lower limit rather than terminating on a time limit."
+      ],
+      "limitations": [
+        "A Ragone plot built from points that mix material-level and device-level normalisation is not interpretable, and this is a common way it happens.",
+        "Average power says nothing about whether the device can supply a short high-current pulse."
+      ],
+      "measuredBy": [
+        "method.gcd_ec"
+      ],
+      "relatedFormulaIds": [
+        "formula.specific_energy_capacitor",
+        "formula.max_power_capacitor"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "supercapacitor",
+        "power density",
+        "Ragone"
+      ],
+      "provides": "P"
+    },
+    {
+      "id": "formula.max_power_capacitor",
+      "name": "Matched-load maximum specific power",
+      "domain": "supercapacitor",
+      "derivedFrom": "GCD",
+      "plainText": "P_max = ΔV² / (4 × R_ESR × m)",
+      "latex": "P_{\\max} = \\dfrac{\\Delta V^{2}}{4R_{\\mathrm{ESR}}\\,m}",
+      "expression": "ΔV^2/(4*R_ESR*m)",
+      "aliases": [
+        "maximum power",
+        "P max",
+        "matched load power"
+      ],
+      "variables": [
+        {
+          "symbol": "ΔV",
+          "name": "Operating voltage",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 1,
+          "note": "Conventionally the voltage after the IR drop has been removed. Using the full window overstates the result."
+        },
+        {
+          "symbol": "R_ESR",
+          "name": "Equivalent series resistance",
+          "siUnit": "Ω",
+          "units": [
+            {
+              "u": "Ω",
+              "f": 1
+            },
+            {
+              "u": "mΩ",
+              "f": 0.001
+            }
+          ],
+          "default": 25
+        },
+        {
+          "symbol": "m",
+          "name": "Mass basis",
+          "siUnit": "kg",
+          "units": [
+            {
+              "u": "mg",
+              "f": 1e-06
+            },
+            {
+              "u": "g",
+              "f": 0.001
+            }
+          ],
+          "default": 4
+        }
+      ],
+      "result": {
+        "name": "Maximum specific power",
+        "siUnit": "W/kg",
+        "units": [
+          {
+            "u": "kW/kg",
+            "f": 1000
+          },
+          {
+            "u": "W/kg",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "two-electrode for a device claim",
+        "deviceConfig": "state which",
+        "performanceLevel": "device or material — match the mass basis",
+        "note": "The factor of four is the maximum-power-transfer condition: power delivered to an external load peaks when the load resistance equals the internal resistance, and at that point half the voltage is dropped internally."
+      },
+      "assumptions": [
+        "A single lumped series resistance describes the device, which is a strong idealisation for a porous electrode.",
+        "The device can actually survive the current implied, which at matched load is ΔV/(2·R_ESR)."
+      ],
+      "limitations": [
+        "An idealised ceiling, not a measured capability. It is reported far more often than it is demonstrated.",
+        "Half the energy is dissipated internally at matched load, so this is not an operating point anybody would choose.",
+        "Extremely sensitive to how R_ESR was measured — see the two ESR records, which differ by a factor of two."
+      ],
+      "measuredBy": [
+        "method.gcd_ec"
+      ],
+      "relatedFormulaIds": [
+        "formula.esr_from_ir_reversal",
+        "formula.specific_power_capacitor"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "supercapacitor",
+        "power",
+        "ESR",
+        "Ragone"
+      ],
+      "provides": "P_max"
+    },
+    {
+      "id": "formula.capacitance_retention",
+      "name": "Capacitance retention",
+      "domain": "supercapacitor",
+      "derivedFrom": "cycling",
+      "plainText": "Retention = C_n / C_ref × 100",
+      "latex": "\\mathrm{Retention} = \\dfrac{C_n}{C_{\\mathrm{ref}}}\\times100",
+      "expression": "C_n/C_ref*100",
+      "aliases": [
+        "capacitance retention",
+        "cycling stability",
+        "capacity fade"
+      ],
+      "variables": [
+        {
+          "symbol": "C_n",
+          "name": "Capacitance at cycle n",
+          "siUnit": "F",
+          "units": [
+            {
+              "u": "same unit for both",
+              "f": 1.0
+            }
+          ],
+          "default": 92,
+          "note": " Enter both values in the SAME unit — the ratio cancels it, and mixing units here is an error the arithmetic cannot detect."
+        },
+        {
+          "symbol": "C_ref",
+          "name": "Reference capacitance",
+          "siUnit": "F",
+          "units": [
+            {
+              "u": "same unit for both",
+              "f": 1.0
+            }
+          ],
+          "default": 100,
+          "note": "Both values must be on the same basis and from the same rate. State which cycle is the reference. Enter both values in the SAME unit — the ratio cancels it, and mixing units here is an error the arithmetic cannot detect."
+        }
+      ],
+      "result": {
+        "name": "Retention",
+        "siUnit": "%",
+        "units": [
+          {
+            "u": "%",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "device or material",
+        "note": "The reference cycle is a reporting choice that changes the answer. Normalising to cycle 1 flatters the result because cycle 1 is dominated by formation; a reference taken after the response has stabilised is the more informative choice, and either way it must be stated."
+      },
+      "assumptions": [
+        "Both capacitances are measured at the same rate, in the same window, with the same IR convention.",
+        "The reference cycle is stated."
+      ],
+      "limitations": [
+        "Retention over a few thousand cycles at a high rate can look excellent while the same cell fails quickly at a low rate — a high rate spends less time at the potential extremes where degradation happens.",
+        "Retention alone hides what changed. Pair it with the resistance trend, which usually moves first."
+      ],
+      "measuredBy": [
+        "method.long_term_cycling"
+      ],
+      "relatedFormulaIds": [
+        "formula.capacity_retention"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "supercapacitor",
+        "cycling",
+        "stability",
+        "retention"
+      ]
+    },
+    {
+      "id": "formula.specific_capacity",
+      "name": "Specific capacity (from a galvanostatic discharge)",
+      "domain": "battery",
+      "derivedFrom": "GCD",
+      "plainText": "Q = I × Δt / m",
+      "latex": "Q = \\dfrac{I\\,\\Delta t}{m}",
+      "expression": "I*Δt/m",
+      "aliases": [
+        "specific capacity",
+        "gravimetric capacity",
+        "mAh/g",
+        "discharge capacity"
+      ],
+      "variables": [
+        {
+          "symbol": "I",
+          "name": "Discharge current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            },
+            {
+              "u": "µA",
+              "f": 1e-06
+            }
+          ],
+          "default": 0.5
+        },
+        {
+          "symbol": "Δt",
+          "name": "Discharge time",
+          "siUnit": "s",
+          "units": [
+            {
+              "u": "h",
+              "f": 3600
+            },
+            {
+              "u": "min",
+              "f": 60
+            },
+            {
+              "u": "s",
+              "f": 1
+            }
+          ],
+          "default": 2
+        },
+        {
+          "symbol": "m",
+          "name": "Mass of active material",
+          "siUnit": "kg",
+          "units": [
+            {
+              "u": "mg",
+              "f": 1e-06
+            },
+            {
+              "u": "g",
+              "f": 0.001
+            }
+          ],
+          "default": 5
+        }
+      ],
+      "result": {
+        "name": "Specific capacity",
+        "siUnit": "A·s/kg",
+        "units": [
+          {
+            "u": "mAh/g",
+            "f": 3600.0
+          },
+          {
+            "u": "Ah/kg",
+            "f": 3600.0
+          },
+          {
+            "u": "A·s/kg",
+            "f": 1.0
+          }
+        ]
+      },
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "half cell or full cell",
+        "deviceConfig": "state which — half cell or full cell",
+        "performanceLevel": "material",
+        "note": "Integrate the RECORDED current, not the programmed setpoint. Where the channel hit a compliance limit the two differ, and the recorded current is what actually passed."
+      },
+      "assumptions": [
+        "The current was constant, or the recorded current was integrated properly if it was not.",
+        "The step ended on its voltage limit rather than on a time limit — a step that ran out of time reports a capacity that is an artefact of the protocol.",
+        "m is active material only."
+      ],
+      "limitations": [
+        "Meaningless without the rate and the voltage window. The same electrode gives very different capacities at C/20 and 5C.",
+        "First-cycle capacity includes irreversible processes and should not be compared with steady-state cycles.",
+        "In a half cell against lithium, the counter electrode is effectively unlimited; a full cell will not reproduce these numbers."
+      ],
+      "measuredBy": [
+        "method.cc_charge_discharge"
+      ],
+      "relatedFormulaIds": [
+        "formula.theoretical_capacity",
+        "formula.c_rate",
+        "formula.coulombic_efficiency"
+      ],
+      "relatedIds": [
+        "concept.bt_active_mass"
+      ],
+      "tags": [
+        "battery",
+        "capacity",
+        "GCD",
+        "mAh/g"
+      ],
+      "provides": "Q"
+    },
+    {
+      "id": "formula.theoretical_capacity",
+      "name": "Theoretical specific capacity",
+      "domain": "battery",
+      "derivedFrom": "literature",
+      "plainText": "Q_th = n × F / M",
+      "latex": "Q_{\\mathrm{th}} = \\dfrac{nF}{M}",
+      "expression": "n*F/M",
+      "aliases": [
+        "theoretical capacity",
+        "maximum capacity",
+        "Faraday capacity"
+      ],
+      "variables": [
+        {
+          "symbol": "n",
+          "name": "Electrons transferred per formula unit",
+          "siUnit": "dimensionless",
+          "units": [
+            {
+              "u": "electrons",
+              "f": 1
+            }
+          ],
+          "default": 1,
+          "note": "Per formula unit of the compound whose molar mass you enter. Mixing the two — electrons per lithium against the molar mass of the host — is the usual error."
+        },
+        {
+          "symbol": "M",
+          "name": "Molar mass of the active compound",
+          "siUnit": "kg/mol",
+          "units": [
+            {
+              "u": "g/mol",
+              "f": 0.001
+            },
+            {
+              "u": "kg/mol",
+              "f": 1
+            }
+          ],
+          "default": 157.76
+        }
+      ],
+      "result": {
+        "name": "Theoretical specific capacity",
+        "siUnit": "A·s/kg",
+        "units": [
+          {
+            "u": "mAh/g",
+            "f": 3600.0
+          },
+          {
+            "u": "Ah/kg",
+            "f": 3600.0
+          },
+          {
+            "u": "A·s/kg",
+            "f": 1.0
+          }
+        ]
+      },
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "not applicable — a compound property",
+        "deviceConfig": "not applicable",
+        "performanceLevel": "material, theoretical",
+        "note": "A theoretical value, not a measurement. It belongs in a comparison only when it is labelled as theoretical — the default example here is LiFePO₄ (M = 157.76 g/mol, n = 1), which gives about 170 mAh/g."
+      },
+      "assumptions": [
+        "Complete utilisation of the redox couple, which no real electrode achieves.",
+        "The molar mass is that of the compound in the state you are weighing, including any water of hydration.",
+        "No contribution from anything but the stated redox reaction."
+      ],
+      "limitations": [
+        "It is an upper bound and nothing else. A measured capacity approaching it should prompt a check of the mass and the current before it prompts a claim.",
+        "A measured capacity ABOVE the theoretical value means something is wrong — usually the active mass, the current, or an unaccounted contribution such as electrolyte decomposition or conductive carbon."
       ],
       "measuredBy": [],
-      "relatedFormulaIds": [],
-      "relatedIds": ["concept.specific_capacitance"],
-      "tags": ["supercapacitor", "EDLC", "GCD", "capacitance"]
+      "relatedFormulaIds": [
+        "formula.specific_capacity"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "battery",
+        "capacity",
+        "theoretical"
+      ],
+      "provides": "Q_th"
     },
     {
       "id": "formula.coulombic_efficiency",
       "name": "Coulombic efficiency",
+      "domain": "battery",
+      "derivedFrom": "cycling",
       "plainText": "η = Q_discharge / Q_charge × 100",
       "latex": "\\eta = \\dfrac{Q_{\\mathrm{discharge}}}{Q_{\\mathrm{charge}}}\\times 100",
-      "aliases": ["coulombic efficiency", "CE", "faradaic efficiency"],
-      "variables": [
-        { "symbol": "Q_discharge", "name": "Charge extracted during discharge", "siUnit": "C", "commonUnit": "mAh" },
-        { "symbol": "Q_charge",    "name": "Charge passed during charge",       "siUnit": "C", "commonUnit": "mAh" }
+      "expression": "Q_dis/Q_ch*100",
+      "aliases": [
+        "coulombic efficiency",
+        "CE",
+        "faradaic efficiency"
       ],
-      "siUnit": "dimensionless",
-      "commonUnit": "%",
+      "variables": [
+        {
+          "symbol": "Q_dis",
+          "name": "Charge extracted during discharge",
+          "siUnit": "C",
+          "units": [
+            {
+              "u": "same unit for both",
+              "f": 1.0
+            }
+          ],
+          "default": 148,
+          "note": " Enter both values in the SAME unit — the ratio cancels it, and mixing units here is an error the arithmetic cannot detect."
+        },
+        {
+          "symbol": "Q_ch",
+          "name": "Charge passed during charge",
+          "siUnit": "C",
+          "units": [
+            {
+              "u": "same unit for both",
+              "f": 1.0
+            }
+          ],
+          "default": 150,
+          "note": "From the SAME cycle as the discharge, over the same window. Enter both values in the SAME unit — the ratio cancels it, and mixing units here is an error the arithmetic cannot detect."
+        }
+      ],
+      "result": {
+        "name": "Coulombic efficiency",
+        "siUnit": "%",
+        "units": [
+          {
+            "u": "%",
+            "f": 1
+          }
+        ]
+      },
       "normalizationBasis": "none",
       "validContext": {
         "cellType": "two-electrode or three-electrode",
         "deviceConfig": "any",
         "performanceLevel": "device or electrode",
-        "note": "Both quantities must come from the same cycle and be measured over the same voltage window. Reporting an efficiency without stating the cycle number and the rate makes it uninterpretable."
+        "note": "Both quantities must come from the same cycle and the same voltage window. An efficiency reported without the cycle number and the rate is uninterpretable."
       },
       "assumptions": [
         "Both charge quantities are integrated over complete, comparable steps.",
-        "No significant self-discharge occurs during any rest between the two steps, or if it does, it is accounted for.",
-        "The current recorded by the instrument is the actual current, not the programmed setpoint."
+        "No significant self-discharge during any rest between them, or it is accounted for.",
+        "The recorded current is used, not the programmed setpoint."
       ],
       "limitations": [
-        "A value above 100% is not physically meaningful for an ideal cell and usually signals a soft internal short, a redox shuttle, charge carried over from the previous cycle, or a mass or current entry error. It should be treated as a diagnostic prompt rather than a result.",
-        "First-cycle efficiency is dominated by irreversible processes such as SEI formation and should not be compared with steady-state cycles."
+        "A value above 100% is not physically meaningful for an ideal cell. It usually signals a soft internal short, a redox shuttle, charge carried over from the previous cycle, or a mass or current entry error — treat it as a diagnostic prompt, not a result.",
+        "First-cycle efficiency is dominated by irreversible processes such as SEI formation and must not be pooled with steady-state cycles.",
+        "Small errors matter: 99.9% per cycle still loses about 37% of capacity over a thousand cycles."
       ],
-      "measuredBy": [],
-      "relatedFormulaIds": [],
+      "measuredBy": [
+        "method.coulombic_efficiency"
+      ],
+      "relatedFormulaIds": [
+        "formula.energy_efficiency",
+        "formula.capacity_retention"
+      ],
+      "relatedIds": [
+        "troubleshooting.ce_above_100"
+      ],
+      "tags": [
+        "battery",
+        "cycling",
+        "efficiency",
+        "GCD"
+      ]
+    },
+    {
+      "id": "formula.energy_efficiency",
+      "name": "Energy (round-trip) efficiency",
+      "domain": "battery",
+      "derivedFrom": "cycling",
+      "plainText": "η_E = E_discharge / E_charge × 100",
+      "latex": "\\eta_E = \\dfrac{E_{\\mathrm{discharge}}}{E_{\\mathrm{charge}}}\\times100",
+      "expression": "E_dis/E_ch*100",
+      "aliases": [
+        "energy efficiency",
+        "round trip efficiency",
+        "voltage efficiency"
+      ],
+      "variables": [
+        {
+          "symbol": "E_dis",
+          "name": "Energy delivered on discharge (∫V dQ)",
+          "siUnit": "J",
+          "units": [
+            {
+              "u": "same unit for both",
+              "f": 1.0
+            }
+          ],
+          "default": 4.2,
+          "note": " Enter both values in the SAME unit — the ratio cancels it, and mixing units here is an error the arithmetic cannot detect."
+        },
+        {
+          "symbol": "E_ch",
+          "name": "Energy supplied on charge",
+          "siUnit": "J",
+          "units": [
+            {
+              "u": "same unit for both",
+              "f": 1.0
+            }
+          ],
+          "default": 5,
+          "note": " Enter both values in the SAME unit — the ratio cancels it, and mixing units here is an error the arithmetic cannot detect."
+        }
+      ],
+      "result": {
+        "name": "Energy efficiency",
+        "siUnit": "%",
+        "units": [
+          {
+            "u": "%",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "device",
+        "note": "Always lower than the coulombic efficiency, because it also carries the voltage penalty of polarisation. The gap between the two is the more informative quantity: coulombic efficiency near 100% with falling energy efficiency means rising overpotential, not charge loss."
+      },
+      "assumptions": [
+        "Both energies are proper integrals of V dQ over complete steps, not (average voltage × capacity) approximations.",
+        "Same cycle, same window, same rate."
+      ],
+      "limitations": [
+        "Rate-dependent: comparing efficiencies measured at different rates compares polarisation, not the cells.",
+        "A CC–CV charge and a CC-only discharge are not symmetric steps, and the efficiency between them mixes protocol with cell behaviour."
+      ],
+      "measuredBy": [
+        "method.cc_charge_discharge"
+      ],
+      "relatedFormulaIds": [
+        "formula.coulombic_efficiency"
+      ],
       "relatedIds": [],
-      "tags": ["battery", "cycling", "efficiency", "GCD"]
+      "tags": [
+        "battery",
+        "efficiency",
+        "cycling",
+        "energy"
+      ]
+    },
+    {
+      "id": "formula.capacity_retention",
+      "name": "Capacity retention",
+      "domain": "battery",
+      "derivedFrom": "cycling",
+      "plainText": "Retention = Q_n / Q_ref × 100",
+      "latex": "\\mathrm{Retention} = \\dfrac{Q_n}{Q_{\\mathrm{ref}}}\\times100",
+      "expression": "Q_n/Q_ref*100",
+      "aliases": [
+        "capacity retention",
+        "capacity fade",
+        "cycle life"
+      ],
+      "variables": [
+        {
+          "symbol": "Q_n",
+          "name": "Capacity at cycle n",
+          "siUnit": "A·s",
+          "units": [
+            {
+              "u": "same unit for both",
+              "f": 1.0
+            }
+          ],
+          "default": 128,
+          "note": " Enter both values in the SAME unit — the ratio cancels it, and mixing units here is an error the arithmetic cannot detect."
+        },
+        {
+          "symbol": "Q_ref",
+          "name": "Reference capacity",
+          "siUnit": "A·s",
+          "units": [
+            {
+              "u": "same unit for both",
+              "f": 1.0
+            }
+          ],
+          "default": 150,
+          "note": "State which cycle. Normalising to cycle 1 flatters the result, because cycle 1 is dominated by formation. Enter both values in the SAME unit — the ratio cancels it, and mixing units here is an error the arithmetic cannot detect."
+        }
+      ],
+      "result": {
+        "name": "Capacity retention",
+        "siUnit": "%",
+        "units": [
+          {
+            "u": "%",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "device or material",
+        "note": "Report the reference cycle, the rate and the number of cycles together. Retention at cycle 100 relative to cycle 5 at 1C is a statement; '92% retention' on its own is not."
+      },
+      "assumptions": [
+        "Both capacities are measured at the same rate and in the same window.",
+        "Formation cycles are excluded from the comparison, or their inclusion is stated."
+      ],
+      "limitations": [
+        "Retention says nothing about the mechanism. Pair it with the coulombic efficiency trend and the resistance trend, which usually move first.",
+        "High-rate cycling can show excellent retention simply because the cell spends less time at the potential extremes."
+      ],
+      "measuredBy": [
+        "method.capacity_retention",
+        "method.long_term_cycling"
+      ],
+      "relatedFormulaIds": [
+        "formula.coulombic_efficiency",
+        "formula.capacitance_retention"
+      ],
+      "relatedIds": [
+        "troubleshooting.poor_cycling"
+      ],
+      "tags": [
+        "battery",
+        "cycling",
+        "retention",
+        "stability"
+      ]
     },
     {
       "id": "formula.c_rate",
-      "name": "C-rate",
+      "name": "C-rate from an applied current",
+      "domain": "battery",
+      "derivedFrom": "geometry",
       "plainText": "C-rate = I / Q_nominal",
       "latex": "\\mathrm{C\\text{-}rate} = \\dfrac{I}{Q_{\\mathrm{nominal}}}",
-      "aliases": ["C rate", "C-rate", "charge rate"],
-      "variables": [
-        { "symbol": "I",         "name": "Applied current",                  "siUnit": "A",   "commonUnit": "mA" },
-        { "symbol": "Q_nominal", "name": "Nominal capacity of the electrode or cell", "siUnit": "A·s", "commonUnit": "mAh" }
+      "expression": "I/Q_nom",
+      "aliases": [
+        "C rate",
+        "C-rate",
+        "charge rate",
+        "1C"
       ],
-      "siUnit": "1/h",
-      "commonUnit": "C",
+      "variables": [
+        {
+          "symbol": "I",
+          "name": "Applied current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 0.85
+        },
+        {
+          "symbol": "Q_nom",
+          "name": "Nominal capacity",
+          "siUnit": "A·s",
+          "units": [
+            {
+              "u": "mAh",
+              "f": 3.6
+            },
+            {
+              "u": "Ah",
+              "f": 3600
+            }
+          ],
+          "default": 0.85,
+          "note": "Theoretical capacity, manufacturer rating, or the capacity this electrode actually delivered? The three give different currents for '1C' and the basis must be stated."
+        }
+      ],
+      "result": {
+        "name": "C-rate",
+        "siUnit": "1/s",
+        "units": [
+          {
+            "u": "C (per hour)",
+            "f": 0.0002777777777777778
+          },
+          {
+            "u": "1/h",
+            "f": 0.0002777777777777778
+          }
+        ]
+      },
       "normalizationBasis": "none",
       "validContext": {
         "cellType": "any",
         "deviceConfig": "any",
         "performanceLevel": "electrode or device",
-        "note": "1C nominally means full nominal capacity in one hour. Whether Q_nominal is the theoretical capacity, the manufacturer's rating, or the capacity this particular electrode actually delivered changes the meaning entirely, so the basis must always be stated."
+        "note": "1C nominally means the full nominal capacity in one hour. Whether Q_nominal is theoretical, rated or measured changes the meaning entirely."
       },
       "assumptions": [
-        "Q_nominal is defined on the same basis (per gram of active material, or per cell) as the current is applied.",
-        "The nominal capacity is appropriate to this material and voltage window, not carried over from a different chemistry."
+        "Q_nominal is defined on the same basis as the current is applied — per gram of active material, or per cell.",
+        "The nominal capacity is appropriate to this material and window, not carried over from another chemistry."
       ],
       "limitations": [
-        "C-rate is a convenience, not a physical property. Two laboratories quoting 1C for the same material can be applying different currents if they define the nominal capacity differently.",
-        "For materials with no well-defined nominal capacity — many carbons in supercapacitor use — current density is the clearer quantity to report."
+        "A convenience, not a physical property. Two laboratories quoting 1C for the same material can be applying different currents.",
+        "For materials with no well-defined nominal capacity — most carbons in supercapacitor use — current density is the clearer quantity.",
+        "A C-rate defined against the wrong nominal capacity is a common route to an unintended overcurrent."
+      ],
+      "measuredBy": [
+        "method.rate_capability"
+      ],
+      "relatedFormulaIds": [
+        "formula.current_from_c_rate",
+        "formula.specific_capacity"
+      ],
+      "relatedIds": [
+        "glossary.cccv"
+      ],
+      "tags": [
+        "battery",
+        "rate capability",
+        "cycling",
+        "C-rate"
+      ],
+      "provides": "Crate"
+    },
+    {
+      "id": "formula.current_from_c_rate",
+      "name": "Current to apply for a target C-rate",
+      "domain": "battery",
+      "derivedFrom": "geometry",
+      "plainText": "I = C-rate × Q_nominal",
+      "latex": "I = \\mathrm{C\\text{-}rate}\\times Q_{\\mathrm{nominal}}",
+      "expression": "Crate*Q_nom",
+      "aliases": [
+        "current for C rate",
+        "set the current",
+        "C-rate to current"
+      ],
+      "variables": [
+        {
+          "symbol": "Crate",
+          "name": "Target C-rate",
+          "siUnit": "1/s",
+          "units": [
+            {
+              "u": "C (per hour)",
+              "f": 0.0002777777777777778
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "Q_nom",
+          "name": "Nominal capacity",
+          "siUnit": "A·s",
+          "units": [
+            {
+              "u": "mAh",
+              "f": 3.6
+            },
+            {
+              "u": "mAh/g × mg",
+              "f": 0.0036
+            },
+            {
+              "u": "Ah",
+              "f": 3600
+            }
+          ],
+          "default": 0.85
+        }
+      ],
+      "result": {
+        "name": "Current to apply",
+        "siUnit": "A",
+        "units": [
+          {
+            "u": "mA",
+            "f": 0.001
+          },
+          {
+            "u": "µA",
+            "f": 1e-06
+          },
+          {
+            "u": "A",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "electrode or device",
+        "note": "This is the bench calculation — the one done before the run rather than after it. Record the nominal capacity you used alongside the current, because the current alone does not say what rate you thought you were applying."
+      },
+      "assumptions": [
+        "Q_nominal is on the same basis as the cell being tested.",
+        "The channel can actually supply this current within its compliance limits."
+      ],
+      "limitations": [
+        "Same basis problem as the C-rate itself: the answer is only as meaningful as the nominal capacity that went in.",
+        "For a new material there is no reliable nominal capacity until it has been measured, so the first rate study is necessarily provisional."
+      ],
+      "measuredBy": [
+        "method.rate_capability"
+      ],
+      "relatedFormulaIds": [
+        "formula.c_rate",
+        "formula.specific_current"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "battery",
+        "rate capability",
+        "bench",
+        "C-rate"
+      ]
+    },
+    {
+      "id": "formula.mass_loading",
+      "name": "Mass loading",
+      "domain": "shared",
+      "derivedFrom": "geometry",
+      "plainText": "L = m / A",
+      "latex": "L = \\dfrac{m}{A}",
+      "expression": "m/A",
+      "aliases": [
+        "mass loading",
+        "areal loading",
+        "mg/cm2"
+      ],
+      "variables": [
+        {
+          "symbol": "m",
+          "name": "Mass of active material",
+          "siUnit": "kg",
+          "units": [
+            {
+              "u": "mg",
+              "f": 1e-06
+            },
+            {
+              "u": "g",
+              "f": 0.001
+            }
+          ],
+          "default": 2
+        },
+        {
+          "symbol": "A",
+          "name": "Electrode area",
+          "siUnit": "m²",
+          "units": [
+            {
+              "u": "cm²",
+              "f": 0.0001
+            },
+            {
+              "u": "mm²",
+              "f": 1e-06
+            }
+          ],
+          "default": 1.13
+        }
+      ],
+      "result": {
+        "name": "Mass loading",
+        "siUnit": "kg/m²",
+        "units": [
+          {
+            "u": "mg/cm²",
+            "f": 0.01
+          },
+          {
+            "u": "kg/m²",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "areal",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "electrode",
+        "note": "Should be reported with every gravimetric result. A specific capacitance measured at 0.2 mg/cm² and one measured at 5 mg/cm² are not comparable, and the low-loading value is almost always the higher one."
+      },
+      "assumptions": [
+        "The area is the geometric footprint of the coated region.",
+        "The mass is active material only, on the same basis used elsewhere."
+      ],
+      "limitations": [
+        "Says nothing about thickness or porosity, which is what actually governs transport through the electrode.",
+        "Uniformity is assumed; a coating with thin edges has a loading that is an average of quite different local values."
       ],
       "measuredBy": [],
-      "relatedFormulaIds": [],
+      "relatedFormulaIds": [
+        "formula.areal_capacitance",
+        "formula.current_density"
+      ],
+      "relatedIds": [
+        "concept.bt_active_mass"
+      ],
+      "tags": [
+        "electrode",
+        "loading",
+        "preparation",
+        "reporting"
+      ],
+      "provides": "L_mass"
+    },
+    {
+      "id": "formula.current_density",
+      "name": "Current density (areal)",
+      "domain": "shared",
+      "derivedFrom": "geometry",
+      "plainText": "j = I / A",
+      "latex": "j = \\dfrac{I}{A}",
+      "expression": "I/A",
+      "aliases": [
+        "current density",
+        "areal current density",
+        "mA/cm2"
+      ],
+      "variables": [
+        {
+          "symbol": "I",
+          "name": "Applied current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "µA",
+              "f": 1e-06
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "A",
+          "name": "Electrode area",
+          "siUnit": "m²",
+          "units": [
+            {
+              "u": "cm²",
+              "f": 0.0001
+            },
+            {
+              "u": "mm²",
+              "f": 1e-06
+            }
+          ],
+          "default": 1
+        }
+      ],
+      "result": {
+        "name": "Current density",
+        "siUnit": "A/m²",
+        "units": [
+          {
+            "u": "mA/cm²",
+            "f": 10
+          },
+          {
+            "u": "A/cm²",
+            "f": 10000
+          },
+          {
+            "u": "A/m²",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "areal",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "electrode",
+        "note": "Always state whether the area is geometric or a measured surface area such as BET. The two can differ by orders of magnitude, and a current density normalised to BET area is not comparable with one normalised to footprint."
+      },
+      "assumptions": [
+        "Current is distributed uniformly over the stated area, which a porous or partially wetted electrode does not guarantee.",
+        "The whole stated area is in contact with electrolyte."
+      ],
+      "limitations": [
+        "Geometric current density understates the true interfacial current density on a rough or porous electrode, often by a large factor — which is why apparent activity can be improved by roughening alone.",
+        "In a Tafel analysis the normalisation basis directly shifts the extracted exchange current density."
+      ],
+      "measuredBy": [],
+      "relatedFormulaIds": [
+        "formula.specific_current",
+        "formula.mass_loading",
+        "formula.tafel_slope"
+      ],
       "relatedIds": [],
-      "tags": ["battery", "rate capability", "cycling"]
+      "tags": [
+        "electrode",
+        "current density",
+        "reporting",
+        "kinetics"
+      ],
+      "provides": "j"
+    },
+    {
+      "id": "formula.specific_current",
+      "name": "Specific current (gravimetric)",
+      "domain": "shared",
+      "derivedFrom": "geometry",
+      "plainText": "i_s = I / m",
+      "latex": "i_s = \\dfrac{I}{m}",
+      "expression": "I/m",
+      "aliases": [
+        "specific current",
+        "gravimetric current density",
+        "A/g"
+      ],
+      "variables": [
+        {
+          "symbol": "I",
+          "name": "Applied current",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 2
+        },
+        {
+          "symbol": "m",
+          "name": "Mass of active material",
+          "siUnit": "kg",
+          "units": [
+            {
+              "u": "mg",
+              "f": 1e-06
+            },
+            {
+              "u": "g",
+              "f": 0.001
+            }
+          ],
+          "default": 2
+        }
+      ],
+      "result": {
+        "name": "Specific current",
+        "siUnit": "A/kg",
+        "units": [
+          {
+            "u": "A/g",
+            "f": 1000
+          },
+          {
+            "u": "mA/g",
+            "f": 1
+          },
+          {
+            "u": "A/kg",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "gravimetric",
+      "validContext": {
+        "cellType": "any",
+        "deviceConfig": "any",
+        "performanceLevel": "material",
+        "note": "The usual x-axis for a supercapacitor rate study, where C-rate has no clear meaning. For a symmetric device, state whether m is one electrode or both — the same ambiguity as the factor of four."
+      },
+      "assumptions": [
+        "m is active material only, on a stated basis."
+      ],
+      "limitations": [
+        "Not directly comparable with an areal current density; a study should report both or state which it uses throughout.",
+        "At very low mass loading a given A/g corresponds to a tiny absolute current, where instrument resolution and leakage become significant."
+      ],
+      "measuredBy": [],
+      "relatedFormulaIds": [
+        "formula.current_density",
+        "formula.c_rate"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "electrode",
+        "current density",
+        "supercapacitor",
+        "rate"
+      ],
+      "provides": "i_s"
+    },
+    {
+      "id": "formula.randles_sevcik",
+      "name": "Randles–Ševčík peak current",
+      "domain": "kinetics",
+      "derivedFrom": "CV",
+      "plainText": "i_p = 0.4463 × n × F × A × C × √(n F v D / R T)",
+      "latex": "i_p = 0.4463\\,nFAC\\sqrt{\\dfrac{nFvD}{RT}}",
+      "expression": "0.4463*n*F*A*Cb*sqrt(n*F*v*D/(R*T))",
+      "aliases": [
+        "Randles-Sevcik",
+        "Randles Sevcik",
+        "peak current diffusion",
+        "Ševčík"
+      ],
+      "variables": [
+        {
+          "symbol": "n",
+          "name": "Electrons transferred",
+          "siUnit": "dimensionless",
+          "units": [
+            {
+              "u": "electrons",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "A",
+          "name": "Electrode area",
+          "siUnit": "m²",
+          "units": [
+            {
+              "u": "cm²",
+              "f": 0.0001
+            },
+            {
+              "u": "mm²",
+              "f": 1e-06
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "Cb",
+          "name": "Bulk concentration of the redox species",
+          "siUnit": "mol/m³",
+          "units": [
+            {
+              "u": "mM",
+              "f": 1
+            },
+            {
+              "u": "mol/L",
+              "f": 1000
+            },
+            {
+              "u": "mol/m³",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "v",
+          "name": "Scan rate",
+          "siUnit": "V/s",
+          "units": [
+            {
+              "u": "mV/s",
+              "f": 0.001
+            },
+            {
+              "u": "V/s",
+              "f": 1
+            }
+          ],
+          "default": 100
+        },
+        {
+          "symbol": "D",
+          "name": "Diffusion coefficient",
+          "siUnit": "m²/s",
+          "units": [
+            {
+              "u": "cm²/s",
+              "f": 0.0001
+            },
+            {
+              "u": "m²/s",
+              "f": 1
+            }
+          ],
+          "default": 1e-05
+        },
+        {
+          "symbol": "T",
+          "name": "Temperature",
+          "siUnit": "K",
+          "units": [
+            {
+              "u": "K",
+              "f": 1
+            },
+            {
+              "u": "°C",
+              "f": 1,
+              "o": 273.15
+            }
+          ],
+          "default": 298.15
+        }
+      ],
+      "result": {
+        "name": "Peak current",
+        "siUnit": "A",
+        "units": [
+          {
+            "u": "µA",
+            "f": 1e-06
+          },
+          {
+            "u": "mA",
+            "f": 0.001
+          },
+          {
+            "u": "A",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "three-electrode",
+        "deviceConfig": "single electrode, dissolved redox species",
+        "performanceLevel": "material",
+        "note": "This is the temperature-general form. The familiar 2.69×10⁵ constant is this expression evaluated at 25 °C with area in cm², D in cm²/s and concentration in mol/cm³ — that constant carries those units inside it, which is why it silently breaks if any input is entered in SI. Here everything is converted to SI first, so the units on screen are the units you measured in."
+      },
+      "assumptions": [
+        "A reversible (Nernstian) one-step electron transfer. The irreversible and quasi-reversible cases have different coefficients, and using this one on them biases the extracted D.",
+        "Semi-infinite linear diffusion to a planar electrode. Porous, microelectrode and thin-layer geometries do not satisfy this.",
+        "The redox species is dissolved and freely diffusing, not surface-confined. A surface-confined species gives i_p ∝ v, not √v.",
+        "Excess supporting electrolyte, so migration is negligible."
+      ],
+      "limitations": [
+        "Routinely misapplied to solid electrodes in battery and supercapacitor work, where the assumptions above do not hold and the extracted D is not a diffusion coefficient of anything definite.",
+        "The area used must be the electrochemically active area; a geometric area on a rough electrode inflates D.",
+        "Verify the √v proportionality across the scan-rate range before using it — if i_p is not linear in √v, the model does not apply."
+      ],
+      "measuredBy": [
+        "method.cv"
+      ],
+      "relatedFormulaIds": [
+        "formula.b_value",
+        "formula.warburg_diffusion"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "CV",
+        "diffusion",
+        "kinetics",
+        "peak current"
+      ],
+      "provides": "i_p"
+    },
+    {
+      "id": "formula.b_value",
+      "name": "b-value from two scan rates",
+      "domain": "kinetics",
+      "derivedFrom": "CV",
+      "plainText": "b = log(i₂/i₁) / log(v₂/v₁)",
+      "latex": "b = \\dfrac{\\log(i_2/i_1)}{\\log(v_2/v_1)}",
+      "expression": "log10(i2/i1)/log10(v2/v1)",
+      "aliases": [
+        "b value",
+        "b-value",
+        "power law exponent",
+        "capacitive contribution"
+      ],
+      "variables": [
+        {
+          "symbol": "i1",
+          "name": "Current at the lower scan rate",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "µA",
+              "f": 1e-06
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 0.5
+        },
+        {
+          "symbol": "v1",
+          "name": "Lower scan rate",
+          "siUnit": "V/s",
+          "units": [
+            {
+              "u": "mV/s",
+              "f": 0.001
+            },
+            {
+              "u": "V/s",
+              "f": 1
+            }
+          ],
+          "default": 10
+        },
+        {
+          "symbol": "i2",
+          "name": "Current at the higher scan rate",
+          "siUnit": "A",
+          "units": [
+            {
+              "u": "mA",
+              "f": 0.001
+            },
+            {
+              "u": "µA",
+              "f": 1e-06
+            },
+            {
+              "u": "A",
+              "f": 1
+            }
+          ],
+          "default": 4.5
+        },
+        {
+          "symbol": "v2",
+          "name": "Higher scan rate",
+          "siUnit": "V/s",
+          "units": [
+            {
+              "u": "mV/s",
+              "f": 0.001
+            },
+            {
+              "u": "V/s",
+              "f": 1
+            }
+          ],
+          "default": 100
+        }
+      ],
+      "result": {
+        "name": "b-value",
+        "siUnit": "dimensionless",
+        "units": [
+          {
+            "u": "—",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "three-electrode",
+        "deviceConfig": "single electrode",
+        "performanceLevel": "material",
+        "note": "b is defined by i = a·vᵇ. Two points give a number; a defensible b comes from a straight-line fit across several scan rates, with the fit quality and the scan-rate range reported. Use this to check a fit, not to replace one. b must also be evaluated at a FIXED potential, not from whichever peak happens to be tallest."
+      },
+      "assumptions": [
+        "The power law holds across the scan-rate range used — which has to be demonstrated, not assumed.",
+        "Both currents are read at the same potential, on the same branch.",
+        "The currents are background- and iR-corrected consistently."
+      ],
+      "limitations": [
+        "b ≈ 0.5 is the scaling expected of a diffusion-controlled response and b ≈ 1 of a surface-controlled or capacitive one, but b is an EMPIRICAL descriptor and not a mechanism. Intermediate values do not decompose into percentages of two mechanisms.",
+        "Holds only over the scan-rate window actually measured, and b commonly drifts with rate as one process gives way to another.",
+        "Reporting a b-value without the scan-rate range and the potential at which it was evaluated makes it uninterpretable."
+      ],
+      "measuredBy": [
+        "method.cv"
+      ],
+      "relatedFormulaIds": [
+        "formula.randles_sevcik",
+        "formula.capacitance_from_cv"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "CV",
+        "kinetics",
+        "b-value",
+        "supercapacitor"
+      ],
+      "provides": "b"
+    },
+    {
+      "id": "formula.tafel_slope",
+      "name": "Tafel slope from the transfer coefficient",
+      "domain": "kinetics",
+      "derivedFrom": "literature",
+      "plainText": "b = 2.303 × R × T / (α × n × F)",
+      "latex": "b = \\dfrac{2.303\\,RT}{\\alpha nF}",
+      "expression": "2.303*R*T/(α*n*F)",
+      "aliases": [
+        "Tafel slope",
+        "mV per decade",
+        "transfer coefficient"
+      ],
+      "variables": [
+        {
+          "symbol": "α",
+          "name": "Transfer coefficient",
+          "siUnit": "dimensionless",
+          "units": [
+            {
+              "u": "—",
+              "f": 1
+            }
+          ],
+          "default": 0.5
+        },
+        {
+          "symbol": "n",
+          "name": "Electrons in the rate-determining step",
+          "siUnit": "dimensionless",
+          "units": [
+            {
+              "u": "electrons",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "T",
+          "name": "Temperature",
+          "siUnit": "K",
+          "units": [
+            {
+              "u": "K",
+              "f": 1
+            },
+            {
+              "u": "°C",
+              "f": 1,
+              "o": 273.15
+            }
+          ],
+          "default": 298.15
+        }
+      ],
+      "result": {
+        "name": "Tafel slope",
+        "siUnit": "V/decade",
+        "units": [
+          {
+            "u": "mV/dec",
+            "f": 0.001
+          },
+          {
+            "u": "V/dec",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "three-electrode",
+        "deviceConfig": "single electrode, faradaic reaction",
+        "performanceLevel": "material",
+        "note": "This gives the slope a mechanism PREDICTS. It is the number you compare a measured slope against — with α = 0.5, n = 1 at 25 °C it is the familiar 118 mV/dec. Going the other way, from a measured slope to a mechanism, is not a calculation but an inference, and a weak one on its own."
+      },
+      "assumptions": [
+        "A single rate-determining electron-transfer step, with no adsorbed intermediates and no coupled chemical step.",
+        "The transfer coefficient is independent of potential over the region concerned.",
+        "The measurement region is genuinely kinetically controlled — not mass-transport limited, not iR-dominated, not capacitive."
+      ],
+      "limitations": [
+        "Several mechanisms can produce similar slopes, and adsorption or coverage effects shift them. A slope is one piece of evidence, not an identification.",
+        "Not applicable to predominantly capacitive systems such as EDLC electrodes, where there is no faradaic reaction for the slope to describe.",
+        "A measured slope is only comparable with this prediction if the measurement was iR-corrected and the fitting range was reported."
+      ],
+      "measuredBy": [
+        "method.tafel"
+      ],
+      "relatedFormulaIds": [
+        "formula.current_density",
+        "formula.nernst"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "kinetics",
+        "Tafel",
+        "electrocatalysis",
+        "mechanism"
+      ],
+      "interactive": {
+        "route": "#/workstation/tafel",
+        "label": "Interactive Tafel analysis — see what the fitting window does to the answer"
+      },
+      "provides": "b_tafel"
+    },
+    {
+      "id": "formula.nernst",
+      "name": "Nernst equation",
+      "domain": "kinetics",
+      "derivedFrom": "literature",
+      "plainText": "E = E° − (R T / n F) × ln(Q)",
+      "latex": "E = E^{\\circ} - \\dfrac{RT}{nF}\\ln Q",
+      "expression": "E0-(R*T/(n*F))*ln(Q)",
+      "aliases": [
+        "Nernst equation",
+        "Nernst",
+        "equilibrium potential"
+      ],
+      "variables": [
+        {
+          "symbol": "E0",
+          "name": "Standard electrode potential",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            },
+            {
+              "u": "mV",
+              "f": 0.001
+            }
+          ],
+          "default": 0.34
+        },
+        {
+          "symbol": "n",
+          "name": "Electrons transferred",
+          "siUnit": "dimensionless",
+          "units": [
+            {
+              "u": "electrons",
+              "f": 1
+            }
+          ],
+          "default": 2
+        },
+        {
+          "symbol": "T",
+          "name": "Temperature",
+          "siUnit": "K",
+          "units": [
+            {
+              "u": "K",
+              "f": 1
+            },
+            {
+              "u": "°C",
+              "f": 1,
+              "o": 273.15
+            }
+          ],
+          "default": 298.15
+        },
+        {
+          "symbol": "Q",
+          "name": "Reaction quotient (products over reactants, as activities)",
+          "siUnit": "dimensionless",
+          "units": [
+            {
+              "u": "—",
+              "f": 1
+            }
+          ],
+          "default": 0.01,
+          "note": "Activities, not concentrations. Substituting concentrations is an approximation that degrades quickly in concentrated electrolytes."
+        }
+      ],
+      "result": {
+        "name": "Equilibrium potential",
+        "siUnit": "V",
+        "units": [
+          {
+            "u": "V",
+            "f": 1
+          },
+          {
+            "u": "mV",
+            "f": 0.001
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "three-electrode or two-electrode",
+        "deviceConfig": "any",
+        "performanceLevel": "material",
+        "note": "Gives the EQUILIBRIUM potential. It says nothing about how fast the reaction goes, and a cell under current is not at equilibrium — the measured potential then differs from this by the overpotential and the iR drop."
+      },
+      "assumptions": [
+        "The system is at equilibrium and reversible.",
+        "Activities are known. Using concentrations assumes an activity coefficient of one.",
+        "E° is quoted against the reference scale you are actually using."
+      ],
+      "limitations": [
+        "An open-circuit potential that disagrees with the Nernst prediction usually means a mixed potential, a slow process that has not equilibrated, or a reference electrode problem — not that the equation is wrong.",
+        "Does not apply to a cell passing current."
+      ],
+      "measuredBy": [
+        "method.ocp"
+      ],
+      "relatedFormulaIds": [
+        "formula.reference_conversion",
+        "formula.tafel_slope"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "thermodynamics",
+        "potential",
+        "OCP",
+        "kinetics"
+      ]
+    },
+    {
+      "id": "formula.reference_conversion",
+      "name": "Convert a potential to the RHE scale",
+      "domain": "kinetics",
+      "derivedFrom": "geometry",
+      "plainText": "E(RHE) = E(measured) + E°(reference) + (2.303 R T / F) × pH",
+      "latex": "E_{\\mathrm{RHE}} = E_{\\mathrm{meas}} + E^{\\circ}_{\\mathrm{ref}} + \\dfrac{2.303RT}{F}\\,\\mathrm{pH}",
+      "expression": "E_meas+E0_ref+(2.303*R*T/F)*pH",
+      "aliases": [
+        "RHE conversion",
+        "reference electrode conversion",
+        "vs RHE",
+        "Ag/AgCl to RHE"
+      ],
+      "variables": [
+        {
+          "symbol": "E_meas",
+          "name": "Potential measured against your reference",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            },
+            {
+              "u": "mV",
+              "f": 0.001
+            }
+          ],
+          "default": 0.5
+        },
+        {
+          "symbol": "E0_ref",
+          "name": "Standard potential of that reference vs SHE",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "V",
+              "f": 1
+            },
+            {
+              "u": "mV",
+              "f": 0.001
+            }
+          ],
+          "default": 0.197,
+          "note": "Take this from the manufacturer's data for YOUR electrode and its filling solution — Ag/AgCl in saturated KCl and in 3 M KCl differ by tens of millivolts. The default here is a common saturated-KCl value and should be replaced with yours."
+        },
+        {
+          "symbol": "pH",
+          "name": "pH of the electrolyte",
+          "siUnit": "dimensionless",
+          "units": [
+            {
+              "u": "pH",
+              "f": 1
+            }
+          ],
+          "default": 14
+        },
+        {
+          "symbol": "T",
+          "name": "Temperature",
+          "siUnit": "K",
+          "units": [
+            {
+              "u": "K",
+              "f": 1
+            },
+            {
+              "u": "°C",
+              "f": 1,
+              "o": 273.15
+            }
+          ],
+          "default": 298.15
+        }
+      ],
+      "result": {
+        "name": "Potential vs RHE",
+        "siUnit": "V",
+        "units": [
+          {
+            "u": "V",
+            "f": 1
+          },
+          {
+            "u": "mV",
+            "f": 0.001
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "three-electrode",
+        "deviceConfig": "aqueous electrolyte of known pH",
+        "performanceLevel": "not applicable — a scale conversion",
+        "note": "The pH term is 0.0591 V per pH unit at 25 °C; this record computes it at your temperature instead of hard-coding room temperature. Conversions to RHE are meaningful only in aqueous systems where pH is defined."
+      },
+      "assumptions": [
+        "The reference electrode is behaving correctly. A drifting or contaminated reference makes every converted number wrong by the same unknown amount.",
+        "The pH is measured, not assumed from the nominal concentration.",
+        "The reference's own potential is that of your specific electrode and filling solution."
+      ],
+      "limitations": [
+        "Does not apply in non-aqueous electrolytes, where pH is not defined and pseudo-references drift; there, potentials should be referenced to an internal standard such as the ferrocene couple.",
+        "The conversion cannot repair a junction potential, which is a separate and often larger error.",
+        "Publishing potentials without stating the reference and the conversion used is one of the most common reproducibility failures in electrocatalysis."
+      ],
+      "measuredBy": [
+        "method.ocp"
+      ],
+      "relatedFormulaIds": [
+        "formula.nernst"
+      ],
+      "relatedIds": [
+        "concept.ec_three_electrode"
+      ],
+      "tags": [
+        "reference electrode",
+        "RHE",
+        "potential scale",
+        "reporting"
+      ]
+    },
+    {
+      "id": "formula.warburg_diffusion",
+      "name": "Diffusion coefficient from the Warburg coefficient (EIS)",
+      "domain": "kinetics",
+      "derivedFrom": "EIS",
+      "plainText": "D = R² T² / (2 A² n⁴ F⁴ C² σ²)",
+      "latex": "D = \\dfrac{R^{2}T^{2}}{2A^{2}n^{4}F^{4}C^{2}\\sigma^{2}}",
+      "expression": "R^2*T^2/(2*A^2*n^4*F^4*Cb^2*σ^2)",
+      "aliases": [
+        "Warburg diffusion coefficient",
+        "sigma to D",
+        "EIS diffusion"
+      ],
+      "variables": [
+        {
+          "symbol": "σ",
+          "name": "Warburg coefficient",
+          "siUnit": "Ω·s^(−1/2)",
+          "units": [
+            {
+              "u": "Ω·s^-½",
+              "f": 1
+            }
+          ],
+          "default": 20,
+          "note": "The slope of Z′ against ω^(−1/2) in the low-frequency Warburg region — not a number read off the Nyquist plot by eye."
+        },
+        {
+          "symbol": "A",
+          "name": "Electrode area",
+          "siUnit": "m²",
+          "units": [
+            {
+              "u": "cm²",
+              "f": 0.0001
+            },
+            {
+              "u": "m²",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "n",
+          "name": "Electrons transferred",
+          "siUnit": "dimensionless",
+          "units": [
+            {
+              "u": "electrons",
+              "f": 1
+            }
+          ],
+          "default": 1
+        },
+        {
+          "symbol": "Cb",
+          "name": "Concentration of the diffusing species",
+          "siUnit": "mol/m³",
+          "units": [
+            {
+              "u": "mol/m³",
+              "f": 1
+            },
+            {
+              "u": "mol/L",
+              "f": 1000
+            },
+            {
+              "u": "mM",
+              "f": 1
+            }
+          ],
+          "default": 10000,
+          "note": "For solid-state intercalation this is the concentration of the mobile ion IN the host, computed from the host's molar volume — not the electrolyte concentration. Getting this wrong moves D by orders of magnitude."
+        },
+        {
+          "symbol": "T",
+          "name": "Temperature",
+          "siUnit": "K",
+          "units": [
+            {
+              "u": "K",
+              "f": 1
+            },
+            {
+              "u": "°C",
+              "f": 1,
+              "o": 273.15
+            }
+          ],
+          "default": 298.15
+        }
+      ],
+      "result": {
+        "name": "Diffusion coefficient",
+        "siUnit": "m²/s",
+        "units": [
+          {
+            "u": "cm²/s",
+            "f": 0.0001
+          },
+          {
+            "u": "m²/s",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "three-electrode preferred",
+        "deviceConfig": "single electrode",
+        "performanceLevel": "material",
+        "note": "Valid only where a genuine semi-infinite Warburg region exists — a 45° line in the Nyquist plot on EQUALLY SCALED axes, sustained over a real frequency range. A porous electrode produces a 45° region from pore resistance with no diffusion limitation involved, and applying this equation there returns a number that describes nothing."
+      },
+      "assumptions": [
+        "Semi-infinite diffusion — the diffusion length is short compared with the particle or film, over the frequency range fitted.",
+        "One diffusing species, one interface, one time constant.",
+        "The spectrum satisfies linearity, stationarity and causality (check it with a Kramers–Kronig test before interpreting it).",
+        "The area is the electrochemically active area, not the geometric footprint."
+      ],
+      "limitations": [
+        "Depends on σ², A², C² and n⁴ — so a factor-of-two error in area becomes a factor of four in D, and a factor of two in n becomes sixteen. Diffusion coefficients from EIS are routinely quoted with a precision the inputs cannot support.",
+        "Values from EIS, GITT and CV on the same material commonly disagree by one to two orders of magnitude, because each embeds different assumptions. Report which method produced the number.",
+        "Not applicable to porous or composite electrodes without an explicit argument that the Warburg region really is diffusion."
+      ],
+      "measuredBy": [
+        "method.eis"
+      ],
+      "relatedFormulaIds": [
+        "formula.gitt_diffusion",
+        "formula.randles_sevcik"
+      ],
+      "relatedIds": [
+        "concept.ec_eis_validity",
+        "method.eis_fitting"
+      ],
+      "tags": [
+        "EIS",
+        "diffusion",
+        "Warburg",
+        "kinetics"
+      ],
+      "interactive": {
+        "route": "#/workstation/circuits",
+        "label": "See what a Warburg element does to a spectrum, and what else produces a 45° line"
+      },
+      "provides": "D"
+    },
+    {
+      "id": "formula.gitt_diffusion",
+      "name": "Diffusion coefficient from GITT",
+      "domain": "kinetics",
+      "derivedFrom": "GITT",
+      "plainText": "D = (4 / (π τ)) × L² × (ΔE_s / ΔE_τ)²",
+      "latex": "D = \\dfrac{4}{\\pi\\tau}L^{2}\\left(\\dfrac{\\Delta E_s}{\\Delta E_\\tau}\\right)^{2}",
+      "expression": "(4/(PI*τ))*L^2*(ΔE_s/ΔE_τ)^2",
+      "aliases": [
+        "GITT",
+        "GITT diffusion coefficient",
+        "titration technique"
+      ],
+      "variables": [
+        {
+          "symbol": "τ",
+          "name": "Duration of the current pulse",
+          "siUnit": "s",
+          "units": [
+            {
+              "u": "s",
+              "f": 1
+            },
+            {
+              "u": "min",
+              "f": 60
+            }
+          ],
+          "default": 600
+        },
+        {
+          "symbol": "L",
+          "name": "Characteristic diffusion length",
+          "siUnit": "m",
+          "units": [
+            {
+              "u": "µm",
+              "f": 1e-06
+            },
+            {
+              "u": "nm",
+              "f": 1e-09
+            },
+            {
+              "u": "cm",
+              "f": 0.01
+            }
+          ],
+          "default": 5,
+          "note": "Usually the particle radius, or the electrode thickness for a dense film — and the least certain input in the calculation by a wide margin. A polydisperse powder has no single value."
+        },
+        {
+          "symbol": "ΔE_s",
+          "name": "Steady-state voltage change over the pulse",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "mV",
+              "f": 0.001
+            },
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 10,
+          "note": "The change in the relaxed (equilibrium) voltage between the start and end of the step, after the rest."
+        },
+        {
+          "symbol": "ΔE_τ",
+          "name": "Voltage change during the pulse, IR drop excluded",
+          "siUnit": "V",
+          "units": [
+            {
+              "u": "mV",
+              "f": 0.001
+            },
+            {
+              "u": "V",
+              "f": 1
+            }
+          ],
+          "default": 40,
+          "note": "Excluding the instantaneous IR step. Including it inflates ΔE_τ and understates D."
+        }
+      ],
+      "result": {
+        "name": "Diffusion coefficient",
+        "siUnit": "m²/s",
+        "units": [
+          {
+            "u": "cm²/s",
+            "f": 0.0001
+          },
+          {
+            "u": "m²/s",
+            "f": 1
+          }
+        ]
+      },
+      "normalizationBasis": "none",
+      "validContext": {
+        "cellType": "half cell or full cell",
+        "deviceConfig": "single electrode of interest",
+        "performanceLevel": "material",
+        "note": "This is the simplified Weppner–Huggins form, valid only when the pulse is SHORT compared with the diffusion time, τ ≪ L²/D, and when the voltage during the pulse varies linearly with √t. Both conditions must be checked from the data, at every state of charge, rather than assumed."
+      },
+      "assumptions": [
+        "τ ≪ L²/D — check it against the D you obtain, and discard the point if it fails.",
+        "The voltage during the pulse is linear in √t. If it is not, the simplified form does not apply.",
+        "One-dimensional diffusion into particles of a single, known size.",
+        "No phase transformation during the pulse. Across a two-phase plateau the equilibrium voltage barely changes, ΔE_s approaches zero, and the extracted D collapses — that is an artefact of the method, not a property of the material."
+      ],
+      "limitations": [
+        "Depends on L², and L is rarely known better than a factor of two — so D is rarely known better than a factor of four.",
+        "Gives a different D at every state of charge; a single quoted value is a summary of a curve and should be presented as such.",
+        "GITT, EIS and CV routinely disagree by orders of magnitude on the same material. Always state the method."
+      ],
+      "measuredBy": [
+        "method.gitt"
+      ],
+      "relatedFormulaIds": [
+        "formula.warburg_diffusion"
+      ],
+      "relatedIds": [],
+      "tags": [
+        "GITT",
+        "diffusion",
+        "battery",
+        "kinetics"
+      ],
+      "provides": "D"
     }
-  ]
+  ],
+  "_workbench": {
+    "_note": "Drives the Calculation workbench. Each group is a decision the MEASUREMENT forces on you — the workbench asks it before it computes anything, and shows the formulas your answer rules out rather than hiding them. Seeing the two-electrode form sitting there disabled, with the reason, is the point.",
+    "groups": [
+      {
+        "id": "capacitance-config",
+        "question": "Which configuration did you measure in?",
+        "why": "It decides which capacitance equation is valid — and the two differ by a factor of four.",
+        "options": [
+          {
+            "id": "three-electrode",
+            "label": "Three-electrode, single electrode",
+            "note": "Working electrode against a reference. The result is a material property."
+          },
+          {
+            "id": "symmetric",
+            "label": "Symmetric two-electrode device",
+            "note": "Two nominally identical electrodes. The factor of four converts the device result to a single-electrode-equivalent value."
+          }
+        ]
+      },
+      {
+        "id": "ir-convention",
+        "question": "Where did you read the IR drop?",
+        "why": "At a current reversal the current changes by 2I; from rest it changes by I. The two differ by exactly a factor of two.",
+        "options": [
+          {
+            "id": "reversal",
+            "label": "At a charge-to-discharge reversal",
+            "note": "Current swings from +I to −I."
+          },
+          {
+            "id": "rest",
+            "label": "At the start of a step, from rest",
+            "note": "Current steps from 0 to I."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "id": "GCD",
+        "label": "Charge–discharge curve",
+        "lede": "Everything a galvanostatic charge–discharge run can give you. Enter what you measured once; each result states the configuration it is valid for."
+      },
+      {
+        "id": "CV",
+        "label": "Cyclic voltammogram",
+        "lede": "From an integrated CV and a scan-rate pair."
+      },
+      {
+        "id": "EIS",
+        "label": "Impedance spectrum",
+        "lede": "From a fitted Warburg coefficient. Check first that the 45° region really is diffusion."
+      },
+      {
+        "id": "cycling",
+        "label": "Cycling run",
+        "lede": "Efficiencies and retention. Ratios — enter both values on the same basis."
+      },
+      {
+        "id": "geometry",
+        "label": "Bench measurements",
+        "lede": "Loading, current density and the rate you are about to set. The calculations done before the run, not after it."
+      },
+      {
+        "id": "GITT",
+        "label": "GITT run",
+        "lede": "Diffusion from a pulse–relaxation sequence."
+      },
+      {
+        "id": "literature",
+        "label": "Reference values",
+        "lede": "Theoretical and predicted quantities. Label them as theoretical wherever they appear beside a measurement."
+      }
+    ]
+  }
 }

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "_kind": "tafel",
+  "_README": "Tafel analysis support content — Instrumentation spec §29. The validity checklist is deliberately placed BEFORE the analysis on the page: the first question is whether Tafel analysis applies at all, not what the slope is. DRAFT — pending review by the research group.",
+
+  "preamble": "Work down the page in order. Answer the four questions first — they decide whether a Tafel slope is a meaningful quantity for the system in front of you. Then use the analysis below, where the response is generated from parameters you set, so the fitted slope can be compared against the slope the model actually contains. Move the fitting window into the wrong region and watch the fit return a confident, well-correlated, wrong answer.",
+
+  "validity": {
+    "title": "Before fitting anything: does Tafel analysis apply here?",
+    "note": "All four must hold. If any one fails, a fitted slope is not a Tafel slope.",
+    "checks": [
+      { "q": "Is the current predominantly faradaic?",
+        "why": "Tafel analysis describes an electron-transfer reaction. Capacitive charging, double-layer current and leakage are not that reaction.",
+        "failsWhen": "EDLC and pseudocapacitive electrodes measured for their storage behaviour; any fast sweep where charging current is significant." },
+      { "q": "Is the region kinetically controlled?",
+        "why": "The Butler–Volmer relationship holds where the interface, not the supply of reactant, sets the current.",
+        "failsWhen": "Anywhere approaching the limiting current, and anywhere convection or stirring changes the measured current." },
+      { "q": "Has uncompensated resistance been corrected?",
+        "why": "Part of the recorded overpotential is iR drop, which grows with current and bends the plot upward. Fitting uncorrected data biases the slope high, and the bias grows with the current of the window.",
+        "failsWhen": "Resistive electrolytes, thick electrodes, poorly placed reference electrodes, high current densities." },
+      { "q": "Is there a linear region spanning at least one decade of current?",
+        "why": "Any curve looks straight over a narrow enough window. A region worth calling linear should stay linear across a full decade or more.",
+        "failsWhen": "Short windows chosen because the fit looks good there." }
+    ]
+  },
+
+  "reporting": {
+    "title": "What has to be reported alongside a Tafel slope",
+    "note": "A slope quoted without these cannot be checked, reproduced or compared.",
+    "items": [
+      "The fitting range, in both potential and current",
+      "Whether and how uncompensated resistance was corrected, and the value used",
+      "The current normalisation basis — geometric area, BET area, or mass",
+      "The reference electrode and the scale the potentials are on",
+      "The electrolyte, concentration and temperature",
+      "Whether the data were collected under steady-state or sweep conditions, and at what rate"
+    ]
+  },
+
+  "pitfalls": [
+    { "name": "Fitting where mass transport contributes",
+      "what": "As the current approaches its transport limit the curve flattens in current and steepens in η against log|j|, so the apparent slope rises.",
+      "shows": "A slope well above the value expected for the mechanism, growing as the window is moved to higher current.",
+      "check": "Move the window to lower current and see whether the slope changes. A genuine Tafel region gives the same slope over a range of windows." },
+    { "name": "Skipping the iR correction",
+      "what": "The recorded overpotential includes j·A·Ru, which is proportional to current and therefore adds curvature that looks like a larger slope.",
+      "shows": "Slope inflated, and inflated more in the high-current part of the plot.",
+      "check": "Measure Ru independently (from the high-frequency impedance intercept), correct, and refit. Report both the value used and the method." },
+    { "name": "Applying it to a capacitive electrode",
+      "what": "An electrical double-layer electrode has no faradaic reaction to describe. What steady current there is behaves ohmically.",
+      "shows": "A plot that still looks convincingly linear in places, and a slope that changes completely with the window chosen.",
+      "check": "Ask what reaction the slope is supposed to describe. If the answer is 'the storage behaviour', Tafel analysis is the wrong tool." },
+    { "name": "Reading a mechanism off the slope",
+      "what": "Characteristic slopes are associated with rate-determining steps, but several mechanisms can produce similar values, and adsorption or coverage effects shift them.",
+      "shows": "A confident mechanistic claim resting on one number.",
+      "check": "Treat the slope as one piece of evidence. Support it with order studies, coverage measurements or spectroscopic evidence before naming a mechanism." },
+    { "name": "Extrapolating an exchange current density from a slope you do not trust",
+      "what": "j₀ is read by extending the fitted line back to zero overpotential. That extrapolation runs across several decades of current, so any error in the slope is magnified enormously in j₀ — a slope wrong by 20% can put j₀ out by an order of magnitude.",
+      "shows": "An exchange current density that moves by orders of magnitude when the fitting window is nudged, while the slope itself changes only modestly.",
+      "check": "Refit over several windows and report how much j₀ moves. If it is not stable, the extrapolation is not reportable — and quoting it to two significant figures is misleading regardless." },
+    { "name": "Trusting the fit statistic",
+      "what": "R² measures how straight the fitted points are, not whether they should have been fitted.",
+      "shows": "An excellent R² over a window that is wholly inside a mass-transport-limited or iR-dominated region.",
+      "check": "Judge the window by the physics of the region, then use the statistic only to describe the quality of the line within it." }
+  ],
+
+  "closing": "If you cannot state the fitting range, the iR correction and the normalisation basis, the slope is not reportable. If the slope changes when the window moves, the region was not a Tafel region."
+}

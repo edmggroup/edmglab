@@ -117,6 +117,14 @@ export function renderMethodDetail(host, m, opts = {}) {
 
     ${controlBar(m)}
 
+    ${/* Some methods have an interactive module. The link is generic — a
+          record declares { interactive: { route, label } } and it appears
+          here, rather than each module having to know about method pages. */
+      m.interactive?.route ? `<div class="callout callout-info" style="margin-bottom:1.25rem">
+        <strong>Interactive.</strong>
+        <a href="${esc(m.interactive.route)}">${esc(m.interactive.label || 'Open the interactive page')} →</a>
+      </div>` : ''}
+
     ${block('The instrument', 'What the workstation or cycler is doing', instrumentHtml(m))}
     ${block('The cell', 'What physically happens', cellHtml(m))}
     ${block('The applied signal', 'What you impose, and how to choose it', signalHtml(m))}
@@ -150,9 +158,9 @@ export function renderMethodDetail(host, m, opts = {}) {
       .mv-kv .k { font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:.06em;
         color:var(--text-muted); font-weight:650; }
       .mv-kv .v { color:var(--text); }
-      .lim-list { margin:0; padding-left:1.15rem; font-size:var(--fs-sm); color:var(--text-2); }
-      .lim-list li { margin-bottom:.35rem; }
-      .lim-list.warn li::marker { color:var(--warn); }
+      /* .lim-list now lives in css/style.css — it is used by the workflow,
+         safety, cells, circuits and Tafel pages too, and a shared class
+         defined here only exists on pages that render a method. */
       .param { border:1px solid var(--border); border-radius:var(--r-md);
         background:var(--surface-2); padding:.6rem .75rem; }
       .param .pn { font-weight:600; font-size:var(--fs-sm); color:var(--text); display:block; margin-bottom:.15rem; }

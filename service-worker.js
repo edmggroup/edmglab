@@ -24,7 +24,7 @@
  * after a fix has shipped.
  */
 
-const CACHE_VERSION = 'edmglab-v10';
+const CACHE_VERSION = 'edmglab-v12';
 const DATA_CACHE = 'edmglab-data-v1';
 
 /* Paths are RELATIVE so the app works both at a domain root and at a
@@ -50,6 +50,11 @@ const SHELL = [
   './js/lib/diagram.js',
   './js/lib/sim-label.js',
   './js/lib/charts.js',
+  './js/lib/expr.js',
+  './js/lib/formula-view.js',
+  './js/views/formulas.js',
+  './js/views/formula.js',
+  './js/views/calculators.js',
   './js/views/dashboard.js',
   './js/views/placeholder.js',
   './js/views/menu.js',
@@ -67,9 +72,14 @@ const SHELL = [
   './js/views/troubleshooting.js',
   './js/echem/index.js',
   './js/echem/electrodes.js',
+  './js/echem/circuits.js',
+  './js/echem/tafel.js',
+  './js/echem/sim/complex.js',
   './js/echem/sim/cv.js',
   './js/echem/sim/gcd.js',
   './js/echem/sim/eis.js',
+  './js/echem/sim/circuits.js',
+  './js/echem/sim/tafel.js',
   './pwa/icons/icon-192.png',
   './pwa/icons/icon-512.png'
 ];

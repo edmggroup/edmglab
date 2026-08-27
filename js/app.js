@@ -123,6 +123,15 @@ router.route('/method/:id', () => import('./views/method.js'), { title: 'Method'
 router.route('/troubleshooting',     () => import('./views/troubleshooting.js'), { title: 'Troubleshooting' });
 router.route('/troubleshooting/:id', () => import('./views/troubleshooting.js'), { title: 'Troubleshooting' });
 
+/* ── Formulas and calculators (Roadmap P1, P2) ──
+   Two views over ONE data file. The library is reference-first (what does this
+   equation mean, where is it valid); the workbench is measurement-first (I have
+   a discharge curve, what can I get from it). Neither duplicates the other's
+   arithmetic — both call js/lib/expr.js. */
+router.route('/formulas',    () => import('./views/formulas.js'),    { title: 'Formula Library' });
+router.route('/formula/:id', () => import('./views/formula.js'),     { title: 'Formula' });
+router.route('/calculators', () => import('./views/calculators.js'), { title: 'Calculation Workbench' });
+
 router.start(document.getElementById('view-outlet'));
 
 /* ══════════════════════════════════════════════════════════

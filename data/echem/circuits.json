@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "_README": "Equivalent-circuit elements — Instrumentation spec §26. Every element record deliberately carries BOTH the process it is commonly associated with AND what that association does not license, because naming an element after a process is the single most common way an equivalent-circuit fit turns into an unsupported physical claim. DRAFT — pending review by the research group.",
+
+  "preamble": "Work through the explorer first: select an element, move its parameter, and learn to recognise its signature in the Nyquist and Bode plots on sight. Then look at the second section, where two entirely different circuits are shown producing the same spectrum exactly — that is the constraint every equivalent-circuit interpretation has to live inside.",
+
+  "items": [
+    {
+      "id": "circuit.r",
+      "name": "Resistor",
+      "symbol": "R",
+      "sim": "r",
+      "param": "R — resistance, in ohms",
+      "impedance": "Z = R",
+      "phaseSignature": "0° at every frequency — current and voltage stay in step.",
+      "inTheSpectrum": "A point on the real axis of a Nyquist plot. In a circuit it shifts the whole spectrum sideways; on its own it has no frequency dependence at all.",
+      "oftenAssociatedWith": [
+        "Electrolyte (solution) resistance, when in series with everything else",
+        "Charge-transfer resistance, when in parallel with an interfacial capacitance",
+        "Contact and current-collector resistance",
+        "Cable and connection resistance"
+      ],
+      "butNot": [
+        "A series resistance is not automatically 'the electrolyte'. Contact resistance, cable resistance and current-collector resistance all land in the same place, and impedance cannot separate them.",
+        "A parallel resistance is only a charge-transfer resistance if the process it sits with is actually charge transfer. The fit does not know which."
+      ],
+      "misreadAs": [
+        "Reporting the high-frequency intercept as 'solution resistance' when the cell has appreciable contact resistance",
+        "Comparing Rct between electrodes of different area without normalising"
+      ],
+      "relatedIds": ["concept.ec_ir_compensation", "method.eis"]
+    },
+    {
+      "id": "circuit.c",
+      "name": "Capacitor",
+      "symbol": "C",
+      "sim": "c",
+      "param": "C — capacitance, in farads",
+      "impedance": "Z = 1 / (jωC)",
+      "phaseSignature": "−90° at every frequency. Magnitude falls as 1/f — a straight line of slope −1 on a log|Z| vs log f plot.",
+      "inTheSpectrum": "A vertical line on the imaginary axis when alone. In parallel with a resistor it produces the classic perfect semicircle, whose apex sits at ω = 1/(RC).",
+      "oftenAssociatedWith": [
+        "Double-layer capacitance at an electrode–electrolyte interface",
+        "Passive-film or coating capacitance",
+        "Stray and cell capacitance at high frequency"
+      ],
+      "butNot": [
+        "A capacitance extracted from a fit is not the same quantity as a capacitance from CV or GCD unless the conditions and the normalisation match — three numbers with the same units are not necessarily the same measurement.",
+        "Real interfaces are almost never ideal capacitors. If an ideal C fits well over a wide frequency range, that is worth being curious about rather than pleased with."
+      ],
+      "misreadAs": [
+        "Converting a fitted C directly into a specific capacitance for reporting, without stating that it came from an impedance model",
+        "Attributing a perfect semicircle to good data when it may reflect an over-simplified circuit"
+      ],
+      "relatedIds": ["method.eis", "concept.specific_capacitance"]
+    },
+    {
+      "id": "circuit.cpe",
+      "name": "Constant phase element",
+      "symbol": "CPE (Q, n)",
+      "sim": "cpe",
+      "param": "Q — magnitude, in S·sⁿ · n — exponent between 0 and 1",
+      "impedance": "Z = 1 / ( Q·(jω)ⁿ )",
+      "phaseSignature": "Constant at −n·90° across all frequencies. n = 1 reproduces an ideal capacitor; n = 0.5 reproduces a Warburg-like 45°; n = 0 is a resistor.",
+      "inTheSpectrum": "Depresses the semicircle — the arc's centre drops below the real axis. This is the element that makes a fit 'work' when an ideal capacitor will not.",
+      "oftenAssociatedWith": [
+        "Surface roughness and porosity",
+        "A distribution of time constants across a non-uniform surface",
+        "Non-uniform current distribution",
+        "Slow adsorption processes"
+      ],
+      "butNot": [
+        "A CPE is a DESCRIPTION of non-ideality, not an explanation of it. Fitting one does not identify which of the causes above is responsible.",
+        "Q is not a capacitance and does not have units of farads. Converting Q to an 'effective capacitance' requires an additional assumed relationship, which must be stated whenever such a value is reported.",
+        "A better fit after swapping C for a CPE is expected — it adds a free parameter. Improvement alone is not evidence that the physical picture is right."
+      ],
+      "misreadAs": [
+        "Quoting Q as if it were a capacitance in farads",
+        "Treating a low n as a measurement of roughness",
+        "Using a CPE to rescue a fit and then interpreting the other elements as if the circuit had been validated"
+      ],
+      "relatedIds": ["method.eis", "method.eis_fitting"]
+    },
+    {
+      "id": "circuit.w",
+      "name": "Warburg element (semi-infinite)",
+      "symbol": "W (σ)",
+      "sim": "w",
+      "param": "σ — Warburg coefficient, in Ω·s^(−1/2)",
+      "impedance": "Z = σ·ω^(−1/2)·(1 − j)",
+      "phaseSignature": "−45° at every frequency, because the real and imaginary parts are always equal.",
+      "inTheSpectrum": "A straight 45° line at low frequency. It only looks like 45° when the Nyquist axes are equally scaled — on unequal axes any line can be made to look like any angle.",
+      "oftenAssociatedWith": [
+        "Diffusion of a species through a layer thick enough that the far boundary is never reached within the measurement"
+      ],
+      "butNot": [
+        "A 45° region is not proof of diffusion control. Porous electrodes produce a 45° region from distributed resistance in the pores, with no diffusion limitation involved at all.",
+        "σ is not a diffusion coefficient. Extracting one requires further assumptions about concentration, area and the number of electrons — each of which must be stated."
+      ],
+      "misreadAs": [
+        "Calling any low-frequency 45° feature 'Warburg diffusion' in a porous electrode",
+        "Reporting a diffusion coefficient from σ without stating the assumed area and concentration"
+      ],
+      "relatedIds": ["method.eis", "method.gitt"]
+    },
+    {
+      "id": "circuit.ws",
+      "name": "Finite-length diffusion (transmissive)",
+      "symbol": "Ws (Rd, τ)",
+      "sim": "ws",
+      "param": "Rd — diffusion resistance, in ohms · τ — diffusion time constant, in seconds",
+      "impedance": "Z = ( Rd / √(jωτ) )·tanh( √(jωτ) )",
+      "phaseSignature": "−45° at high frequency, turning towards 0° at low frequency.",
+      "inTheSpectrum": "A 45° line that bends over into a finite arc and terminates on the real axis at Rd — the diffusing species reaches a boundary where it is consumed or replenished.",
+      "oftenAssociatedWith": [
+        "Diffusion across a layer of finite thickness with a fixed concentration at the far side"
+      ],
+      "butNot": [
+        "The bend frequency gives τ, and a diffusion coefficient only follows if the diffusion LENGTH is known independently. In a composite electrode it usually is not."
+      ],
+      "misreadAs": [
+        "Fitting a finite element to a spectrum whose low-frequency end was simply not measured far enough down"
+      ],
+      "relatedIds": ["method.eis"]
+    },
+    {
+      "id": "circuit.wo",
+      "name": "Finite-space diffusion (reflective)",
+      "symbol": "Wo (Rd, τ)",
+      "sim": "wo",
+      "param": "Rd — diffusion resistance, in ohms · τ — diffusion time constant, in seconds",
+      "impedance": "Z = ( Rd / √(jωτ) )·coth( √(jωτ) )",
+      "phaseSignature": "−45° at high frequency, turning towards −90° at low frequency.",
+      "inTheSpectrum": "A 45° line that turns upward into a near-vertical capacitive tail — the species accumulates against a blocking boundary instead of passing through it. This is the shape usually seen in intercalation electrodes.",
+      "oftenAssociatedWith": [
+        "Diffusion into a particle or film with a blocking (impermeable) far boundary",
+        "Intercalation, where the low-frequency tail is often read as a capacitive storage response"
+      ],
+      "butNot": [
+        "A rising low-frequency tail is not by itself evidence of intercalation. A blocking interface, a slow side reaction or simply an incomplete sweep can all produce one."
+      ],
+      "misreadAs": [
+        "Treating the low-frequency vertical tail as 'the capacitance of the material' without stating the model it came from"
+      ],
+      "relatedIds": ["method.eis", "method.gitt"]
+    },
+    {
+      "id": "circuit.l",
+      "name": "Inductor",
+      "symbol": "L",
+      "sim": "l",
+      "param": "L — inductance, in henries",
+      "impedance": "Z = jωL",
+      "phaseSignature": "+90° at every frequency — the opposite sign to a capacitor.",
+      "inTheSpectrum": "Pulls the high-frequency end BELOW the real axis, into negative −Z″. Almost always this is the cables and the cell fixture, not the electrochemistry.",
+      "oftenAssociatedWith": [
+        "Cable and lead inductance at high frequency — an instrument artefact",
+        "Occasionally, genuine adsorption or passivation behaviour at low frequency"
+      ],
+      "butNot": [
+        "A high-frequency inductive tail is an artefact of the measurement setup in the great majority of cases. Fitting it with a physical process is a mistake; shortening and separating the leads is the fix.",
+        "A LOW-frequency inductive loop is a different phenomenon entirely and should not be confused with the high-frequency tail."
+      ],
+      "misreadAs": [
+        "Fitting the cable inductance and then interpreting it",
+        "Reading the point where the tail crosses the real axis as the series resistance without noting the inductive contribution"
+      ],
+      "relatedIds": ["troubleshooting.large_semicircle", "method.eis"]
+    }
+  ],
+
+  "topologies": [
+    {
+      "id": "circuit.model.rc",
+      "name": "Rs + (Rp ∥ C)",
+      "sketch": "Rs ──[ Rp ∥ C ]──",
+      "describes": "One resistive path in series with a single interfacial process.",
+      "produces": "One perfect semicircle, offset from the origin by Rs.",
+      "cannotRepresent": [
+        "More than one interfacial process",
+        "Any surface non-ideality — a real semicircle is almost always depressed",
+        "Diffusion at low frequency"
+      ]
+    },
+    {
+      "id": "circuit.model.randles",
+      "name": "Randles: Rs + (CPE ∥ (Rct + W))",
+      "sketch": "Rs ──[ CPE ∥ ( Rct — W ) ]──",
+      "describes": "Electrolyte resistance, an interfacial capacitance, one charge-transfer step and diffusion of the reacting species.",
+      "produces": "A depressed semicircle followed by a 45° line — the shape most often reproduced in the literature.",
+      "cannotRepresent": [
+        "Two or more overlapping charge-transfer processes",
+        "A porous electrode, where the interface is distributed through the pore depth rather than located at a plane",
+        "Finite-length diffusion, unless W is replaced by Ws or Wo"
+      ]
+    },
+    {
+      "id": "circuit.model.two_time",
+      "name": "Two time constants in series",
+      "sketch": "Rs ──[ R1 ∥ C1 ]──[ R2 ∥ C2 ]──",
+      "describes": "Two distinct processes with different characteristic frequencies — for example a surface film and a charge-transfer step.",
+      "produces": "Two semicircles, which merge into what looks like one depressed arc when the time constants are within about an order of magnitude of each other.",
+      "cannotRepresent": [
+        "Which process is which. The circuit produces two arcs; assigning them to a film and to charge transfer is an interpretation that needs independent evidence.",
+        "Processes whose time constants are so close that the data cannot resolve them — fitting two elements to one arc will still 'work'."
+      ]
+    },
+    {
+      "id": "circuit.model.porous",
+      "name": "Transmission line (porous electrode)",
+      "sketch": "distributed R–C ladder along the pore",
+      "describes": "An electrode where resistance and interfacial capacitance are distributed along the depth of a pore, rather than concentrated at one plane.",
+      "produces": "A 45° region at high frequency turning into a near-vertical capacitive line — superficially like a Warburg response, but arising from pore resistance, not diffusion.",
+      "cannotRepresent": [
+        "Nothing about it justifies calling the 45° region 'diffusion'. This is the most common misattribution in supercapacitor impedance work.",
+        "Pore-size distribution: a single transmission line assumes uniform pores."
+      ]
+    }
+  ],
+
+  "closing": "Fit quality does not select a circuit. A circuit with more elements will always fit at least as well as one with fewer, and — as the demonstration on this page shows — two entirely different circuits can produce the same spectrum exactly. Choosing between them requires evidence that does not come from the impedance measurement: a variation study, a complementary technique, or a physical argument about the electrode."
+}

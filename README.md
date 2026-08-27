@@ -4,7 +4,15 @@
 
 An interactive platform for supercapacitors, batteries, electrode materials, characterisation and electrochemical analysis. Built for undergraduate researchers through to postdocs joining the group.
 
-> **Build status: Phase 0 — foundation.** The application shell, animation engine, diagram engine, simulation labelling, chart layer and data health check are in place. Scientific content arrives module by module. Modules marked `Pn` in the sidebar name the roadmap phase that builds them.
+> **Build status: Stage 2 complete — both instrument modules are built.**
+>
+> The **Battery Tester** module covers the instrument, methods, cell formats and configurations, the twelve-step testing workflow, the protocol builder, troubleshooting and safety. The **Electrochemical Workstation** module covers the potentiostat and galvanostat, the three-electrode cell, the method library, CV / GCD / EIS simulators, the equivalent-circuit element explorer, Tafel analysis, method selection and troubleshooting.
+>
+> The **Formula library** and **Calculation workbench** are built: 28 formulas, each with the configuration it is valid for, and a calculator generated from the record itself. The workbench is organised by what you measured — enter a discharge curve's numbers once and everything that measurement supports is computed from them.
+>
+> The shared foundation — application shell, animation engine, diagram engine, enforced simulation labelling, chart layer, expression/unit engine and data health check — is in place. Modules marked `Pn` in the sidebar name the roadmap phase that builds them and are not built yet.
+>
+> **All scientific content is draft**, marked as such in the interface, and pending review by the research group. The safety section should be reviewed with your safety officer before anyone treats it as guidance.
 
 ---
 
@@ -62,6 +70,10 @@ service-worker.js       Offline caching    ┘ a service worker only controls it
     diagram.js          Clickable block diagrams, driven by JSON
     sim-label.js        Enforced "Illustrative simulation" labelling
     charts.js           Chart.js wrapper: zoom, pan, inspect, reset, downsampling
+    expr.js             Safe expression parser + SI unit engine (never eval)
+    formula-view.js     One renderer + one calculator for every formula
+    method-view.js      The five-layer method record renderer
+    decision-tree.js    Guided trees that always state what they cannot tell you
     storage.js          localStorage, namespaced and versioned
   /views                One file per screen, loaded on first visit
 

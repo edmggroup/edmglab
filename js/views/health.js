@@ -21,6 +21,7 @@
 
 import * as data from '../data.js';
 import { esc, pageHead, callout } from '../ui.js';
+import { compile } from '../lib/expr.js';
 
 const SEV = { error: 'error', warn: 'warning', info: 'info' };
 
@@ -85,6 +86,45 @@ export async function render(outlet) {
         }
         if (!rec.assumptions?.length) {
           issues.push(mk('warn', key, rec.id, 'Formula states no assumptions.'));
+        }
+        if (!rec.limitations?.length) {
+          issues.push(mk('warn', key, rec.id, 'Formula states no limitations — every equation has conditions it fails under.'));
+        }
+
+        /* A formula that offers a CALCULATOR is a stronger claim than one that
+           only prints an equation: somebody will act on the number. These
+           checks are the machine-readable form of that responsibility. */
+        if (rec.expression) {
+          let fn = null;
+          try {
+            fn = compile(rec.expression);
+          } catch (e) {
+            issues.push(mk('error', key, rec.id,
+              `Expression does not parse (${e.message}) — the calculator would be broken.`));
+          }
+          if (fn) {
+            const declared = new Set((rec.variables || []).map((v) => v.symbol));
+            for (const s of fn.symbols) {
+              if (!declared.has(s)) {
+                issues.push(mk('error', key, rec.id,
+                  `Expression uses "${s}", which is not declared in variables. The calculator would ask for a value it cannot label, or silently compute with nothing.`));
+              }
+            }
+            for (const v of rec.variables || []) {
+              if (!fn.symbols.includes(v.symbol)) {
+                issues.push(mk('warn', key, rec.id,
+                  `Variable "${v.symbol}" is declared but never used by the expression.`));
+              }
+              if (!v.units?.length) {
+                issues.push(mk('error', key, rec.id,
+                  `Variable "${v.symbol}" declares no units. Every input must state what it converts to SI by — unit errors are the most common way a calculated result is wrong.`));
+              }
+            }
+            if (!rec.result?.units?.length) {
+              issues.push(mk('error', key, rec.id,
+                'Computable formula has no result units — the answer would be a bare number.'));
+            }
+          }
         }
       }
 
@@ -187,12 +227,19 @@ export async function render(outlet) {
             const f = files.find((x) => x.key === k);
             const count = f ? (f.payload.items || []).length : 0;
             const isMissing = missing.includes(k);
+            /* A file that declares a non-content `_kind` holds a tree, a
+               diagram set or a grouped document rather than a record list.
+               Reporting it as "empty" would read as missing content when the
+               file is in fact full — say what shape it is instead. */
+            const kind = f && !isMissing && f.payload._kind && f.payload._kind !== 'content'
+              ? f.payload._kind : null;
             return `<tr>
               <td data-label="Data key"><code>${esc(k)}</code></td>
-              <td data-label="Records" class="num">${isMissing ? '—' : count}</td>
+              <td data-label="Records" class="num">${isMissing ? '—' : kind ? 'n/a' : count}</td>
               <td data-label="Schema" class="num">${f && !isMissing ? esc(f.payload.schemaVersion ?? '—') : '—'}</td>
               <td data-label="Status">${isMissing
                 ? '<span class="chip">not yet authored</span>'
+                : kind ? `<span class="badge badge-literature">loaded</span> <span class="chip">${esc(kind)}</span>`
                 : count ? '<span class="badge badge-literature">loaded</span>'
                         : '<span class="chip">empty</span>'}</td>
             </tr>`;
@@ -209,6 +256,7 @@ export async function render(outlet) {
           <li>Every cross-reference (<code>relatedIds</code>, <code>equationIds</code>, <code>calculatorId</code>…) resolves to a real record.</li>
           <li>Every numeric value declares a <code>provenance</code>; literature and datasheet values cite a <code>source</code>.</li>
           <li>Every formula declares a <code>validContext</code> — the configuration it is valid for.</li>
+          <li>Every computable formula's <code>expression</code> parses, uses only declared variables, and gives every input and its result a unit.</li>
           <li>Every troubleshooting entry offers <strong>more than one</strong> possible cause.</li>
           <li>Every method record declares what is <em>controlled</em> and what is <em>measured</em>, and states its limitations.</li>
           <li>Any simulated content declares the model it is based on.</li>

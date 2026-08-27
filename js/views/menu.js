@@ -21,7 +21,7 @@ export function render(outlet) {
           <a class="menu-row" href="${esc(m.route)}">
             ${icon(m.icon)}
             <span class="menu-label">${esc(m.label)}</span>
-            ${m.view ? '' : `<span class="nav-phase">P${m.phase}</span>`}
+            ${m.view || m.phase === undefined ? '' : `<span class="nav-phase">P${m.phase}</span>`}
             <span class="menu-chev" aria-hidden="true">›</span>
           </a>`).join('')}
       </div>

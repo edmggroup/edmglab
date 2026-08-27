@@ -42,6 +42,7 @@ const REGISTRY = {
   'ec/electrodes':       'echem/electrodes.json',
   'ec/methods':          'echem/methods.json',
   'ec/circuits':         'echem/circuits.json',
+  'ec/tafel':            'echem/tafel.json',
   'ec/troubleshooting':  'echem/troubleshooting.json',
   'shared/instrument-choice':    'shared/instrument-choice.json',
   'shared/method-decision-tree': 'shared/method-decision-tree.json'

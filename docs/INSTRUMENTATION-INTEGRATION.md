@@ -421,3 +421,184 @@ Answer 1 and 3 and I'll start on Stage 1A.
 ---
 
 *Scope note: this report covers only the Battery Tester and Electrochemical Workstation modules, per your instruction. It does not revise the wider platform architecture — I'll fold the shared-service changes from Section 1 into Architecture v0.3 once the single-page decision is settled, so the two documents don't drift.*
+
+---
+
+## 9. Stage 2 — what was built (added after Stage 1B shipped)
+
+Stage 2 completes both instrument modules. Everything §7.2 listed as deferred is now built,
+with two exceptions noted at the end.
+
+### 9.1 Battery Tester
+
+| Spec | Built | Files |
+|---|---|---|
+| §4 | Cell formats and configurations, split apart | `battery-tester/cells.js` · `data/battery-tester/cells.json` |
+| §5 | Twelve-step clickable testing workflow | `battery-tester/workflow.js` · `workflow.json` |
+| §6 | Twelve method records in the five-layer schema | `methods.json` |
+| §10 | Protocol builder with a V–t preview | `protocol-builder.js` |
+| §11 | Troubleshooting symptom library | `troubleshooting.json` |
+| §12 | Safety orientation — 14 hazards, 4 groups | `renderSafety()` · `safety.json` |
+
+The §4 split is the decision worth recording: the spec lists coin, pouch, cylindrical, half,
+full, symmetric and three-electrode as one list, but a coin cell can be a half cell *or* a full
+cell. **Format** is how the cell is built; **configuration** is what the measurement is about,
+and it is the configuration that decides which formula is valid — including the factor of four
+between a symmetric device and its single electrode. Presenting them as one list would teach the
+wrong model of the relationship.
+
+### 9.2 Electrochemical Workstation
+
+| Spec | Built | Files |
+|---|---|---|
+| §18 | Eleven method records, OrigaMaster aliases | `data/echem/methods.json` |
+| §20, §24, §25 | CV, GCD and EIS simulators | `sim/cv.js` · `sim/gcd.js` · `sim/eis.js` |
+| §26 | **Equivalent-circuit element explorer** | `circuits.js` · `sim/circuits.js` · `circuits.json` |
+| §29 | **Tafel analysis** | `tafel.js` · `sim/tafel.js` · `tafel.json` |
+| §30 | Method-selection decision tree | `decision-tree.js` |
+| §33 | Troubleshooting symptom library | `data/echem/troubleshooting.json` |
+
+### 9.3 How §26 was implemented, and why that way
+
+§38 forbids assuming any one equivalent circuit is universally correct. A page that *states* this
+and then hands over a fitting tool teaches the opposite of what it says, so the rule is demonstrated
+instead:
+
+- **Each element is plotted alone** — Nyquist, log|Z| and phase — so its signature is learned by
+  looking. Every element record carries `oftenAssociatedWith` **and** a separate `butNot` list, because
+  naming an element after a process is the usual route by which a fit becomes an unsupported claim.
+- **Non-uniqueness is demonstrated, not asserted.** Two different topologies are plotted together:
+  `Rs + (Rp ∥ C)` and `Ra ∥ (Rb + Cb)`. The mapping between them is exact algebra, derived in the
+  header of `sim/circuits.js`:
+
+  ```
+  Ra = Rs + Rp        Cb = Rp²·C/(Rs+Rp)²        Rb = Rs·(Rs+Rp)/Rp
+  ```
+
+  The two spectra agree to ~4×10⁻¹⁶ relative — double-precision rounding — at every frequency and
+  for every parameter setting the sliders allow. The page displays that residual, so the claim is
+  checkable rather than rhetorical. No fit quality, residual or information criterion can separate
+  the two circuits, which is exactly the point: choosing between circuits needs evidence from
+  outside the impedance measurement.
+
+Equal-axis scaling is applied to a Nyquist plot only where the locus has real width. A purely
+reactive element has no angle to preserve, and forcing equal axes there would stretch the real
+axis across an empty frame to match a 160 kΩ imaginary range.
+
+**Automated CNLS fitting remains deliberately unbuilt**, per §6.6. Nothing on this page changes
+that assessment — if anything the degenerate-pair demonstration strengthens it.
+
+### 9.4 How §29 was implemented
+
+§6.7 committed to three things. All three are built, with one deliberate departure:
+
+1. **Applicability before method.** The page opens with four conditions that must all hold, each
+   with why it matters and when it fails. The calculator is below them.
+2. **The fitting range is an explicit, required choice**, not a default the student can leave alone.
+3. **Unsuitable ranges are flagged** — proximity to the limiting current, iR share of the recorded
+   overpotential, background share of the total current, and windows narrower than a decade.
+
+*Departure:* §6.7 said the calculator should flag an implausible range "rather than silently
+returning a slope". It flags the range **and still returns the slope**, next to the slope the model
+actually contains. Refusing to compute would teach that a tool protects you. Showing a fit return
+238 mV/dec from a system whose true slope is 118 mV/dec, with R² = 0.98, teaches that it does not.
+The `system` selector goes further: set it to a purely resistive electrode — no faradaic reaction
+at all — and the same fit returns a plausible-looking ~118 mV/dec in one window and ~700 mV/dec in
+another. That is the §29 misapplication warning made unforgettable rather than merely printed.
+
+The comparison is only possible because the response is generated from a stated model. On real data
+the fitted number is the only number there is, and the page says so.
+
+### 9.5 Shared-layer changes made during Stage 2
+
+- `sim/complex.js` extracted so the EIS and circuit-element models share one complex arithmetic
+  implementation rather than two copies that can drift.
+- `.field-label` and `.lim-list` moved into `css/style.css`. Both were used across modules while
+  being defined inside one module's inline `<style>` — the same defect class as the `.tabbar` bug.
+  `.field-label` is deliberately **not** uppercased: these labels carry symbols where case is
+  meaningful (Rs is not RS, n is not N).
+- Method records may now declare `interactive: { route, label }`; `method-view.js` renders it as a
+  link. Seven method records use it.
+- The health check reports a `_kind` file's shape instead of calling it "empty".
+
+### 9.6 Still open
+
+Not part of the instrument modules, and carried into the platform roadmap: materials database (P7),
+storage chemistry (P8), electrode preparation and characterisation (P9), the calculators engine (P2),
+formula library UI (P1), CSV data import (P4), quiz and glossary (P12), PWA hardening (P13).
+
+The ~35,000 words of scientific content across both modules carry a visible draft banner and are
+**pending review by the research group**. The safety section (§12) should be reviewed with your
+safety officer specifically.
+
+---
+
+## 10. Formula library and calculation workbench (Roadmap P1 + P2)
+
+The pathway's CALCULATION stage. Two views over one data file, and no per-formula code
+anywhere in the application.
+
+### 10.1 The calculator IS the formula record
+
+A formula declares its own `expression`, the units each variable may be entered in, and the
+units its result may be shown in. One generic renderer turns that into a working calculator.
+Adding a formula is a JSON edit; it is never a code change, and there is no `calculators.json` —
+a separate calculator file would have been a second place for the same equation to live and drift.
+
+`js/lib/expr.js` is a real recursive-descent parser, not `eval` or `new Function`. That matters
+because the expressions live in a git-tracked content file that group members are explicitly
+invited to edit through GitHub's web editor: handing that file a path to arbitrary JavaScript
+execution would be indefensible however trusted the authors are. The parser accepts numbers,
+declared symbols, `+ − × ÷ ^`, parentheses and a fixed function list. Verified rejections include
+`alert(1)`, `process.exit()`, template literals, arrow functions and `__proto__` access.
+
+**Everything is evaluated in SI.** Each unit carries the factor that converts it to SI (and an
+additive offset, used only for temperature). Unit confusion — mA against A, g against kg — is by
+a wide margin the most common way a specific capacitance comes out a thousand times wrong, so the
+conversion is done once, centrally, and shown to the user under "Show the working, in SI".
+
+Authoring this set caught exactly that class of error in review: `mAh/g` had been factored as 3.6
+rather than 3600 — a per-gram basis mistaken for per-kilogram. It made specific capacity read
+200 000 mAh/g instead of 200. The unit-invariance test now asserts that entering the same physical
+quantity in any of a variable's alternative units gives an identical result; all 72 alternative-unit
+entries pass.
+
+### 10.2 Ordering is the argument
+
+On a formula page the **valid context comes first** — cell type, configuration, performance level,
+normalisation — above the equation and well above the input boxes. A student arriving to compute a
+specific capacitance meets the question of which configuration they are in before they meet a place
+to type. That ordering is the reason this exists rather than a spreadsheet: the spreadsheet will
+happily apply the three-electrode equation to a symmetric device, return a number four times too
+large, and look entirely normal doing it.
+
+Where two conventions exist they are **separate records with distinct names**, never one record
+with a footnote — the factor-of-four capacitance pair, and the factor-of-two ESR pair (IR drop read
+at a current reversal, where the current changes by 2I, versus from rest, where it changes by I).
+
+### 10.3 The workbench asks before it computes
+
+`#/calculators` is organised by what you MEASURED, not by what you want. Pick the measurement,
+answer the configuration questions, enter what you read off the curve once, and every quantity that
+measurement supports is computed from the same inputs. Quantities that feed others — capacitance
+into energy into power, ESR into maximum power — are chained automatically and labelled as chained,
+so it stays visible that a number rests on the assumptions of the one above it.
+
+The equations your answers rule out are **shown, greyed, with the reason**, rather than hidden.
+Selecting "three-electrode" leaves the symmetric-device form on screen saying *"Ruled out by your
+answer: this is the symmetric two-electrode form, and you selected three-electrode."* Hiding it
+would teach that only one equation ever existed; showing it disabled teaches that the measurement
+chose between them.
+
+### 10.4 Machine-enforced rules added
+
+The health check now refuses to pass a formula whose `expression` does not parse, uses a symbol not
+declared in `variables`, leaves an input or a result without units, or states no limitations.
+Verified by injecting a deliberately broken record: 3 errors and 1 warning raised, all four naming
+the specific defect; removed, back to zero.
+
+### 10.5 Content
+
+28 formulas across supercapacitor, battery, kinetics and shared/electrode domains, each with its
+valid context, assumptions, limitations and cross-references. Every one was checked against a
+hand-worked value; 28/28 agree. The library is draft and pending review by the research group.

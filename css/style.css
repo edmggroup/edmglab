@@ -712,6 +712,25 @@ body.gate-open { overflow: hidden; }
 
 .stack   { display: grid; gap: var(--sp-4); }
 .stack-sm{ display: grid; gap: var(--sp-2); }
+
+/* Control and parameter labels. Used by every simulator panel in both
+   instrument modules, so it lives here rather than inside any one of them —
+   a shared class defined in a module's inline <style> only exists on the
+   pages that module happens to render. */
+/* NOT uppercased. These labels carry symbols where case is meaningful —
+   Rs is not RS, Rct is not RCT, and n is not N. An uppercase transform
+   would quietly corrupt every one of them. */
+.field-label {
+  display: block; font-size: var(--fs-xs); font-weight: 650;
+  letter-spacing: .01em; color: var(--text-2);
+}
+
+/* Limitation / consideration lists. Moved out of method-view.js for the same
+   reason: workflow, safety, cells, circuits and Tafel pages all use it. */
+.lim-list { margin: 0; padding-left: 1.15rem; font-size: var(--fs-sm); color: var(--text-2); }
+.lim-list li { margin-bottom: .35rem; }
+.lim-list li:last-child { margin-bottom: 0; }
+.lim-list.warn li::marker { color: var(--warn); }
 .row     { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
 .muted   { color: var(--text-muted); }
 .small   { font-size: var(--fs-sm); }

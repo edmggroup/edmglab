@@ -26,16 +26,9 @@
  * which feature of a spectrum each element controls — nothing more.
  */
 
-/* ── Minimal complex arithmetic ──────────────────────────── */
-
-const c = (re, im) => ({ re, im });
-const add = (a, b) => c(a.re + b.re, a.im + b.im);
-const mul = (a, b) => c(a.re * b.re - a.im * b.im, a.re * b.im + a.im * b.re);
-const div = (a, b) => {
-  const d = b.re * b.re + b.im * b.im;
-  return c((a.re * b.re + a.im * b.im) / d, (a.im * b.re - a.re * b.im) / d);
-};
-const abs = (a) => Math.hypot(a.re, a.im);
+/* Complex arithmetic lives in ./complex.js so this file and the equivalent-
+   circuit explorer share one implementation. */
+import { c, add, mul, div, abs } from './complex.js';
 
 /** Impedance of a constant phase element at angular frequency ω.
  *  Z = 1/(Q(jω)^n);  (jω)^n = ω^n · (cos(nπ/2) + j sin(nπ/2)) */

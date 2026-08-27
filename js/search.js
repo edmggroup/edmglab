@@ -23,6 +23,7 @@ const TYPE_LABEL = {
   'bt/concepts': 'Battery Tester', 'bt/methods': 'Battery Tester · Methods',
   'bt/protocols': 'Protocols', 'bt/troubleshooting': 'Battery Tester · Troubleshooting',
   'ec/concepts': 'Workstation', 'ec/methods': 'Workstation · Methods',
+  'ec/circuits': 'Workstation · Circuit elements',
   'ec/troubleshooting': 'Workstation · Troubleshooting'
 };
 
@@ -52,6 +53,9 @@ function routeFor(key, rec) {
     calculator: '#/calculator/', method: '#/method/', protocol: '#/protocol/',
     technique: '#/technique/', instrument: '#/instrument/', troubleshooting: '#/troubleshooting/'
   };
+  // Circuit elements have no page of their own — they are all on one
+  // explorer, so every element resolves to that tab.
+  if (ns === 'circuit') return '#/workstation/circuits';
   if (map[ns] && rest) return map[ns] + rest;
   const mod = MODULES.find((m) => key.startsWith(m.id));
   return mod ? mod.route : '#/';

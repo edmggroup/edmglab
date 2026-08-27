@@ -36,6 +36,8 @@ const SECTIONS = [
   { id: 'cv',           label: 'CV' },
   { id: 'gcd',          label: 'GCD' },
   { id: 'eis',          label: 'EIS' },
+  { id: 'circuits',     label: 'Circuit elements' },
+  { id: 'tafel',        label: 'Tafel' },
   { id: 'choose',       label: 'Which method?' }
 ];
 
@@ -90,6 +92,8 @@ async function mountSection(id, host) {
     case 'cv':           return sectionCV(host);
     case 'gcd':          return sectionGCD(host);
     case 'eis':          return sectionEIS(host);
+    case 'circuits':     return sectionCircuits(host);
+    case 'tafel':        return sectionTafel(host);
     case 'choose':       return sectionChoose(host);
     default:             return sectionOverview(host);
   }
@@ -432,7 +436,8 @@ function sectionEIS(host) {
       ${callout(`<strong>An equivalent circuit is a model, not a photograph of the system.</strong>
         More than one circuit can usually fit the same spectrum, and a good fit is not evidence that the
         elements correspond to real physical processes. Use this to learn which feature each element
-        controls — then test any real interpretation against independent evidence.`, 'warn')}
+        controls — then test any real interpretation against independent evidence.
+        <a href="#/workstation/circuits">See two different circuits producing the same spectrum exactly →</a>`, 'warn')}
       <div class="sim-grid" style="margin-top:1rem">
         <div class="panel"><div class="panel-head">Circuit parameters</div>
           <div class="panel-body"><div class="ctl" id="eis-ctl"></div>
@@ -497,6 +502,24 @@ function sectionEIS(host) {
   buildControls(host.querySelector('#eis-ctl'), defs, state, redraw);
   redraw();
   return { destroy() { cN?.destroy?.(); cM?.destroy?.(); cP?.destroy?.(); } };
+}
+
+/* ════════════════════════════════════════════════════════════
+   Equivalent-circuit elements (§26) and Tafel analysis (§29)
+
+   Both are large enough to own a file, and both are loaded only when their
+   tab is opened — a student reading the potentiostat page never downloads
+   the Tafel model or the circuit-element library.
+   ════════════════════════════════════════════════════════════ */
+
+async function sectionCircuits(host) {
+  const mod = await import('./circuits.js');
+  return mod.render(host);
+}
+
+async function sectionTafel(host) {
+  const mod = await import('./tafel.js');
+  return mod.render(host);
 }
 
 /* ════════════════════════════════════════════════════════════
