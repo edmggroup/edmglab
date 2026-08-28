@@ -153,6 +153,103 @@ export async function render(outlet) {
         }
       }
 
+      /* A characterisation technique must state what it CANNOT tell you.
+         Nearly every characterisation mistake in this field is a technique
+         applied outside the question it can answer — BET area presented as
+         electrochemically accessible area, Scherrer size as particle size,
+         a bulk claim from a surface technique — and the wrong answer still
+         looks like a result. A technique page without that list teaches the
+         confidence that causes the mistake. */
+      if (rec.id.startsWith('technique.')) {
+        const cant = rec.cannotTell || [];
+        if (cant.length === 0) {
+          issues.push(mk('error', key, rec.id,
+            'Technique record does not state what it CANNOT tell you. That field is required — a technique page without its limits teaches over-confidence.'));
+        } else if (cant.length < 2) {
+          issues.push(mk('warn', key, rec.id,
+            'Only one stated limit. Most techniques are blind to several things worth naming.'));
+        }
+        if (!(rec.answers || []).length) {
+          issues.push(mk('warn', key, rec.id, 'Technique states nothing it can answer.'));
+        }
+        if (!rec.sample) {
+          issues.push(mk('warn', key, rec.id,
+            'Technique does not describe what the sample has to be, or what preparation does to it.'));
+        }
+        if (!(rec.reportWith || []).length) {
+          issues.push(mk('warn', key, rec.id,
+            'Technique does not say what must be reported alongside the result.'));
+        }
+      }
+
+      /* A storage-mechanism record must say how to tell it from its
+         neighbours. Mechanisms sit on a continuum, and every curve shape on
+         one of these pages is shared with at least one neighbouring mechanism
+         — a near-rectangular voltammogram is double-layer OR broad surface
+         redox; a plateau is intercalation OR a side reaction holding a
+         voltage. A record that lists a signature without saying what else
+         produces it teaches exactly the identification error the page exists
+         to prevent. */
+      if (rec.id.startsWith('mechanism.')) {
+        const d = rec.distinguishFrom || [];
+        if (d.length === 0) {
+          issues.push(mk('error', key, rec.id,
+            'Mechanism record does not say how to distinguish it from its neighbours. Required — no single curve identifies a mechanism, and a page that implies one does teaches the mistake.'));
+        } else if (d.length < 2) {
+          issues.push(mk('warn', key, rec.id,
+            'Only one distinguishing test given. Most mechanisms are confusable with more than one neighbour.'));
+        }
+        if (!rec.quantityToReport) {
+          issues.push(mk('warn', key, rec.id,
+            'Mechanism does not state which quantity may be reported for it — the practical consequence of the mechanism.'));
+        }
+        for (const f of ['inCV', 'inGCD', 'dQdV']) {
+          if (!rec[f]) {
+            issues.push(mk('warn', key, rec.id, `Mechanism does not describe its "${f}" signature.`));
+          }
+        }
+      }
+
+      /* A concept record exists to be read in two registers. One with neither
+         filled in renders as a title and nothing else, which is worse than not
+         listing the concept at all. */
+      if (rec.id.startsWith('concept.')) {
+        const l = rec.learnMode || {}, r = rec.researchMode || {};
+        const hasLearn = !!(l.simpleDefinition || l.physicalMeaning || l.example);
+        const hasResearch = !!(r.scientificDefinition || r.mathematicalTreatment || r.experimentalInterpretation);
+        if (!hasLearn && !hasResearch) {
+          issues.push(mk('error', key, rec.id,
+            'Concept has neither a Learn nor a Research version — it would render as a heading with nothing under it.'));
+        } else if (!hasLearn) {
+          issues.push(mk('warn', key, rec.id, 'Concept has no Learn version; it disappears in Learn mode.'));
+        } else if (!hasResearch) {
+          issues.push(mk('warn', key, rec.id, 'Concept has no Research version; it disappears in Research mode.'));
+        }
+      }
+
+      /* A quiz question that only explains its correct answer teaches nothing
+         about the trap. The wrong options are the trap, so each one has to say
+         why it is plausible and why it fails. */
+      if (rec.id.startsWith('quiz.')) {
+        const opts = rec.options || [];
+        const correct = opts.filter((o) => o.correct).length;
+        if (opts.length < 2) {
+          issues.push(mk('error', key, rec.id, 'Quiz question has fewer than two options.'));
+        }
+        if (correct !== 1) {
+          issues.push(mk('error', key, rec.id,
+            `Quiz question has ${correct} correct options — it must have exactly one.`));
+        }
+        const unexplained = opts.filter((o) => !o.why).length;
+        if (unexplained) {
+          issues.push(mk('error', key, rec.id,
+            `${unexplained} option(s) carry no explanation. Every option must say why it is right or why it is wrong — the wrong ones are where the teaching is.`));
+        }
+        if (!rec.explanation) {
+          issues.push(mk('warn', key, rec.id, 'Quiz question has no overall explanation.'));
+        }
+      }
+
       // Anything that plots a model must declare that model.
       if (rec.simulation && !rec.simulationBasis) {
         issues.push(mk('error', key, rec.id,
@@ -258,6 +355,10 @@ export async function render(outlet) {
           <li>Every formula declares a <code>validContext</code> — the configuration it is valid for.</li>
           <li>Every computable formula's <code>expression</code> parses, uses only declared variables, and gives every input and its result a unit.</li>
           <li>Every troubleshooting entry offers <strong>more than one</strong> possible cause.</li>
+          <li>Every characterisation technique states what it <strong>cannot</strong> tell you.</li>
+          <li>Every storage mechanism states how to <strong>distinguish it from its neighbours</strong>.</li>
+          <li>Every concept has both a <strong>Learn</strong> and a <strong>Research</strong> version, so neither mode shows an empty page.</li>
+          <li>Every quiz question has exactly <strong>one</strong> correct option, and every option — right or wrong — explains itself.</li>
           <li>Every method record declares what is <em>controlled</em> and what is <em>measured</em>, and states its limitations.</li>
           <li>Any simulated content declares the model it is based on.</li>
         </ul>

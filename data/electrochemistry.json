@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "_README": "Storage chemistry — Roadmap P8. The mechanism layer: what physically happens when an electrode stores charge, how each mechanism shows itself in CV and GCD, and — the field the health check enforces — how to tell it from its neighbours. No mechanism record may claim a signature that proves it. DRAFT — pending review by the research group.",
+
+  "preamble": "Mechanisms are not categories with hard edges. They are points on one continuum, and the quantity that orders them is the DIFFERENTIAL CAPACITANCE dQ/dV — how much charge the electrode takes for each additional volt. Flat dQ/dV gives a rectangular voltammogram and a straight discharge line; peaked dQ/dV gives a peaked voltammogram and a plateau. Everything else on this page follows from where a material sits on that continuum, and the interactive model lets you move along it.",
+
+  "items": [
+    {
+      "id": "mechanism.edl",
+      "name": "Electrical double layer",
+      "short": "EDL / EDLC",
+      "family": "capacitive",
+      "aliases": ["EDLC", "double layer", "electrostatic", "supercapacitor", "carbon"],
+      "tags": ["supercapacitor", "carbon", "capacitive"],
+      "summary": "Charge is stored electrostatically in the layer of ions that assembles at the electrode surface. No electron crosses the interface, and no bond changes.",
+      "whatHappens": "Applying a potential attracts counter-ions to the surface and repels co-ions, forming a compact layer of separated charge a few ion diameters thick. The charge is held by electrostatics alone, like a capacitor with a very small plate separation and a very large area.",
+      "whereChargeGoes": "The surface, and only the surface. Storage scales with accessible area, not with volume.",
+      "dQdV": "Flat, or nearly so — the electrode takes roughly the same charge per volt everywhere in its window.",
+      "inCV": "A rectangle. Current is roughly constant across the window and reverses sign immediately at each vertex, because there is no reaction to wait for.",
+      "inGCD": "A straight line. Voltage falls linearly with time, which is the definition of constant capacitance.",
+      "rateBehaviour": "Fast. There is no charge-transfer step, so the rate limit is ion transport into the pores — which is why pore size and wetting dominate rate capability rather than any chemistry.",
+      "degradation": "Slow, because nothing is transformed. What fails is usually the electrolyte at the window edges, the binder, or the contact — not the carbon.",
+      "quantityToReport": "Capacitance (F, F/g, F/cm²) is meaningful here, because a single value describes the electrode across its whole window.",
+      "distinguishFrom": [
+        "Versus surface pseudocapacitance: both give near-rectangular CVs, and that shape alone does NOT separate them. A double layer stores no charge faradaically, so its capacitance is largely insensitive to the redox chemistry of the electrolyte; a pseudocapacitive contribution disappears when the couple is removed. Comparing electrolytes, not curve shapes, is what separates them.",
+        "Versus battery-type: look at the discharge line. A genuine double layer is linear over the whole window; a plateau anywhere means charge is going somewhere else."
+      ],
+      "misread": [
+        "Attributing all of a carbon electrode's capacitance to the double layer when surface functional groups are contributing faradaically",
+        "Explaining a capacitance difference by BET area alone — the accessible area, not the measured area, is what stores charge"
+      ],
+      "relatedIds": ["mechanism.pseudo_surface", "technique.bet", "formula.specific_capacitance"]
+    },
+
+    {
+      "id": "mechanism.pseudo_surface",
+      "name": "Surface pseudocapacitance",
+      "short": "Surface redox",
+      "family": "pseudocapacitive",
+      "aliases": ["pseudocapacitance", "surface redox", "underpotential deposition", "RuO2", "MnO2"],
+      "tags": ["supercapacitor", "pseudocapacitance", "faradaic"],
+      "summary": "Charge is stored by fast, reversible redox reactions at or very near the surface — faradaic in mechanism, capacitor-like in behaviour.",
+      "whatHappens": "Electrons cross the interface and change an oxidation state, but the reaction is confined to the surface and is fast enough to follow the potential almost without lag. Because surface sites have a spread of energies, the couple is broadened until its differential capacitance is nearly flat.",
+      "whereChargeGoes": "Surface and near-surface sites. Storage still scales with accessible area, but each site holds far more charge than a double-layer site.",
+      "dQdV": "Broad and gently humped. Broad enough to look flat, which is precisely why the electrochemistry resembles a capacitor.",
+      "inCV": "Near-rectangular, often with a broad, low hump rather than a sharp peak. The hump moves little with scan rate if the process really is fast.",
+      "inGCD": "Nearly linear, usually with a visible curvature or a change of slope where the couple sits.",
+      "rateBehaviour": "Fast, but not as fast as a double layer: there is a charge-transfer step, so rate capability falls off sooner. Whether it behaves capacitively at YOUR scan rate is an experimental question, not a property of the material.",
+      "degradation": "Faster than a double layer, because bonds are being made and broken. Dissolution and structural rearrangement of the redox-active surface are the usual routes.",
+      "quantityToReport": "Capacitance is defensible IF the discharge is close to linear and a single value describes the window — check that, do not assume it.",
+      "distinguishFrom": [
+        "Versus the double layer: a pseudocapacitive contribution depends on the redox chemistry available. Change the electrolyte or the surface chemistry and it changes; a double layer largely does not. Curve shape alone cannot tell them apart.",
+        "Versus battery-type intercalation: the distinction is how BROAD the couple is, not whether one exists. A broad couple is pseudocapacitive in behaviour; a narrow one gives a plateau. There is no sharp line between them, and materials sit anywhere along it.",
+        "Versus intercalation pseudocapacitance: surface pseudocapacitance is confined to the surface, so it scales with area and is thickness-independent; intercalation pseudocapacitance involves the bulk and is not."
+      ],
+      "misread": [
+        "Calling any near-rectangular CV 'double layer' when the material has obvious redox chemistry",
+        "Reporting a b-value near 1 as proof of a capacitive mechanism — b is an empirical descriptor of scaling, not an identification",
+        "Deconvoluting a CV into 'capacitive' and 'diffusion-controlled' percentages and presenting the split as a measurement rather than as the output of an assumed model"
+      ],
+      "relatedIds": ["mechanism.edl", "mechanism.pseudo_intercalation", "formula.b_value", "method.cv"]
+    },
+
+    {
+      "id": "mechanism.pseudo_intercalation",
+      "name": "Intercalation pseudocapacitance",
+      "short": "Fast intercalation",
+      "family": "pseudocapacitive",
+      "aliases": ["intercalation pseudocapacitance", "Nb2O5", "fast intercalation", "bulk pseudocapacitance"],
+      "tags": ["supercapacitor", "battery", "pseudocapacitance", "intercalation"],
+      "summary": "Ions enter the bulk of the host, as in a battery, but without a phase change and fast enough that the response still looks capacitive.",
+      "whatHappens": "Ions insert into a host structure with open, low-barrier diffusion pathways. Because no phase transformation is required, the potential varies continuously with occupancy instead of pinning to a plateau, and the kinetics stay fast even though the bulk is involved.",
+      "whereChargeGoes": "Throughout the particle volume — so capacity does not saturate with thickness in the way surface storage does.",
+      "dQdV": "Moderately broad. Between surface pseudocapacitance and battery-type intercalation, which is exactly where the material sits physically.",
+      "inCV": "Broad, resolvable peaks whose separation grows only slowly with scan rate — the signature usually quoted, and one that overlaps with several other explanations.",
+      "inGCD": "Sloping, without a flat plateau. The slope is what tells you the host is a solid solution rather than a two-phase system.",
+      "rateBehaviour": "Fast for a bulk process, which is the whole interest of it — but still bulk, so particle size matters far more than it does for surface storage.",
+      "degradation": "Better than most battery-type hosts, because there is no repeated phase transformation to strain the lattice.",
+      "quantityToReport": "Usually capacity, not capacitance. The discharge slopes rather than being straight, so a single capacitance describes it only approximately — and how approximately should be checked and stated.",
+      "distinguishFrom": [
+        "Versus surface pseudocapacitance: this involves the bulk. Vary the particle size or the electrode thickness — surface storage scales with area, bulk storage does not.",
+        "Versus battery-type intercalation: the difference is the absence of a phase transition, which shows as a sloping curve rather than a flat plateau. It is a continuum, not a boundary.",
+        "None of these distinctions can be made from one CV at one scan rate. A scan-rate series, a thickness series and a particle-size comparison are what separate them."
+      ],
+      "misread": [
+        "Treating a fast bulk process as a surface process and normalising to surface area",
+        "Reporting capacitance in farads per gram for a material whose discharge curve is visibly sloped"
+      ],
+      "relatedIds": ["mechanism.pseudo_surface", "mechanism.intercalation", "formula.b_value"]
+    },
+
+    {
+      "id": "mechanism.intercalation",
+      "name": "Battery-type intercalation",
+      "short": "Intercalation",
+      "family": "battery",
+      "aliases": ["intercalation", "insertion", "topotactic", "staging", "graphite", "layered oxide"],
+      "tags": ["battery", "lithium-ion", "sodium-ion", "intercalation"],
+      "summary": "Ions insert into defined sites in a host lattice, often through a sequence of ordered phases, giving the flat plateaus that define battery behaviour.",
+      "whatHappens": "Guest ions occupy interstitial sites in a host that keeps its framework. Where two phases coexist, thermodynamics fixes the potential — the extra ions convert one phase into the other rather than raising the energy of the system — and the voltage stays constant until the transformation completes.",
+      "whereChargeGoes": "The bulk of the particle, into a limited number of defined sites. That limit is what makes theoretical capacity calculable.",
+      "dQdV": "Sharp peaks. Each peak is one phase transition or one ordering transition, and the sharper the peak the flatter the plateau.",
+      "inCV": "Distinct, often narrow peaks whose separation grows with scan rate. Peak positions map onto the plateaus.",
+      "inGCD": "One or more flat plateaus. This is the shape people mean by 'battery-like'.",
+      "rateBehaviour": "Limited by solid-state diffusion and by the phase-boundary movement. Particle size dominates; rate capability improves roughly as the diffusion length shortens.",
+      "degradation": "Repeated phase transformation strains the lattice. Particle cracking, loss of electrical contact and interface growth are the usual routes.",
+      "quantityToReport": "Capacity (mAh/g), never capacitance. Across a plateau the differential capacitance is enormous and off the plateau it is almost nothing — so C = I·Δt/ΔV returns a number that depends entirely on the window and describes nothing about the material.",
+      "distinguishFrom": [
+        "Versus intercalation pseudocapacitance: the flat plateau is the tell — it means a two-phase region, which the pseudocapacitive case does not have. Confirm it with in-situ XRD rather than curve shape alone.",
+        "Versus conversion: intercalation keeps the host framework, so the first cycle is efficient and the curve is reproducible from cycle two. Conversion breaks the framework and shows a large first-cycle loss and a changed second-cycle shape.",
+        "A plateau alone does not prove intercalation. Electrolyte decomposition, a side reaction and a soft short can each hold a voltage for a while."
+      ],
+      "misread": [
+        "Reporting specific capacitance in F/g for a material with plateaus — the single most consequential reporting error in this field",
+        "Reading plateau length as capacity without confirming the step ended on its voltage limit rather than a time limit",
+        "Attributing every dQ/dV peak to a phase transition without structural evidence"
+      ],
+      "relatedIds": ["mechanism.pseudo_intercalation", "mechanism.conversion", "formula.specific_capacity", "technique.xrd"]
+    },
+
+    {
+      "id": "mechanism.conversion",
+      "name": "Conversion",
+      "short": "Conversion",
+      "family": "battery",
+      "aliases": ["conversion", "displacement", "metal oxide anode", "transition metal fluoride"],
+      "tags": ["battery", "conversion", "high capacity"],
+      "summary": "The host is chemically taken apart and rebuilt each cycle — very high capacity, at the cost of large hysteresis and difficult reversibility.",
+      "whatHappens": "The compound is reduced to a metal dispersed in a matrix of the reaction product, and re-oxidised on charge. Every bond in the starting material is broken and remade, so far more electrons are stored per formula unit than intercalation allows.",
+      "whereChargeGoes": "The entire compound participates, not a set of interstitial sites — which is why capacities are several times those of intercalation hosts.",
+      "dQdV": "Broad features, usually at markedly different potentials on charge and discharge.",
+      "inCV": "Large separation between the oxidation and reduction features — often hundreds of millivolts — which is thermodynamic and kinetic, not an artefact.",
+      "inGCD": "A sloping curve with a large gap between the charge and discharge branches. That gap is wasted energy and it does not go away with a better cell build.",
+      "rateBehaviour": "Poor. Nucleating a new phase takes overpotential, and the reaction is limited by solid-state mass transport through a changing structure.",
+      "degradation": "Severe. Large volume changes, continuous new surface formation and consequent electrolyte consumption. First-cycle efficiency is usually low.",
+      "quantityToReport": "Capacity, with the voltage hysteresis reported alongside it. A capacity figure without the round-trip energy efficiency hides the main problem with these materials.",
+      "distinguishFrom": [
+        "Versus intercalation: a large first-cycle irreversible capacity and a second-cycle curve shaped differently from the first are the signature. Intercalation gives a reproducible shape from cycle two.",
+        "Versus alloying: both give big capacities and big volume changes. Conversion breaks the compound into a metal and a matrix; alloying forms an intermetallic. Ex-situ XRD after cycling distinguishes them; the electrochemistry alone usually does not.",
+        "A big first-cycle loss is not by itself evidence of conversion — SEI formation gives one too, and both are usually present."
+      ],
+      "misread": [
+        "Quoting capacity without the hysteresis, so the energy efficiency problem is invisible",
+        "Presenting first-cycle capacity as the material's capacity",
+        "Attributing all first-cycle loss to conversion when SEI formation accounts for part of it"
+      ],
+      "relatedIds": ["mechanism.intercalation", "mechanism.alloying", "formula.energy_efficiency"]
+    },
+
+    {
+      "id": "mechanism.alloying",
+      "name": "Alloying",
+      "short": "Alloying",
+      "family": "battery",
+      "aliases": ["alloying", "silicon anode", "tin", "germanium", "Li-Si"],
+      "tags": ["battery", "alloying", "silicon", "volume change"],
+      "summary": "The guest ion forms an alloy with the host element — the highest capacities available, and the largest volume changes.",
+      "whatHappens": "Lithium (or sodium) alloys with an element such as silicon or tin, forming successive intermetallic compositions. Many ions are stored per host atom, which is why the capacities are so high.",
+      "whereChargeGoes": "The whole particle, transformed into a new compound with a substantially larger volume.",
+      "dQdV": "Peaks corresponding to the successive alloy compositions, though these are often smeared once the material has been cycled and amorphised.",
+      "inCV": "Peaks that change shape between the first cycle and later cycles, because the crystalline starting material does not usually come back.",
+      "inGCD": "Sloping with steps. The first-cycle curve is characteristically different from every subsequent one.",
+      "rateBehaviour": "Limited by solid-state transport, and increasingly by the mechanical state of the particle as cycling proceeds.",
+      "degradation": "Dominated by the volume change: particle fracture, loss of electrical contact, and an SEI that keeps re-forming on newly exposed surface and keeps consuming electrolyte. Cycle life, not capacity, is the problem to solve.",
+      "quantityToReport": "Capacity and capacity retention together, with the cycle number and the rate. A high first-cycle capacity says nothing about whether the material is usable.",
+      "distinguishFrom": [
+        "Versus conversion: alloying forms an intermetallic with the host element; conversion decomposes a compound into a metal and a matrix. Post-cycling XRD separates them; the discharge curve usually does not.",
+        "Versus intercalation: the volume change is the tell. Intercalation hosts change volume by a few percent; alloying hosts change by hundreds of percent, and the mechanical consequences dominate everything else.",
+        "The first cycle is not representative of any of these mechanisms. Compare cycle two onwards."
+      ],
+      "misread": [
+        "Reporting first-cycle capacity as the headline figure",
+        "Presenting good capacity over a few tens of cycles as cycling stability",
+        "Comparing capacities measured at very low mass loading with practical electrodes"
+      ],
+      "relatedIds": ["mechanism.conversion", "mechanism.intercalation", "formula.capacity_retention"]
+    }
+  ],
+
+  "devices": {
+    "title": "What the device does with those mechanisms",
+    "note": "A device is two electrodes. Which mechanism each one uses decides the shape of the cell curve, where the voltage window comes from, and which quantity is valid to report for the whole thing.",
+    "rows": [
+      { "device": "Symmetric EDLC",
+        "electrodes": "Two identical carbon electrodes, both double-layer.",
+        "window": "Set by the electrolyte's stability, not by any redox potential.",
+        "curve": "Triangular. Both electrodes are capacitive, so the cell is too.",
+        "report": "Cell capacitance for the device; single-electrode-equivalent capacitance for the material, with the factor of four stated.",
+        "watch": "The two electrodes must genuinely be identical for the factor of four to apply." },
+      { "device": "Asymmetric / hybrid supercapacitor",
+        "electrodes": "One capacitive electrode against one pseudocapacitive or battery-type electrode.",
+        "window": "Wider than a symmetric cell, because the two electrodes work over different potential ranges.",
+        "curve": "Between triangular and plateaued, depending on how battery-like the second electrode is.",
+        "report": "Cell-level quantities. The factor of four does NOT apply — the electrodes are not identical, and each must be characterised separately in a three-electrode arrangement.",
+        "watch": "Mass balancing between the two electrodes is a design choice that changes every reported number." },
+      { "device": "Lithium-ion capacitor",
+        "electrodes": "A capacitive carbon cathode against a battery-type intercalation anode.",
+        "window": "Set by the anode's operating potential and the electrolyte limit.",
+        "curve": "Sloping, closer to a capacitor than to a battery.",
+        "report": "Energy and power at the device level. Capacitance is not the natural quantity here.",
+        "watch": "The anode usually needs pre-lithiation, which is a preparation step with its own reproducibility problems." },
+      { "device": "Lithium-ion / sodium-ion battery",
+        "electrodes": "Two intercalation electrodes at different potentials.",
+        "window": "Set by the difference between the two electrodes' redox potentials.",
+        "curve": "Plateaued, or sloping-with-steps.",
+        "report": "Capacity, energy, coulombic and energy efficiency, retention. Never capacitance.",
+        "watch": "A half cell against lithium metal is not a full cell — the counter electrode is effectively unlimited, so full-cell behaviour cannot be inferred from it." },
+      { "device": "Half cell (research configuration)",
+        "electrodes": "The electrode of interest against a large excess of metal.",
+        "window": "Chosen by you, within the electrolyte's stability.",
+        "curve": "The electrode of interest, essentially uncontaminated by the counter electrode.",
+        "report": "Electrode-level quantities only, always stated as half-cell values.",
+        "watch": "Coulombic efficiency in a half cell flatters the material, because the counter electrode supplies whatever is lost." }
+    ]
+  },
+
+  "closing": "Which mechanism an electrode uses is not a label you attach after the fact. It decides which quantity is valid to report, which formula applies, which failure modes to expect and which characterisation will answer your next question. It also cannot be established from a single curve — every distinction on this page needs at least a series, and most need a technique from outside electrochemistry."
+}

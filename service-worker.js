@@ -24,7 +24,7 @@
  * after a fix has shipped.
  */
 
-const CACHE_VERSION = 'edmglab-v12';
+const CACHE_VERSION = 'edmglab-v17';
 const DATA_CACHE = 'edmglab-data-v1';
 
 /* Paths are RELATIVE so the app works both at a domain root and at a
@@ -52,6 +52,17 @@ const SHELL = [
   './js/lib/charts.js',
   './js/lib/expr.js',
   './js/lib/formula-view.js',
+  './js/lib/csv-core.js',
+  './js/lib/csv.js',
+  './js/lib/csv-worker.js',
+  './js/views/import.js',
+  './js/views/preparation.js',
+  './js/views/characterization.js',
+  './js/views/fundamentals.js',
+  './js/views/quiz.js',
+  './js/views/glossary.js',
+  './js/chemistry/index.js',
+  './js/chemistry/sim/mechanism.js',
   './js/views/formulas.js',
   './js/views/formula.js',
   './js/views/calculators.js',

@@ -147,31 +147,11 @@ export function renderMethodDetail(host, m, opts = {}) {
       research group before it is treated as teaching material.</div>` : ''}
 
     <style>
-      .mv-block { margin-bottom:1.25rem; }
-      .mv-head { display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;
-        padding-bottom:.4rem; margin-bottom:.7rem; border-bottom:1px solid var(--border); }
-      .mv-head h2 { margin:0; font-size:var(--fs-md); }
-      .mv-head span { font-size:var(--fs-xs); color:var(--text-muted); }
-      .mv-body { font-size:var(--fs-sm); color:var(--text-2); display:grid; gap:.7rem; }
-      .mv-body p { margin:0; }
-      .mv-kv { display:grid; gap:.45rem; }
-      .mv-kv .k { font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:.06em;
-        color:var(--text-muted); font-weight:650; }
-      .mv-kv .v { color:var(--text); }
-      /* .lim-list now lives in css/style.css — it is used by the workflow,
-         safety, cells, circuits and Tafel pages too, and a shared class
-         defined here only exists on pages that render a method. */
-      .param { border:1px solid var(--border); border-radius:var(--r-md);
-        background:var(--surface-2); padding:.6rem .75rem; }
-      .param .pn { font-weight:600; font-size:var(--fs-sm); color:var(--text); display:block; margin-bottom:.15rem; }
-      .cbar { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
-      .cbar .cb { display:flex; flex-direction:column; gap:.15rem; padding:.55rem .8rem;
-        border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface); flex:1 1 150px; }
-      .cbar .cb .cbk { font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); font-weight:650; }
-      .cbar .cb .cbv { font-size:var(--fs-sm); font-weight:600; }
-      .cbar .cb.ctrl .cbv { color:var(--accent-strong); }
-      .cbar .cb.meas .cbv { color:var(--warn); }
-      .cols { display:flex; flex-wrap:wrap; gap:.4rem; }
+      /* The .mv-*, .cbar, .param and .cols rules that used to live here are now
+         in css/style.css. They were always shared — the workflow, safety and
+         technique pages all use them — and a shared class defined inside one
+         module's inline style only exists on the pages that module renders.
+         That is the same defect that once left the workstation unstyled. */
     </style>`;
 
   return { destroy() {} };

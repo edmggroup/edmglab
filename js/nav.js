@@ -71,22 +71,22 @@ export const TABS = [
 export const MODULES = [
   { id: 'dashboard',       label: 'Dashboard',           route: '#/',                    icon: 'home',      tab: 'home',  group: null,    phase: 0,  view: 'dashboard' },
 
-  { id: 'fundamentals',    label: 'Fundamentals',        route: '#/fundamentals',        icon: 'book',      tab: 'learn', group: 'learn', phase: 1 },
-  { id: 'chemistry',       label: 'Storage Chemistry',   route: '#/chemistry',           icon: 'atom',      tab: 'learn', group: 'learn', phase: 8 },
-  { id: 'glossary',        label: 'Glossary',            route: '#/glossary',            icon: 'book',      tab: 'learn', group: 'learn', phase: 12 },
-  { id: 'learning',        label: 'Learning & Quiz',     route: '#/learning',            icon: 'heart',     tab: 'learn', group: 'learn', phase: 12 },
+  { id: 'fundamentals',    label: 'Fundamentals',        route: '#/fundamentals',        icon: 'book',      tab: 'learn', group: 'learn', view: 'fundamentals' },
+  { id: 'chemistry',       label: 'Storage Chemistry',   route: '#/chemistry',           icon: 'atom',      tab: 'learn', group: 'learn', view: 'chemistry/index' },
+  { id: 'glossary',        label: 'Glossary',            route: '#/glossary',            icon: 'book',      tab: 'learn', group: 'learn', view: 'glossary' },
+  { id: 'learning',        label: 'Learning & Quiz',     route: '#/learning',            icon: 'heart',     tab: 'learn', group: 'learn', view: 'quiz' },
 
   { id: 'materials',       label: 'Electrode Materials', route: '#/materials',           icon: 'layers',    tab: 'lab',   group: 'lab',   phase: 7 },
-  { id: 'preparation',     label: 'Electrode Prep',      route: '#/preparation',         icon: 'flask',     tab: 'lab',   group: 'lab',   phase: 9 },
-  { id: 'characterization',label: 'Characterisation',    route: '#/characterization',    icon: 'scope',     tab: 'lab',   group: 'lab',   phase: 9 },
+  { id: 'preparation',     label: 'Electrode Prep',      route: '#/preparation',         icon: 'flask',     tab: 'lab',   group: 'lab',   view: 'preparation' },
+  { id: 'characterization',label: 'Characterisation',    route: '#/characterization',    icon: 'scope',     tab: 'lab',   group: 'lab',   view: 'characterization' },
   { id: 'battery-tester',  label: 'Battery Tester',      route: '#/battery-tester',      icon: 'battery',   tab: 'lab',   group: 'lab',   phase: 3,  view: 'battery-tester/index' },
   { id: 'workstation',     label: 'Echem Workstation',   route: '#/workstation',         icon: 'wave',      tab: 'lab',   group: 'lab',   phase: 5,  view: 'echem/index' },
-  { id: 'protocols',       label: 'Test Protocols',      route: '#/protocols',           icon: 'clipboard', tab: 'lab',   group: 'lab',   phase: 3 },
+  { id: 'protocols',       label: 'Test Protocols',      route: '#/battery-tester/protocol', icon: 'clipboard', tab: 'lab', group: 'lab', view: 'battery-tester/index' },
   { id: 'which-instrument',label: 'Which Instrument?',   route: '#/workstation/choose',  icon: 'compass',   tab: 'lab',   group: 'lab',   phase: 5,  view: 'echem/index' },
 
   { id: 'formulas',        label: 'Formula Library',     route: '#/formulas',            icon: 'sigma',     tab: 'tools', group: 'tools', view: 'formulas' },
   { id: 'calculators',     label: 'Calculators',         route: '#/calculators',         icon: 'calc',      tab: 'tools', group: 'tools', view: 'calculators' },
-  { id: 'import',          label: 'Data Import',         route: '#/import',              icon: 'upload',    tab: 'tools', group: 'tools', phase: 4 },
+  { id: 'import',          label: 'Data Import',         route: '#/import',              icon: 'upload',    tab: 'tools', group: 'tools', view: 'import' },
   { id: 'troubleshooting', label: 'Troubleshooting',     route: '#/troubleshooting',     icon: 'wrench',    tab: 'tools', group: 'tools', phase: 10, view: 'troubleshooting' },
 
   // Utilities — footer rail, not the main list (see GROUPS above).

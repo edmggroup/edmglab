@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "_kind": "preparation",
+  "_README": "Electrode preparation — Roadmap P9. This is a DECISION GUIDE, not a laboratory SOP: it explains what each choice does and how it shows up later in the electrochemistry. Your group's own written procedure always takes precedence, and nothing here substitutes for training. DRAFT — pending review by the research group.",
+
+  "preamble": "Most results reported as properties of a material are properties of an electrode. The same powder, made into two electrodes with different loading, thickness or binder content, gives two different rate capabilities, two different resistances and two different capacitances — and nothing in the electrochemical data says which difference came from the material. Preparation is therefore not the step before the experiment. It is part of the experiment, and it has to be recorded like one.",
+
+  "formulation": {
+    "title": "What is in an electrode, and what each part is for",
+    "note": "Composition is usually quoted as a mass ratio of active : conductive additive : binder. The ratio is a design choice with consequences, not a house style.",
+    "components": [
+      { "name": "Active material",
+        "role": "The material under study. Everything you report per gram is normally per gram of THIS, not of the coating.",
+        "increasing": "More active material raises the fraction of the electrode doing useful work, which is what a device wants.",
+        "cost": "Below a certain additive and binder content the electrode loses electronic connectivity or mechanical integrity, and the measured performance falls for reasons that have nothing to do with the material.",
+        "watch": "The mass used in every gravimetric calculation. Whether it is active mass or total coating mass must be stated once and kept consistent — a study that mixes the two produces a scatter nobody can explain." },
+      { "name": "Conductive additive",
+        "role": "Carries electrons between active particles and the current collector. Usually a carbon black or a conductive carbon.",
+        "increasing": "More additive lowers electronic resistance and usually improves rate capability.",
+        "cost": "It contributes surface area and some capacity of its own, dilutes the active material, and above a point simply fills porosity that the electrolyte needs.",
+        "watch": "For a low-capacity material, or a supercapacitor carbon, the additive's own contribution is not negligible and should be measured in a blank electrode rather than assumed away." },
+      { "name": "Binder",
+        "role": "Holds the coating together and to the collector.",
+        "increasing": "More binder gives a mechanically robust coating that survives handling and cycling.",
+        "cost": "Binder is insulating and can block pores and coat active surfaces, raising resistance and lowering accessible capacity.",
+        "watch": "Binder chemistry is not interchangeable. Changing binder changes the interface, the slurry rheology, the drying behaviour and often the electrochemistry — it is a variable, not a detail." },
+      { "name": "Solvent",
+        "role": "Disperses the solids so they can be coated, then leaves.",
+        "increasing": "More solvent gives a thinner, more workable slurry.",
+        "cost": "More solvent means more to remove, longer drying, and more opportunity for components to segregate as it goes.",
+        "watch": "The solvent must suit the binder. It leaves the electrode, but the structure it left behind is set by how it left." },
+      { "name": "Current collector",
+        "role": "Conducts current in and out, and supports the coating.",
+        "increasing": "—",
+        "cost": "—",
+        "watch": "Its own stability window matters: a collector that corrodes inside your potential range contributes current that will be read as the material's." }
+    ]
+  },
+
+  "steps": [
+    { "id": "prep.weighing", "n": 1, "name": "Weighing the solids", "phase": "formulate",
+      "purpose": "Fix the composition, and record it precisely enough that the electrode can be reproduced.",
+      "controlled": "the mass ratio", "measured": "component masses",
+      "expected": "Masses recorded to the balance's stated resolution, with the ratio calculated and written down rather than assumed.",
+      "considerations": [
+        "Record the actual masses, not the intended ratio. They differ, and the difference is what makes a batch reproducible.",
+        "Materials that have taken up water weigh more than they should — dry and store appropriately, and note whether you did.",
+        "Small total batches carry proportionally larger weighing errors."
+      ],
+      "mistakes": ["Writing down the target ratio instead of the weighed masses", "Weighing a hygroscopic powder in humid air without noting it"],
+      "shows": "A composition error propagates into every gravimetric result and is invisible in the electrochemistry.",
+      "record": "Component masses, the ratio they give, the balance resolution, and the batch identifier." },
+
+    { "id": "prep.mixing", "n": 2, "name": "Mixing the slurry", "phase": "formulate",
+      "purpose": "Disperse the solids uniformly so the coating is the same everywhere.",
+      "controlled": "mixing method, energy and time", "measured": "—",
+      "expected": "A homogeneous slurry with no visible agglomerates and a consistency suited to the coating method.",
+      "considerations": [
+        "Mixing energy and time are experimental variables. Under-mixing leaves agglomerates; over-mixing can break structures you wanted to keep and can shear the binder.",
+        "Order of addition matters — dispersing the carbon before adding the active material generally gives a better network.",
+        "Give the slurry the same treatment between batches you intend to compare."
+      ],
+      "mistakes": ["Varying mixing time between batches and then comparing them", "Assuming a slurry that looks uniform is uniform"],
+      "shows": "Poor dispersion shows up as scatter between nominally identical cells, and as a rate capability that is worse than the material deserves.",
+      "record": "Method, speed, duration, order of addition, total solids content." },
+
+    { "id": "prep.coating", "n": 3, "name": "Coating", "phase": "form",
+      "purpose": "Lay the slurry onto the collector at a controlled, repeatable wet thickness.",
+      "controlled": "wet film thickness and coating speed", "measured": "—",
+      "expected": "An even film with no streaks, pinholes or thick edges.",
+      "considerations": [
+        "Wet thickness sets dry loading, but not linearly — solids content and drying shrinkage both intervene.",
+        "Edges dry differently from the middle. Punching discs from the middle of a coating is a defensible choice; punching from wherever is convenient is not.",
+        "A clean, well-wetted collector is the difference between good adhesion and a coating that lifts during cycling."
+      ],
+      "mistakes": ["Punching discs from an edge region and treating them as equivalent", "Changing coating gap between batches without recording it"],
+      "shows": "Thickness variation across a coating turns into loading variation between cells, which turns into scatter in specific capacity.",
+      "record": "Coating method, gap or wet thickness, speed, collector material and thickness." },
+
+    { "id": "prep.drying", "n": 4, "name": "Drying", "phase": "form",
+      "purpose": "Remove the solvent, leaving the porous structure the electrode will actually have.",
+      "controlled": "temperature, time, atmosphere, pressure", "measured": "mass loss, if tracked",
+      "expected": "A coating at constant mass, adherent, without cracks or blisters.",
+      "considerations": [
+        "Drying too fast can drive binder and additive to the surface as the solvent leaves, producing a gradient through the thickness that no later step undoes.",
+        "Residual solvent and residual water both affect electrochemistry, particularly at high voltage. A final vacuum dry is usual, and its conditions should be recorded.",
+        "Dry to constant mass rather than for a fixed time, and note which you did."
+      ],
+      "mistakes": ["Fixed drying time regardless of coating thickness", "Skipping the final vacuum step and attributing the resulting behaviour to the material"],
+      "shows": "Incomplete drying appears as extra first-cycle irreversible capacity, gas evolution, and poor efficiency that improves over the first cycles.",
+      "record": "Temperature, duration, atmosphere or vacuum level, and whether constant mass was reached." },
+
+    { "id": "prep.calendering", "n": 5, "name": "Calendering (if used)", "phase": "form",
+      "purpose": "Compress the coating to a defined thickness and density, improving contact.",
+      "controlled": "gap or pressure", "measured": "thickness before and after",
+      "expected": "A denser, better-connected coating at a reproducible thickness.",
+      "considerations": [
+        "Calendering trades porosity for contact. Too much closes the pore network the electrolyte needs, and rate capability falls even though the electronic path improved.",
+        "Report the porosity or the density achieved, not just that calendering was performed.",
+        "Brittle materials fracture under pressure; the damage is not visible from the surface."
+      ],
+      "mistakes": ["Calendering some cells in a study and not others", "Reporting 'calendered' with no pressure or resulting density"],
+      "shows": "Over-calendering shows as a rate capability that falls while low-rate capacity stays fine — a transport limitation, not a kinetic one.",
+      "record": "Pressure or gap, resulting thickness, and the calculated porosity if you can." },
+
+    { "id": "prep.punching", "n": 6, "name": "Punching and selection", "phase": "finish",
+      "purpose": "Cut electrodes of known, identical area from the coating.",
+      "controlled": "disc diameter", "measured": "area",
+      "expected": "Clean-edged discs of uniform area, taken from comparable regions.",
+      "considerations": [
+        "The punch diameter defines the area every areal quantity is normalised to. Measure it once rather than trusting the nominal figure.",
+        "Discard discs with edge defects, delamination or visible thickness variation, and say how many you discarded.",
+        "Take discs from equivalent regions across every batch you intend to compare."
+      ],
+      "mistakes": ["Using the nominal punch diameter without checking it", "Silently selecting the best-looking discs"],
+      "shows": "An area error scales every areal capacitance and current density by the same factor, and is invisible afterwards.",
+      "record": "Punch diameter as measured, the region of the coating used, and the number discarded." },
+
+    { "id": "prep.mass", "n": 7, "name": "Determining the active mass", "phase": "finish",
+      "purpose": "Establish the number every gravimetric result will be divided by.",
+      "controlled": "—", "measured": "coating mass, then active mass by composition",
+      "expected": "An active mass with an uncertainty you can state.",
+      "considerations": [
+        "Coating mass is the difference between the coated disc and a bare collector disc of the same size. Both weighings carry the balance's uncertainty, and it is the SMALL difference that matters — so at low loading the relative uncertainty can be large.",
+        "Weigh several bare discs and use their mean, rather than one.",
+        "Active mass is coating mass times the active fraction — which assumes the composition is uniform through the coating, and drying can make it not so.",
+        "Record the mass on paper, independently of the instrument. A mass that exists only in the cycler's parameter field cannot be checked later."
+      ],
+      "mistakes": [
+        "Assuming the bare-collector mass instead of measuring it",
+        "Working at a loading so low that the coating mass is close to the balance's resolution",
+        "Recording only the derived specific capacity, so the mass can never be revisited"
+      ],
+      "shows": "Every gravimetric result is inversely proportional to this number. A 10% mass error is a 10% error in every specific capacity you report from that cell, and there is nothing in the data to reveal it.",
+      "record": "Coated disc mass, mean bare disc mass, the active fraction used, the resulting active mass, and the balance resolution.",
+      "calculator": "#/formula/mass_loading" },
+
+    { "id": "prep.storage", "n": 8, "name": "Storage and handling before assembly", "phase": "finish",
+      "purpose": "Get the electrode to the cell in the state you characterised it in.",
+      "controlled": "atmosphere, humidity, time", "measured": "—",
+      "expected": "An electrode assembled in the condition it was dried in.",
+      "considerations": [
+        "Dried electrodes reabsorb water from room air, and quickly. Time in air between the oven and the glovebox is an uncontrolled variable unless you control it.",
+        "Label everything with the batch, the coating, the mass and the date. An unlabelled electrode is an electrode you will not use.",
+        "Handle by the edge with clean tools; fingerprints are contamination."
+      ],
+      "mistakes": ["Leaving dried electrodes on the bench 'for a while'", "Losing track of which disc came from which batch"],
+      "shows": "Reabsorbed water appears as first-cycle irreversible capacity and poor early efficiency — exactly the signature that gets attributed to the material.",
+      "record": "Where and how stored, in what atmosphere, and for how long before assembly." }
+  ],
+
+  "decisions": {
+    "title": "Choices, and what each does to your data",
+    "note": "Each row is a variable you set. If it is not recorded, a difference between two cells cannot be attributed to anything.",
+    "rows": [
+      { "choice": "Mass loading", "raise": "Raises areal capacity and makes the electrode more device-relevant.",
+        "cost": "Transport limitations grow with thickness, so rate capability falls and the material looks worse.",
+        "inData": "Low-rate capacity holds while high-rate capacity falls; IR drop rises.",
+        "report": "Always. A gravimetric result at very low loading is systematically flattering and not transferable." },
+      { "choice": "Binder fraction", "raise": "Raises mechanical integrity and cycling stability.",
+        "cost": "Insulating and pore-blocking; raises resistance and can lower accessible capacity.",
+        "inData": "Higher charge-transfer and series resistance; lower rate capability.",
+        "report": "Always, with the binder chemistry." },
+      { "choice": "Conductive additive fraction", "raise": "Lowers electronic resistance and improves rate.",
+        "cost": "Dilutes the active material and adds its own surface area and capacity.",
+        "inData": "Better rate capability; for low-capacity materials, an inflated apparent capacity.",
+        "report": "Always, and measure a blank electrode where the additive's own contribution could matter." },
+      { "choice": "Calendering pressure", "raise": "Denser coating, better particle contact, higher volumetric performance.",
+        "cost": "Closes porosity; can fracture brittle particles.",
+        "inData": "Rate capability falls while low-rate capacity is unchanged — a transport signature.",
+        "report": "Pressure and the resulting thickness or porosity." },
+      { "choice": "Drying temperature and time", "raise": "More complete solvent and water removal.",
+        "cost": "Too hot or too fast causes binder migration and cracking; some materials degrade.",
+        "inData": "Residual water shows as first-cycle irreversible capacity and gassing.",
+        "report": "Temperature, time, atmosphere, and the final vacuum step." },
+      { "choice": "Electrolyte volume", "raise": "Ensures full wetting of a porous electrode.",
+        "cost": "Excess electrolyte in a coin cell is a reservoir that masks consumption and flatters cycle life.",
+        "inData": "Under-filling shows as high resistance and capacity that recovers after a long rest.",
+        "report": "The volume used, per cell." }
+    ]
+  },
+
+  "closing": "This page is a decision guide, not a procedure. It deliberately gives no quantities, temperatures or times — those belong to your group's own written method for your own materials, and copying them from a web page is how a procedure stops being traceable. What it does say is which choices change the answer, and what each change looks like once the cell is on test."
+}

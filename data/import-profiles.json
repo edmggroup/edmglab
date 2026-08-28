@@ -1,0 +1,672 @@
+{
+  "schemaVersion": 1,
+  "_kind": "profiles",
+  "_README": "Column-role aliases for instrument exports — Roadmap P4. This is DATA, not code: when someone in the group meets an export whose header this does not recognise, they add the alias here and commit, and every future import understands it. Aliases are matched case-insensitively after normalising separators, so 'Voltage_V', 'voltage (V)' and 'VOLTAGE/V' all match 'voltage'. Detection is always shown to the user as a proposal to confirm — it is never applied silently, because a current column read as a voltage column produces a plot that looks entirely reasonable and is nonsense.",
+  "_note_on_units": "Each role lists the units its column may carry, with the factor that converts to SI. A header like 'I/mA' or 'Current (A)' sets the unit automatically; where it does not, the user picks. This is the same unit engine the formula library uses, and for the same reason — mA read as A is a factor of a thousand and produces no error anywhere.",
+  "roles": [
+    {
+      "id": "time",
+      "label": "Time",
+      "siUnit": "s",
+      "aliases": [
+        "time",
+        "test time",
+        "total time",
+        "step time",
+        "t",
+        "elapsed time",
+        "time/s",
+        "run time",
+        "testtime",
+        "time (s)",
+        "temps",
+        "zeit"
+      ],
+      "units": [
+        {
+          "u": "s",
+          "f": 1,
+          "aliases": [
+            "sec",
+            "secs",
+            "second",
+            "seconds",
+            "s"
+          ]
+        },
+        {
+          "u": "ms",
+          "f": 0.001,
+          "aliases": [
+            "millisecond",
+            "msec"
+          ]
+        },
+        {
+          "u": "min",
+          "f": 60,
+          "aliases": [
+            "minute",
+            "minutes",
+            "mins"
+          ]
+        },
+        {
+          "u": "h",
+          "f": 3600,
+          "aliases": [
+            "hour",
+            "hours",
+            "hr",
+            "hrs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "voltage",
+      "label": "Voltage / potential",
+      "siUnit": "V",
+      "aliases": [
+        "voltage",
+        "potential",
+        "ewe",
+        "e we",
+        "v",
+        "e",
+        "cell voltage",
+        "working electrode potential",
+        "volt",
+        "u",
+        "spannung",
+        "tension",
+        "ecell",
+        "e cell",
+        "vf",
+        "voltage(v)"
+      ],
+      "units": [
+        {
+          "u": "V",
+          "f": 1,
+          "aliases": [
+            "volt",
+            "volts",
+            "v"
+          ]
+        },
+        {
+          "u": "mV",
+          "f": 0.001,
+          "aliases": [
+            "millivolt",
+            "mv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "current",
+      "label": "Current",
+      "siUnit": "A",
+      "aliases": [
+        "current",
+        "i",
+        "cell current",
+        "amps",
+        "amperage",
+        "strom",
+        "courant",
+        "i/ma",
+        "current(a)"
+      ],
+      "units": [
+        {
+          "u": "A",
+          "f": 1,
+          "aliases": [
+            "amp",
+            "amps",
+            "ampere",
+            "a"
+          ]
+        },
+        {
+          "u": "mA",
+          "f": 0.001,
+          "aliases": [
+            "milliamp",
+            "ma"
+          ]
+        },
+        {
+          "u": "µA",
+          "f": 1e-06,
+          "aliases": [
+            "microamp",
+            "ua",
+            "μa"
+          ]
+        },
+        {
+          "u": "nA",
+          "f": 1e-09,
+          "aliases": [
+            "nanoamp",
+            "na"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "capacity",
+      "label": "Capacity",
+      "siUnit": "A·s",
+      "aliases": [
+        "capacity",
+        "q",
+        "charge capacity",
+        "discharge capacity",
+        "cap",
+        "capacity/mah",
+        "specific capacity",
+        "q charge",
+        "q discharge",
+        "capacite",
+        "kapazitat"
+      ],
+      "units": [
+        {
+          "u": "mAh",
+          "f": 3.6,
+          "aliases": [
+            "mah",
+            "ma h",
+            "ma.h"
+          ]
+        },
+        {
+          "u": "Ah",
+          "f": 3600,
+          "aliases": [
+            "ah",
+            "a h",
+            "a.h"
+          ]
+        },
+        {
+          "u": "C",
+          "f": 1,
+          "aliases": [
+            "coulomb",
+            "coulombs",
+            "as",
+            "a s"
+          ]
+        },
+        {
+          "u": "mAh/g",
+          "f": 3600,
+          "aliases": [
+            "mah/g",
+            "mahg-1",
+            "mah g-1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cycle",
+      "label": "Cycle number",
+      "siUnit": "count",
+      "aliases": [
+        "cycle",
+        "cycle index",
+        "cycle number",
+        "cycle no",
+        "cyc",
+        "cycle id",
+        "zyklus"
+      ],
+      "units": [
+        {
+          "u": "cycle",
+          "f": 1,
+          "aliases": [
+            "cycles",
+            "n",
+            "count",
+            "-"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "step",
+      "label": "Step / mode",
+      "siUnit": "label",
+      "aliases": [
+        "step",
+        "step index",
+        "step type",
+        "mode",
+        "state",
+        "step name",
+        "ns",
+        "step number",
+        "half cycle"
+      ],
+      "units": [
+        {
+          "u": "—",
+          "f": 1,
+          "aliases": [
+            "",
+            "-",
+            "label",
+            "index"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frequency",
+      "label": "Frequency",
+      "siUnit": "Hz",
+      "aliases": [
+        "frequency",
+        "freq",
+        "f",
+        "freq/hz",
+        "frequence",
+        "frequenz"
+      ],
+      "units": [
+        {
+          "u": "Hz",
+          "f": 1,
+          "aliases": [
+            "hz",
+            "hertz"
+          ]
+        },
+        {
+          "u": "kHz",
+          "f": 1000,
+          "aliases": [
+            "khz"
+          ]
+        },
+        {
+          "u": "mHz",
+          "f": 0.001,
+          "aliases": [
+            "mhz"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zreal",
+      "label": "Z′ — real impedance",
+      "siUnit": "Ω",
+      "aliases": [
+        "z real",
+        "zreal",
+        "z'",
+        "re z",
+        "re(z)",
+        "z re",
+        "real",
+        "zr",
+        "z1",
+        "realz",
+        "z prime"
+      ],
+      "units": [
+        {
+          "u": "Ω",
+          "f": 1,
+          "aliases": [
+            "ohm",
+            "ohms",
+            "o"
+          ]
+        },
+        {
+          "u": "mΩ",
+          "f": 0.001,
+          "aliases": [
+            "mohm",
+            "milliohm"
+          ]
+        },
+        {
+          "u": "kΩ",
+          "f": 1000,
+          "aliases": [
+            "kohm",
+            "kiloohm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zimag",
+      "label": "Z″ — imaginary impedance",
+      "siUnit": "Ω",
+      "aliases": [
+        "z imag",
+        "zimag",
+        "z''",
+        "z\"",
+        "im z",
+        "im(z)",
+        "z im",
+        "imaginary",
+        "zi",
+        "z2",
+        "-z''",
+        "minus z''",
+        "z double prime"
+      ],
+      "units": [
+        {
+          "u": "Ω",
+          "f": 1,
+          "aliases": [
+            "ohm",
+            "ohms",
+            "o"
+          ]
+        },
+        {
+          "u": "mΩ",
+          "f": 0.001,
+          "aliases": [
+            "mohm"
+          ]
+        },
+        {
+          "u": "kΩ",
+          "f": 1000,
+          "aliases": [
+            "kohm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zmag",
+      "label": "|Z| — impedance magnitude",
+      "siUnit": "Ω",
+      "aliases": [
+        "z mag",
+        "zmag",
+        "|z|",
+        "mod z",
+        "modulus",
+        "abs z",
+        "z modulus",
+        "magnitude"
+      ],
+      "units": [
+        {
+          "u": "Ω",
+          "f": 1,
+          "aliases": [
+            "ohm",
+            "ohms"
+          ]
+        },
+        {
+          "u": "kΩ",
+          "f": 1000,
+          "aliases": [
+            "kohm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase",
+      "label": "Phase angle",
+      "siUnit": "°",
+      "aliases": [
+        "phase",
+        "phase angle",
+        "theta",
+        "phi",
+        "arg z",
+        "angle",
+        "phase z"
+      ],
+      "units": [
+        {
+          "u": "°",
+          "f": 1,
+          "aliases": [
+            "deg",
+            "degree",
+            "degrees",
+            "dega"
+          ]
+        },
+        {
+          "u": "rad",
+          "f": 57.29577951308232,
+          "aliases": [
+            "radian",
+            "radians"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "temperature",
+      "label": "Temperature",
+      "siUnit": "K",
+      "aliases": [
+        "temperature",
+        "temp",
+        "aux temperature",
+        "chamber temperature",
+        "t cell",
+        "temperatur"
+      ],
+      "units": [
+        {
+          "u": "°C",
+          "f": 1,
+          "o": 273.15,
+          "aliases": [
+            "c",
+            "degc",
+            "deg c",
+            "celsius"
+          ]
+        },
+        {
+          "u": "K",
+          "f": 1,
+          "aliases": [
+            "k",
+            "kelvin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "energy",
+      "label": "Energy",
+      "siUnit": "J",
+      "aliases": [
+        "energy",
+        "charge energy",
+        "discharge energy",
+        "w",
+        "wh",
+        "energie"
+      ],
+      "units": [
+        {
+          "u": "Wh",
+          "f": 3600,
+          "aliases": [
+            "wh",
+            "w h"
+          ]
+        },
+        {
+          "u": "mWh",
+          "f": 3.6,
+          "aliases": [
+            "mwh"
+          ]
+        },
+        {
+          "u": "J",
+          "f": 1,
+          "aliases": [
+            "joule",
+            "joules"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "power",
+      "label": "Power",
+      "siUnit": "W",
+      "aliases": [
+        "power",
+        "p",
+        "leistung"
+      ],
+      "units": [
+        {
+          "u": "W",
+          "f": 1,
+          "aliases": [
+            "watt",
+            "watts"
+          ]
+        },
+        {
+          "u": "mW",
+          "f": 0.001,
+          "aliases": [
+            "mw",
+            "milliwatt"
+          ]
+        }
+      ]
+    }
+  ],
+  "plots": [
+    {
+      "id": "v_t",
+      "title": "Voltage against time",
+      "x": "time",
+      "y": "voltage",
+      "needs": [
+        "time",
+        "voltage"
+      ],
+      "note": "The rawest view of a galvanostatic run. Look at it before anything derived — a step that ended on its time limit rather than its voltage limit is obvious here and invisible in a capacity number."
+    },
+    {
+      "id": "v_q",
+      "title": "Voltage against capacity",
+      "x": "capacity",
+      "y": "voltage",
+      "needs": [
+        "capacity",
+        "voltage"
+      ],
+      "note": "The shape most battery results are read from."
+    },
+    {
+      "id": "i_e",
+      "title": "Current against potential",
+      "x": "voltage",
+      "y": "current",
+      "needs": [
+        "voltage",
+        "current"
+      ],
+      "note": "On a potential-sweep run this IS the cyclic voltammogram, with anodic current plotted positive (IUPAC convention); if your instrument exported the opposite sign convention the curve appears mirrored, which is a convention difference and not a measurement. On a galvanostatic run it is not a voltammogram at all — the current was held constant, so the plot shows the levels it was held at.",
+      "constantCurrentCheck": true
+    },
+    {
+      "id": "nyquist",
+      "title": "Nyquist plot",
+      "x": "zreal",
+      "y": "zimag",
+      "needs": [
+        "zreal",
+        "zimag"
+      ],
+      "equalAspect": true,
+      "negateY": true,
+      "note": "Axes are equally scaled. A semicircle is only a semicircle, and a Warburg line only 45°, when they are — on unequal axes any line can be made to look like any angle."
+    },
+    {
+      "id": "bode_mag",
+      "title": "Bode — magnitude",
+      "x": "frequency",
+      "y": "zmag",
+      "needs": [
+        "frequency",
+        "zmag"
+      ],
+      "logX": true,
+      "note": "Logarithmic frequency axis."
+    },
+    {
+      "id": "bode_ph",
+      "title": "Bode — phase",
+      "x": "frequency",
+      "y": "phase",
+      "needs": [
+        "frequency",
+        "phase"
+      ],
+      "logX": true,
+      "note": "−90° is ideal capacitive behaviour; 0° is purely resistive."
+    },
+    {
+      "id": "i_t",
+      "title": "Current against time",
+      "x": "time",
+      "y": "current",
+      "needs": [
+        "time",
+        "current"
+      ],
+      "note": "Worth checking on any constant-current run: a recorded current that diverges from the setpoint means the channel hit a compliance limit, and every capacity must then be integrated from the recorded current rather than the programmed one."
+    },
+    {
+      "id": "q_cycle",
+      "title": "Capacity against cycle",
+      "x": "cycle",
+      "y": "capacity",
+      "needs": [
+        "cycle",
+        "capacity"
+      ],
+      "note": "Retention over a run. Read it alongside coulombic efficiency — efficiency usually moves first."
+    },
+    {
+      "id": "t_t",
+      "title": "Temperature against time",
+      "x": "time",
+      "y": "temperature",
+      "needs": [
+        "time",
+        "temperature"
+      ],
+      "note": "Both a safety limit and an experimental variable. Capacity and impedance both move with it."
+    }
+  ]
+}

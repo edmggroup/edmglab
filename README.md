@@ -10,7 +10,17 @@ An interactive platform for supercapacitors, batteries, electrode materials, cha
 >
 > The **Formula library** and **Calculation workbench** are built: 28 formulas, each with the configuration it is valid for, and a calculator generated from the record itself. The workbench is organised by what you measured — enter a discharge curve's numbers once and everything that measurement supports is computed from them.
 >
-> The shared foundation — application shell, animation engine, diagram engine, enforced simulation labelling, chart layer, expression/unit engine and data health check — is in place. Modules marked `Pn` in the sidebar name the roadmap phase that builds them and are not built yet.
+> **Fundamentals** is the entry point: 13 core quantities, each with a plain version and a research version of the SAME record so the two cannot drift. Its "Better than what?" page puts two electrodes on six normalisation bases at once and shows the ranking flip three-all — both authors can write "outperforms" truthfully about the same pair.
+>
+> **Storage chemistry** builds every mechanism from one quantity — the differential capacitance dQ/dV — and generates the voltammogram and the discharge curve from it side by side, so "capacitor-like" and "battery-like" read as one continuum. Its Quantity page slides a voltage window across a battery-type electrode and shows C = I·Δt/ΔV changing by a factor of fifty-nine, next to a real capacitor where it does not move at all.
+>
+> **Electrode preparation** explains what each formulation and processing choice does — and, the part that matters, how a mistake at each step shows up once the cell is on test. **Characterisation** covers eleven techniques, each leading with what it CANNOT tell you.
+>
+> **Data import** reads exports from your battery tester and workstation — comma, tab, semicolon or pipe separated, including European decimal-comma files and instrument metadata preambles — parses them in a Web Worker, reports exactly what was read before it draws anything, and plots them. Your file never leaves the browser tab.
+>
+> **Learning check** asks 18 judgement questions — which quantity is valid, what a result does not license — where every option explains itself, including the wrong ones, and "you cannot tell from this alone" is frequently the right answer. The **glossary** gives 35 terms as a definition plus the trap.
+>
+> The shared foundation — application shell, animation engine, diagram engine, enforced simulation labelling, chart layer, expression/unit engine, CSV parser and data health check — is in place. One module remains unbuilt: **Electrode Materials**, marked `P7` in the sidebar. It needs literature values with citations, and it stays unbuilt until the group supplies them.
 >
 > **All scientific content is draft**, marked as such in the interface, and pending review by the research group. The safety section should be reviewed with your safety officer before anyone treats it as guidance.
 
@@ -71,6 +81,9 @@ service-worker.js       Offline caching    ┘ a service worker only controls it
     sim-label.js        Enforced "Illustrative simulation" labelling
     charts.js           Chart.js wrapper: zoom, pan, inspect, reset, downsampling
     expr.js             Safe expression parser + SI unit engine (never eval)
+    csv-core.js         Instrument-export parser: sniffing, roles, units
+    csv.js              Import service — owns the worker, falls back safely
+    csv-worker.js       Parses off the main thread
     formula-view.js     One renderer + one calculator for every formula
     method-view.js      The five-layer method record renderer
     decision-tree.js    Guided trees that always state what they cannot tell you

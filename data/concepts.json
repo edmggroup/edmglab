@@ -1,12 +1,408 @@
 {
   "schemaVersion": 1,
-  "_note": "SEED CONTENT — one concept record demonstrating the Learn/Research pair required by spec §35. Learn Mode and Research Mode are two views of THIS ONE record, never two separate content sets. The full fundamentals library is authored in Phase 1.",
+  "_README": "Fundamentals — Roadmap P1. The CONCEPT stage: the quantities everything else in EDMGLAB is built from. Every record carries a Learn version and a Research version of the same idea; the header switch chooses which is shown, and the two are the SAME record rather than two pages that can drift apart. DRAFT — pending review by the research group.",
+  "_note": "These records deliberately define quantities rather than describe materials, so they contain no measured values and need no citations. Where a number appears it is either definitional (a coulomb is an ampere-second) or an arithmetic consequence.",
+  "categories": [
+    {
+      "id": "electrical",
+      "label": "The electrical quantities"
+    },
+    {
+      "id": "storage",
+      "label": "What storage means"
+    },
+    {
+      "id": "interface",
+      "label": "What happens at the interface"
+    },
+    {
+      "id": "reporting",
+      "label": "Reporting and normalisation"
+    }
+  ],
   "items": [
     {
+      "id": "concept.charge",
+      "category": "electrical",
+      "title": "Charge",
+      "symbol": "Q",
+      "siUnit": "C (coulomb)",
+      "aliases": [
+        "charge",
+        "coulomb",
+        "Q"
+      ],
+      "learnMode": {
+        "simpleDefinition": "The amount of electricity that has moved. It is what you are actually storing.",
+        "physicalMeaning": "Everything else is bookkeeping about charge. Current is how fast it moves, capacity is how much of it fits, capacitance is how much fits per volt. If you can hold on to what charge is, the rest follows.",
+        "example": "A current of one ampere flowing for one second moves one coulomb. A cell rated 1 mAh has moved 3.6 coulombs by the time it is empty."
+      },
+      "researchMode": {
+        "scientificDefinition": "The time integral of current: Q = ∫ i dt. In an electrochemical cell it is the quantity conserved by Faraday's laws, linking the electrical measurement to the amount of substance transformed.",
+        "mathematicalTreatment": "Q = ∫ i dt over the step of interest. For constant current this reduces to Q = I·Δt, but the integral form is the definition and the one to use whenever the recorded current is not exactly the setpoint.",
+        "experimentalInterpretation": "Always integrate the RECORDED current, not the programmed one. A channel that hit a compliance limit delivered less charge than you asked for, and the difference is invisible in any number derived from the setpoint.",
+        "limitations": [
+          "Charge counts electrons through the external circuit. It does not distinguish charge that did useful work from charge consumed by a side reaction — that is what coulombic efficiency is for."
+        ],
+        "researchConsiderations": [
+          "Faraday's constant, 96485 C per mole of electrons, is what converts a measured charge into an amount of substance — the bridge between the electrical and the chemical description of the same event."
+        ]
+      },
+      "relatedIds": [
+        "concept.current",
+        "concept.capacitance_vs_capacity",
+        "formula.specific_capacity"
+      ]
+    },
+    {
+      "id": "concept.current",
+      "category": "electrical",
+      "title": "Current",
+      "symbol": "I, i",
+      "siUnit": "A (ampere)",
+      "aliases": [
+        "current",
+        "ampere",
+        "amp",
+        "I"
+      ],
+      "learnMode": {
+        "simpleDefinition": "How fast charge is moving — coulombs per second.",
+        "physicalMeaning": "Current is the rate knob. Applying more of it means the same charge moves in less time, which is what a rate study varies. It is also what most measurements actually control or measure.",
+        "example": "1 mA flowing for 100 seconds moves 0.1 coulombs, whether the cell is a supercapacitor or a battery."
+      },
+      "researchMode": {
+        "scientificDefinition": "The rate of charge transfer, i = dQ/dt. In a three-electrode cell it flows between the working and counter electrodes; the reference carries none, which is why it can hold a stable potential.",
+        "mathematicalTreatment": "Sign convention matters and is not universal. IUPAC takes anodic (oxidation) current as positive; several instrument vendors and much of the corrosion literature use the opposite. A mirrored voltammogram is usually a convention difference, not a measurement.",
+        "experimentalInterpretation": "Current density — current per unit area or per unit mass — is what is comparable between electrodes. A raw current is a statement about the electrode you built, not about the material.",
+        "limitations": [
+          "The measured current is the sum of everything happening: the reaction of interest, double-layer charging, side reactions and leakage. Attributing all of it to one process is an assumption, not an observation."
+        ],
+        "researchConsiderations": [
+          "At very low currents, instrument resolution and cell leakage become a significant fraction of the signal. This is the practical floor on how low a rate study can usefully go."
+        ]
+      },
+      "relatedIds": [
+        "concept.charge",
+        "formula.current_density",
+        "concept.faradaic"
+      ]
+    },
+    {
+      "id": "concept.potential",
+      "category": "electrical",
+      "title": "Potential and voltage",
+      "symbol": "E, V",
+      "siUnit": "V (volt)",
+      "aliases": [
+        "potential",
+        "voltage",
+        "volt",
+        "E",
+        "V"
+      ],
+      "learnMode": {
+        "simpleDefinition": "The energy per unit charge — how hard the charge is being pushed.",
+        "physicalMeaning": "Potential is always a DIFFERENCE between two points. There is no such thing as the potential of a single electrode on its own; there is only its potential relative to something else, which is why a reference electrode exists.",
+        "example": "A cell voltage of 1 V means each coulomb moved carries one joule of energy. A three-electrode measurement quoting 0.5 V means 0.5 V versus that particular reference — a different reference gives a different number for the same electrode."
+      },
+      "researchMode": {
+        "scientificDefinition": "The electrical potential difference between two points, equal to the work per unit charge to move charge between them. An electrode potential is meaningful only against a stated reference.",
+        "mathematicalTreatment": "The measured potential of a working electrode under current is the equilibrium potential plus the overpotential plus the uncompensated iR drop. Separating those three is most of what careful electrochemistry consists of.",
+        "experimentalInterpretation": "Always state the reference. Converting to a common scale such as RHE requires the reference's own standard potential and, in aqueous systems, the pH — and a conversion cannot repair a drifting or contaminated reference.",
+        "limitations": [
+          "A two-electrode cell voltage is the difference between two electrodes, both of which may be changing. It cannot tell you what either electrode is doing on its own.",
+          "Junction potentials add an unknown offset that no arithmetic removes."
+        ],
+        "researchConsiderations": [
+          "In non-aqueous electrolytes, pseudo-references drift and pH is undefined; potentials should be referenced to an internal standard such as the ferrocene couple and stated as such."
+        ]
+      },
+      "relatedIds": [
+        "concept.ec_three_electrode",
+        "formula.reference_conversion",
+        "formula.nernst"
+      ]
+    },
+    {
+      "id": "concept.resistance",
+      "category": "electrical",
+      "title": "Resistance and the IR drop",
+      "symbol": "R",
+      "siUnit": "Ω (ohm)",
+      "aliases": [
+        "resistance",
+        "ohm",
+        "IR drop",
+        "ESR",
+        "internal resistance"
+      ],
+      "learnMode": {
+        "simpleDefinition": "How much potential is lost simply pushing current through the cell, rather than doing anything useful.",
+        "physicalMeaning": "Every part of the current path resists it — the electrolyte, the electrode, the contacts, the cables. The lost voltage appears instantly when the current changes and vanishes instantly when it stops, which is exactly how you recognise it.",
+        "example": "A 25 Ω cell carrying 1 mA loses 25 mV to resistance. Reverse the current and the voltage jumps by twice that, 50 mV, because the current changed by 2 mA."
+      },
+      "researchMode": {
+        "scientificDefinition": "The proportionality between the potential lost and the current passed, ΔV = I·R. Distinct from charge-transfer resistance, which is a kinetic quantity that only looks like a resistance.",
+        "mathematicalTreatment": "The factor of two in the reversal case is not a correction: at a charge-to-discharge reversal the current changes by 2I, so the instantaneous step is 2I·R. Reading a step measured from rest with the reversal formula halves the resistance you report.",
+        "experimentalInterpretation": "Read the step at the FIRST sample after the current changes. A coarse sampling interval truncates it and understates the resistance; reading it seconds later includes relaxation and overstates it.",
+        "limitations": [
+          "A single lumped resistance is an idealisation. A porous electrode has a distributed resistance that no single number describes, which is why the value from a GCD step and the high-frequency intercept of an impedance spectrum are not the same quantity even though both are quoted in ohms.",
+          "Most of what is blamed on a material is contact resistance."
+        ],
+        "researchConsiderations": [
+          "Four-wire sensing removes the lead resistance from the measurement. Whether your channel is using it, and where the sense leads actually attach, is worth checking rather than assuming."
+        ]
+      },
+      "relatedIds": [
+        "formula.esr_from_ir_reversal",
+        "formula.esr_from_ir_rest",
+        "concept.ec_ir_compensation",
+        "glossary.ir_drop"
+      ]
+    },
+    {
+      "id": "concept.capacitance_vs_capacity",
+      "category": "storage",
+      "title": "Capacitance and capacity are different quantities",
+      "symbol": "C  vs  Q",
+      "siUnit": "F (farad)  vs  C or mAh",
+      "aliases": [
+        "capacitance",
+        "capacity",
+        "farad",
+        "mAh",
+        "F vs mAh"
+      ],
+      "learnMode": {
+        "simpleDefinition": "Capacity is how much charge fits. Capacitance is how much charge fits per volt. They are not two names for the same thing, and they are not interconvertible without knowing the shape of the curve.",
+        "physicalMeaning": "For a capacitor, voltage rises steadily as charge goes in, so charge-per-volt is a fixed number worth reporting. For a battery, voltage sits on a plateau while charge goes in, so charge-per-volt is enormous on the plateau and tiny off it — there is no single number to report.",
+        "example": "Ask which one your electrode has by looking at its discharge curve. A straight line means capacitance. A plateau means capacity."
+      },
+      "researchMode": {
+        "scientificDefinition": "Capacitance is the derivative dQ/dV. Capacity is the integral ∫dQ over a stated window. A capacitance is meaningful as a single value only where dQ/dV is close to constant across the window.",
+        "mathematicalTreatment": "C = I·Δt/ΔV computes the AVERAGE of dQ/dV over the window. For a genuine capacitor that average equals the value everywhere and is window-independent. For a plateaued electrode it depends entirely on where the window sits — the interactive demonstration in Storage Chemistry shows the same electrode returning values a factor of fifty apart.",
+        "experimentalInterpretation": "Test window-independence rather than assuming it: compute C over two different sub-windows. If they disagree materially, capacitance is not the quantity to report.",
+        "limitations": [
+          "Converting a quoted capacitance to a capacity, or the reverse, requires the voltage window and an assumption about curve shape. Papers that do this silently are not comparable with those that do not.",
+          "F/g and mAh/g describe the same electrode. Choosing whichever is the larger-looking number is a reporting decision, not a measurement."
+        ],
+        "researchConsiderations": [
+          "For anything between the two extremes, reporting the differential capacitance C(V) as a curve is more honest than any single averaged value."
+        ]
+      },
+      "relatedIds": [
+        "mechanism.edl",
+        "mechanism.intercalation",
+        "formula.specific_capacitance",
+        "formula.specific_capacity"
+      ],
+      "interactive": {
+        "route": "#/chemistry/quantity",
+        "label": "See a single electrode return capacitances a factor of fifty apart"
+      }
+    },
+    {
+      "id": "concept.energy_power",
+      "category": "storage",
+      "title": "Energy and power",
+      "symbol": "E, P",
+      "siUnit": "J (joule), W (watt)",
+      "aliases": [
+        "energy",
+        "power",
+        "joule",
+        "watt",
+        "Wh/kg",
+        "Ragone"
+      ],
+      "learnMode": {
+        "simpleDefinition": "Energy is how much work the device can do. Power is how fast it can do it.",
+        "physicalMeaning": "A device with lots of energy and little power runs a long time but cannot deliver a surge. One with lots of power and little energy does the opposite. Nearly every design argument in this field is about where to sit between them.",
+        "example": "A device delivering 100 J over 100 seconds has an average power of 1 W. The same 100 J delivered in 1 second is 100 W — same energy, a hundred times the power."
+      },
+      "researchMode": {
+        "scientificDefinition": "Energy is ∫ V dQ over the discharge; power is its time derivative. For an ideal capacitor the integral evaluates to ½CV², which is why energy scales with the SQUARE of the voltage window.",
+        "mathematicalTreatment": "Because energy goes as V², the operating window dominates every energy figure. Widening the window by 20% raises the energy by 44%, and it is the easiest way to make a material appear better without changing it.",
+        "experimentalInterpretation": "A Ragone plot is only interpretable if every point uses the same normalisation basis. Mixing material-level and device-level points on one plot — common, and usually unintended — makes the whole figure meaningless.",
+        "limitations": [
+          "½CV² applies to an ideal capacitor. For a battery-type or strongly pseudocapacitive electrode, integrate ∫V dQ instead; using the capacitor formula there overstates the energy.",
+          "Material-level energy densities routinely exceed what the packaged device delivers by an order of magnitude, because they exclude the counter electrode, electrolyte, separator, collectors and packaging."
+        ],
+        "researchConsiderations": [
+          "Matched-load maximum power is an idealised ceiling at which half the energy is dissipated internally. It is reported far more often than it is demonstrated."
+        ]
+      },
+      "relatedIds": [
+        "formula.specific_energy_capacitor",
+        "formula.specific_power_capacitor",
+        "formula.max_power_capacitor"
+      ]
+    },
+    {
+      "id": "concept.faradaic",
+      "category": "interface",
+      "title": "Faradaic and non-faradaic",
+      "symbol": "—",
+      "siUnit": "—",
+      "aliases": [
+        "faradaic",
+        "non-faradaic",
+        "double layer",
+        "charge transfer",
+        "capacitive current"
+      ],
+      "learnMode": {
+        "simpleDefinition": "Faradaic means an electron crossed the interface and a chemical species changed. Non-faradaic means charge just rearranged, with no reaction.",
+        "physicalMeaning": "It is the difference between charging a capacitor and running a reaction. Both give you current, both store charge, and the current meter cannot tell them apart — only the way the current behaves can.",
+        "example": "Charging the double layer on a carbon electrode is non-faradaic. Reducing a metal oxide is faradaic. A real electrode almost always does both at once."
+      },
+      "researchMode": {
+        "scientificDefinition": "Faradaic processes involve charge transfer across the interface, governed by Faraday's laws and by electrode kinetics. Non-faradaic processes involve only the redistribution of charge in the double layer, with no net electron transfer.",
+        "mathematicalTreatment": "Their scaling with scan rate differs, which is the usual route to separating them: non-faradaic current scales with v, diffusion-limited faradaic current with √v. The b-value in i ∝ vᵇ is the empirical descriptor of where a response sits between the two.",
+        "experimentalInterpretation": "A b-value near 1 does NOT prove a capacitive mechanism. Surface-confined faradaic processes also scale with v, which is precisely why 'pseudocapacitance' exists as a term. The scaling constrains the explanation; it does not select one.",
+        "limitations": [
+          "Deconvoluting a voltammogram into capacitive and diffusion-controlled percentages requires an assumed model. The split is the output of that assumption, not a measurement, and it should be reported as such.",
+          "Background and iR corrections change b-values materially, so a b-value without its correction procedure is not comparable with anyone else's."
+        ],
+        "researchConsiderations": [
+          "The cleanest test is to remove the redox chemistry — change the electrolyte or the surface functionalisation — and see what remains. Curve shape alone rarely settles it."
+        ]
+      },
+      "relatedIds": [
+        "mechanism.edl",
+        "mechanism.pseudo_surface",
+        "formula.b_value"
+      ],
+      "interactive": {
+        "route": "#/chemistry/signatures",
+        "label": "Watch one function turn a rectangle into a peak"
+      }
+    },
+    {
+      "id": "concept.overpotential",
+      "category": "interface",
+      "title": "Overpotential",
+      "symbol": "η",
+      "siUnit": "V (volt)",
+      "aliases": [
+        "overpotential",
+        "eta",
+        "polarisation",
+        "polarization"
+      ],
+      "learnMode": {
+        "simpleDefinition": "The extra potential you have to apply, beyond equilibrium, to make a reaction go at a useful rate.",
+        "physicalMeaning": "Equilibrium tells you where a reaction WOULD sit if you waited forever. Overpotential is the price of not waiting. It is wasted energy, and reducing it is most of what catalysis is for.",
+        "example": "If a reaction's equilibrium potential is 1.23 V and it runs usefully at 1.53 V, the overpotential is 300 mV — energy paid to the kinetics rather than stored."
+      },
+      "researchMode": {
+        "scientificDefinition": "η = E_applied − E_equilibrium. It splits into activation (charge-transfer), concentration (mass-transport) and ohmic contributions, and separating them is the point of most kinetic analysis.",
+        "mathematicalTreatment": "In the activation-controlled region, Butler–Volmer kinetics give current growing exponentially with η — the Tafel relationship. Outside that region the exponential does not hold, which is why a Tafel slope fitted in the wrong window is meaningless.",
+        "experimentalInterpretation": "The measured overpotential includes the uncompensated iR drop, which is not overpotential at all. Correct for it and state the correction, or the number is a property of your cell geometry as much as of your catalyst.",
+        "limitations": [
+          "An overpotential quoted without the current density it was measured at conveys nothing — the whole point is that η and current are related.",
+          "Overpotentials are not comparable between studies that normalised current to different areas."
+        ],
+        "researchConsiderations": [
+          "Quoting the overpotential at a fixed current density is the convention, and it requires stating the normalisation basis alongside it."
+        ]
+      },
+      "relatedIds": [
+        "formula.tafel_slope",
+        "method.tafel",
+        "concept.resistance"
+      ],
+      "interactive": {
+        "route": "#/workstation/tafel",
+        "label": "See a fitted Tafel slope move with the window"
+      }
+    },
+    {
+      "id": "concept.reversibility",
+      "category": "interface",
+      "title": "Reversibility",
+      "symbol": "—",
+      "siUnit": "—",
+      "aliases": [
+        "reversible",
+        "quasi-reversible",
+        "irreversible",
+        "hysteresis"
+      ],
+      "learnMode": {
+        "simpleDefinition": "Whether the reaction goes back the way it came, and how easily.",
+        "physicalMeaning": "A reversible process returns everything you put in. An irreversible one keeps some, and what it keeps shows up as a gap between charge and discharge — wasted energy, every cycle, forever.",
+        "example": "The gap between the charging and discharging curves is the visible cost of irreversibility. A large gap means a device that wastes a large fraction of the energy it stores."
+      },
+      "researchMode": {
+        "scientificDefinition": "Electrochemical reversibility describes whether the interfacial kinetics are fast enough, relative to the measurement timescale, for the surface concentrations to stay at their Nernstian values. It is therefore a property of the experiment as much as of the couple.",
+        "mathematicalTreatment": "In cyclic voltammetry, peak separation and its scan-rate dependence are the usual diagnostics. Peak separation growing with scan rate indicates quasi-reversible behaviour — but uncompensated resistance produces the same trend, and the two must be separated before either is claimed.",
+        "experimentalInterpretation": "Reversibility is timescale-dependent. The same couple can appear reversible at 5 mV/s and irreversible at 500 mV/s, and both observations are correct.",
+        "limitations": [
+          "Peak separation alone does not establish reversibility, because iR drop mimics it. iR-correct first, then interpret.",
+          "Thermodynamic reversibility and electrochemical reversibility are different ideas that share a word."
+        ],
+        "researchConsiderations": [
+          "For a device, the practical measure is round-trip energy efficiency — which folds every irreversibility into one number you can act on."
+        ]
+      },
+      "relatedIds": [
+        "formula.energy_efficiency",
+        "mechanism.conversion",
+        "method.cv"
+      ]
+    },
+    {
+      "id": "concept.normalisation",
+      "category": "reporting",
+      "title": "Normalisation — what \"specific\" actually means",
+      "symbol": "per g, per cm², per cm³",
+      "siUnit": "varies with basis",
+      "aliases": [
+        "normalisation",
+        "normalization",
+        "specific",
+        "gravimetric",
+        "areal",
+        "volumetric",
+        "per gram"
+      ],
+      "learnMode": {
+        "simpleDefinition": "Dividing a result by something so that two different-sized electrodes can be compared. Which something you divide by changes the answer, and sometimes changes which electrode looks better.",
+        "physicalMeaning": "\"Specific\" just means \"divided by something\". It is the most abused word in this field because it is almost never said which something. A number in F/g and a number in F/cm² describe the same electrode and can rank two materials in opposite orders.",
+        "example": "A thin, light coating looks excellent per gram and unremarkable per square centimetre. A thick one does the reverse. Neither is lying."
+      },
+      "researchMode": {
+        "scientificDefinition": "Normalisation divides an extensive quantity by a chosen basis — active mass, total electrode mass, geometric area, measured surface area, electrode volume, or device mass — to give an intensive quantity intended to be comparable.",
+        "mathematicalTreatment": "Every basis is a different division of the same measurement, so the ratio between two electrodes' performance is basis-dependent. Two electrodes can swap rank between bases purely from geometry, with no difference in the material.",
+        "experimentalInterpretation": "State the basis every time, and report the mass loading alongside every gravimetric result. A specific capacitance without a loading cannot be interpreted, because very low loadings systematically flatter.",
+        "limitations": [
+          "Normalising to BET area rather than geometric area can change a current density by orders of magnitude. Both are called 'current density'.",
+          "Device-level and material-level numbers routinely differ by an order of magnitude and are not comparable in either direction.",
+          "For a symmetric device, whether the mass covers one electrode or both is the source of the factor of four that separates otherwise identical papers."
+        ],
+        "researchConsiderations": [
+          "Reporting the same result on two or three bases, rather than choosing the flattering one, is both more useful and easier to defend."
+        ]
+      },
+      "relatedIds": [
+        "formula.mass_loading",
+        "formula.specific_capacitance",
+        "formula.specific_capacitance_symmetric",
+        "formula.current_density"
+      ]
+    },
+    {
       "id": "concept.specific_capacitance",
-      "category": "fundamentals",
+      "category": "reporting",
       "title": "Specific capacitance",
-      "aliases": ["specific capacitance", "gravimetric capacitance"],
+      "symbol": "Cs",
+      "siUnit": "F/kg (commonly F/g)",
+      "aliases": [
+        "specific capacitance",
+        "gravimetric capacitance"
+      ],
       "learnMode": {
         "simpleDefinition": "How much charge-storage capacitance an electrode gives you for each gram of active material.",
         "physicalMeaning": "Capacitance on its own tells you how much charge a device stores per volt. Dividing by mass lets you compare materials rather than compare the particular electrodes somebody happened to make.",
@@ -15,27 +411,91 @@
       "researchMode": {
         "scientificDefinition": "Capacitance normalised to the mass of electroactive material, most commonly extracted from the discharge branch of a galvanostatic cycle.",
         "mathematicalTreatment": "For a linear discharge, C = I·Δt/ΔV follows directly from the definition of capacitance with constant current. Normalising by active mass gives the gravimetric quantity. Where the discharge is not linear, the derivative form C(V) = I/(dV/dt) is more honest than a single averaged value.",
-        "experimentalInterpretation": "The number is only meaningful alongside the current density at which it was obtained, the voltage window, the mass loading, and the cell configuration. A high value at very low current density with very low mass loading may not survive at practical loading.",
+        "experimentalInterpretation": "The number is only meaningful alongside the current density at which it was obtained, the voltage window, the mass loading, and the cell configuration. A high value at very low current density with very low mass loading is not transferable to a practical electrode.",
         "limitations": [
-          "Comparisons across studies are unreliable unless cell configuration, mass basis and IR-drop convention all match.",
-          "Averaging a strongly potential-dependent capacitance into one number can hide the behaviour that matters."
+          "Not comparable between studies unless cell configuration, mass basis and IR-drop convention all match.",
+          "A single number cannot represent a material whose capacitance varies strongly with potential."
         ],
         "researchConsiderations": [
-          "State the mass basis explicitly: active material only, or the whole electrode including binder and conductive additive.",
-          "State whether ΔV includes or excludes the IR drop.",
-          "Report the areal and, where relevant, volumetric values alongside the gravimetric one — a high gravimetric value at negligible loading can be misleading on its own."
+          "For a symmetric two-electrode device the single-electrode-equivalent value carries a factor of four, which arises from the series capacitance and the mass basis together — not from a correction applied afterwards."
         ]
       },
-      "siUnit": "F/kg",
-      "commonResearchUnits": ["F/g", "mF/cm² (areal)", "F/cm³ (volumetric)"],
-      "commonMistakes": [
-        "Using total electrode mass in one measurement and active mass in another, then comparing them.",
-        "Applying the three-electrode single-electrode formula to a two-electrode device measurement.",
-        "Including the IR drop in ΔV without saying so, which inflates the result."
+      "relatedIds": [
+        "formula.specific_capacitance",
+        "concept.normalisation",
+        "concept.capacitance_vs_capacity"
+      ]
+    },
+    {
+      "id": "concept.rate",
+      "category": "reporting",
+      "title": "Rate — C-rate and current density",
+      "symbol": "C-rate, j",
+      "siUnit": "1/h, A/m²",
+      "aliases": [
+        "rate",
+        "C-rate",
+        "current density",
+        "rate capability"
       ],
-      "equationIds": ["formula.specific_capacitance"],
-      "relatedIds": ["formula.specific_capacitance"],
-      "tags": ["supercapacitor", "EDLC", "capacitance", "GCD"]
+      "learnMode": {
+        "simpleDefinition": "How fast you are asking the device to charge or discharge.",
+        "physicalMeaning": "Almost every performance number depends on rate, so a result quoted without one is incomplete. Fast means less time for ions to move, so less of the material participates.",
+        "example": "1C nominally means the full nominal capacity in one hour. 10C means the same capacity in six minutes — and usually you do not get the same capacity."
+      },
+      "researchMode": {
+        "scientificDefinition": "C-rate normalises current to a nominal capacity; current density normalises it to area or mass. They answer different questions and are not interchangeable.",
+        "mathematicalTreatment": "C-rate = I / Q_nominal. Whether Q_nominal is theoretical, manufacturer-rated or measured changes what '1C' means, so the basis has to be stated for the rate to be reproducible.",
+        "experimentalInterpretation": "For supercapacitor carbons there is often no well-defined nominal capacity, so current density in A/g or mA/cm² is the clearer quantity. Using C-rate there imports an arbitrary reference.",
+        "limitations": [
+          "A C-rate defined against the wrong nominal capacity is a common route to an unintended overcurrent.",
+          "Rate capability measured on a very thin electrode does not predict the behaviour of a practical one, because transport limitations grow with thickness."
+        ],
+        "researchConsiderations": [
+          "Report the rate study as a curve, not a pair of points. Where capacity starts to fall is more informative than any single retained value."
+        ]
+      },
+      "relatedIds": [
+        "formula.c_rate",
+        "formula.current_from_c_rate",
+        "formula.specific_current",
+        "method.rate_capability"
+      ]
+    },
+    {
+      "id": "concept.provenance",
+      "category": "reporting",
+      "title": "Where a number came from",
+      "symbol": "—",
+      "siUnit": "—",
+      "aliases": [
+        "provenance",
+        "theoretical",
+        "literature",
+        "measured",
+        "simulated"
+      ],
+      "learnMode": {
+        "simpleDefinition": "Whether a number was calculated, taken from a paper, measured by you, or produced by a model. These are not the same kind of number and should never be mixed without saying so.",
+        "physicalMeaning": "A theoretical capacity is an upper bound that no electrode reaches. A literature value came from someone else's electrode under someone else's conditions. A measured value is yours. A simulated curve is a drawing of an equation. Treating any of them as another is how confident wrong statements get made.",
+        "example": "Throughout EDMGLAB, simulated plots carry a banner saying so, and imported data carries a 'Measured' banner. Nothing is presented as an experimental result unless it is one."
+      },
+      "researchMode": {
+        "scientificDefinition": "Provenance is the record of how a value was obtained. In this platform it is a required field on every numeric record, and values marked as literature or datasheet must cite a source; the data health check errors without one.",
+        "mathematicalTreatment": "Not applicable — this is a data-integrity rule rather than a calculation.",
+        "experimentalInterpretation": "When comparing your result with a published one, the comparison is only as good as the match in conditions. Different loading, rate, window or cell configuration makes two numbers incomparable regardless of how close they look.",
+        "limitations": [
+          "A measured value carries the uncertainty of everything that went into it, most importantly the active mass. That uncertainty is rarely propagated and almost never reported."
+        ],
+        "researchConsiderations": [
+          "A measured capacity that meets or exceeds the theoretical value is a prompt to check the mass and the current before it is a result."
+        ]
+      },
+      "relatedIds": [
+        "formula.theoretical_capacity",
+        "concept.normalisation"
+      ]
     }
-  ]
+  ],
+  "closing": "Every module in EDMGLAB is built from these quantities, and most mistakes further along the pathway are a confusion between two of them — capacitance for capacity, current for current density, measured potential for overpotential, one normalisation basis for another. It is worth being able to state each of these definitions from memory before trusting a number that depends on it."
 }

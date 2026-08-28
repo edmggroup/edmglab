@@ -44,8 +44,11 @@ const REGISTRY = {
   'ec/circuits':         'echem/circuits.json',
   'ec/tafel':            'echem/tafel.json',
   'ec/troubleshooting':  'echem/troubleshooting.json',
+  'preparation':         'preparation.json',
+  'import-profiles':     'import-profiles.json',
   'shared/instrument-choice':    'shared/instrument-choice.json',
-  'shared/method-decision-tree': 'shared/method-decision-tree.json'
+  'shared/method-decision-tree': 'shared/method-decision-tree.json',
+  'shared/characterization-tree': 'shared/characterization-tree.json'
 };
 
 const cache = new Map();     // key -> parsed, migrated payload

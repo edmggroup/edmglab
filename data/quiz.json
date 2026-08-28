@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 1,
+  "_README": "Learning check — Roadmap P12. This is deliberately NOT a recall quiz. Every question asks a judgement of the kind that actually goes wrong in this group's work: which quantity is valid, what a result does and does not license, which of two conventions applies. Every option carries a `why`, including the wrong ones — explaining why a plausible wrong answer is plausible is where the teaching is, and a quiz that only explains the right answer teaches nothing about the trap. DRAFT — pending review by the research group.",
+
+  "_note_on_cannot_tell": "A large fraction of the correct answers are some form of 'you cannot tell from this alone'. That is not evasion and it is not padding: it is the single most common correct answer in experimental work, and a quiz that always rewards a confident choice would undo what the rest of this platform teaches. Where that is the answer, the explanation says what WOULD settle it.",
+
+  "categories": [
+    { "id": "quantity",  "label": "Which quantity is valid?" },
+    { "id": "evidence",  "label": "What does this actually show?" },
+    { "id": "convention","label": "Conventions and factors" },
+    { "id": "practice",  "label": "At the bench" }
+  ],
+
+  "items": [
+    {
+      "id": "quiz.plateau_capacitance",
+      "category": "quantity",
+      "question": "Your discharge curve has a flat plateau over most of the window. A colleague asks for the specific capacitance in F/g. What do you tell them?",
+      "options": [
+        { "text": "Compute C = I·Δt/ΔV over the whole window and report it", "correct": false,
+          "why": "It returns a number, which is the problem. On a plateaued curve dQ/dV is enormous on the plateau and tiny off it, so that average depends entirely on where the window sits — a different window on the same electrode can give a value fifty times larger." },
+        { "text": "Report capacity in mAh/g instead, and explain why capacitance is not the right quantity", "correct": true,
+          "why": "A plateau means there is no single capacitance to find. Capacity is the integral of charge over a stated window, which is well defined for this curve; capacitance is the derivative, which here is not a constant." },
+        { "text": "Compute it only over the plateau, where the capacitance is highest", "correct": false,
+          "why": "This is the version of the mistake that produces the most impressive-looking numbers in the literature. Restricting the window to the plateau maximises the apparent capacitance and makes the value a property of your window choice rather than of the material." },
+        { "text": "Convert the capacity to capacitance by dividing by the voltage window", "correct": false,
+          "why": "That is arithmetically the same as the first option, just described differently. The conversion assumes the very thing the plateau tells you is false — that charge accumulates linearly with voltage." }
+      ],
+      "explanation": "Capacitance is dQ/dV; capacity is ∫dQ. They coincide as useful descriptions only when dQ/dV is roughly constant. The Storage Chemistry module lets you slide a window across a battery-type electrode and watch the answer change by a factor of fifty.",
+      "teaches": ["concept.capacitance_vs_capacity", "mechanism.intercalation"],
+      "goDeeper": { "route": "#/chemistry/quantity", "label": "Slide the window yourself" }
+    },
+
+    {
+      "id": "quiz.rectangular_cv",
+      "category": "evidence",
+      "question": "A cyclic voltammogram is near-rectangular across the whole window. What does that establish about the storage mechanism?",
+      "options": [
+        { "text": "It is double-layer capacitance", "correct": false,
+          "why": "The most common conclusion, and it does not follow. Broad surface redox — pseudocapacitance — gives a near-rectangular voltammogram too, which is precisely why the term exists." },
+        { "text": "It is pseudocapacitance", "correct": false,
+          "why": "Equally unsupported from the shape alone, and in the opposite direction. Both mechanisms produce this shape." },
+        { "text": "Nothing on its own — the shape is shared by double-layer and broad faradaic storage", "correct": true,
+          "why": "Shape constrains the explanation without selecting one. What separates them is whether the storage depends on redox chemistry: change the electrolyte or the surface functionalisation and see whether the capacity survives." },
+        { "text": "That the electrode is behaving ideally", "correct": false,
+          "why": "Rectangularity indicates a flat differential capacitance, which is a description of the response rather than a verdict on quality. A rectangular CV from an electrode with obvious redox chemistry is worth being curious about, not reassured by." }
+      ],
+      "explanation": "This is the reason every mechanism record in Storage Chemistry has to state how to distinguish it from its neighbours. Curve shape is evidence; it is rarely identification.",
+      "teaches": ["mechanism.edl", "mechanism.pseudo_surface", "concept.faradaic"],
+      "goDeeper": { "route": "#/chemistry/mechanisms", "label": "How each mechanism differs from its neighbours" }
+    },
+
+    {
+      "id": "quiz.esr_factor",
+      "category": "convention",
+      "question": "You rest a cell, then step the current from zero to 1 mA and see an immediate 25 mV jump. What is the resistance?",
+      "options": [
+        { "text": "12.5 Ω, using R = ΔV/(2I)", "correct": false,
+          "why": "That formula is for a step measured at a charge-to-discharge REVERSAL, where the current changes by 2I. Here the current changed by I, so dividing by 2I halves the answer." },
+        { "text": "25 Ω, using R = ΔV/I", "correct": true,
+          "why": "The current changed by 1 mA, so the resistance is 25 mV / 1 mA = 25 Ω. Which formula applies is decided by your protocol, not by preference." },
+        { "text": "50 Ω", "correct": false,
+          "why": "This would follow from multiplying rather than dividing by two. Worth checking the direction of the correction whenever a factor of two appears." },
+        { "text": "Cannot be determined without the impedance spectrum", "correct": false,
+          "why": "The step gives a perfectly usable lumped resistance. It is not the same quantity as the high-frequency intercept of an impedance spectrum, but it is not undefined either — and this is one of the cases where a confident answer IS available." }
+      ],
+      "explanation": "Both ESR conventions are correct for their own measurement. The library keeps them as two separate records with distinct names rather than one record with a footnote, because a footnote is what gets skipped.",
+      "teaches": ["formula.esr_from_ir_rest", "concept.resistance"],
+      "goDeeper": { "route": "#/formula/esr_from_ir_rest", "label": "Both ESR conventions, side by side" }
+    },
+
+    {
+      "id": "quiz.factor_of_four",
+      "category": "convention",
+      "question": "A symmetric two-electrode device gives a cell capacitance of 1 F. Total active mass across both electrodes is 4 mg. What single-electrode-equivalent specific capacitance should be reported?",
+      "options": [
+        { "text": "250 F/g — cell capacitance divided by total mass", "correct": false,
+          "why": "This is the device-level number, which is a legitimate quantity but not a single-electrode-equivalent one. Reporting it as the material's specific capacitance understates it by four." },
+        { "text": "1000 F/g — the factor of four applies", "correct": true,
+          "why": "Two identical capacitors in series give C_cell = C_electrode/2, so C_electrode = 2 F. Each electrode carries half the mass, 2 mg, so 2 F / 0.002 kg = 1000 F/g. Two times two." },
+        { "text": "500 F/g — cell capacitance divided by one electrode's mass", "correct": false,
+          "why": "This applies half of the factor of four and is the most common near-miss. It corrects the mass basis but not the series capacitance." },
+        { "text": "The factor of four does not apply to any device", "correct": false,
+          "why": "It applies to SYMMETRIC devices, and only to those. For an asymmetric device the two electrodes have different capacitances and masses, and each must be characterised separately." }
+      ],
+      "explanation": "The factor of four is the single most common source of a fourfold discrepancy between papers reporting the same material. It arises from the series capacitance and the mass basis together, not from a correction applied afterwards.",
+      "teaches": ["formula.specific_capacitance_symmetric", "glossary.factor_of_four"],
+      "goDeeper": { "route": "#/formula/specific_capacitance_symmetric", "label": "Where the four comes from" }
+    },
+
+    {
+      "id": "quiz.bet_capacitance",
+      "category": "evidence",
+      "question": "Material A has twice the BET surface area of material B, but gives a lower specific capacitance. What is the most defensible reading?",
+      "options": [
+        { "text": "The capacitance measurement is probably wrong", "correct": false,
+          "why": "Nothing here suggests that. The assumption that capacitance should track BET area is what needs examining, not the measurement." },
+        { "text": "BET area is not the electrochemically accessible area, so the two need not track each other", "correct": true,
+          "why": "Nitrogen at 77 K enters pores a solvated ion at room temperature cannot, and wetting can exclude regions nitrogen entered freely. The correlation between BET area and capacitance across materials is genuinely weak." },
+        { "text": "Material A must have a lower intrinsic capacitance per unit area", "correct": false,
+          "why": "Possible, and it is one candidate explanation — but it cannot be concluded from these two numbers, because the denominator in 'per unit area' is exactly the quantity in doubt." },
+        { "text": "The BET measurement must have been done with incomplete degassing", "correct": false,
+          "why": "Incomplete degassing LOWERS the measured area, so it would push A's area down rather than explain a high area with low capacitance. Worth checking as a matter of routine, but it does not resolve this." }
+      ],
+      "explanation": "This is the most consequential 'cannot tell you' in the characterisation library. Where BET area and electrochemistry disagree is usually where the interesting chemistry is, and treating the disagreement as an error closes off the question.",
+      "teaches": ["technique.bet", "glossary.bet"],
+      "goDeeper": { "route": "#/characterization/bet", "label": "What BET cannot tell you" }
+    },
+
+    {
+      "id": "quiz.ce_above_100",
+      "category": "practice",
+      "question": "A cell reports 103% coulombic efficiency on cycle 40. What should you do?",
+      "options": [
+        { "text": "Report it — the cell is performing exceptionally well", "correct": false,
+          "why": "Above 100% means more charge came out than went in, which is not possible for an ideal cell. It is a diagnostic signal, not a result." },
+        { "text": "Treat it as a diagnostic prompt and check for a soft short, a shuttle, carry-over or an entry error", "correct": true,
+          "why": "All four are common causes and they need different responses. This is exactly the kind of symptom that must not be traced to a single cause from one number." },
+        { "text": "Discard the cycle and continue", "correct": false,
+          "why": "Discarding the evidence without investigating means whatever caused it keeps affecting the rest of the run, invisibly." },
+        { "text": "Recalibrate the instrument", "correct": false,
+          "why": "One candidate among several, and not the first to check. Calibrating away a real cell problem would hide it." }
+      ],
+      "explanation": "Every troubleshooting record in this platform must offer more than one candidate cause; the health check errors on a single-cause entry. One symptom does not prove one cause.",
+      "teaches": ["troubleshooting.ce_above_100", "formula.coulombic_efficiency"],
+      "goDeeper": { "route": "#/troubleshooting/ce_above_100", "label": "The candidate causes and how to separate them" }
+    },
+
+    {
+      "id": "quiz.tafel_window",
+      "category": "evidence",
+      "question": "You fit a Tafel slope and get 240 mV/dec with R² = 0.998. What does the excellent fit statistic tell you?",
+      "options": [
+        { "text": "That the fitting window was appropriate", "correct": false,
+          "why": "R² measures how collinear the fitted points are. It says nothing about whether they should have been fitted, and a window entirely inside a mass-transport-limited region can be beautifully straight." },
+        { "text": "That the slope is reliable to three significant figures", "correct": false,
+          "why": "Precision is not accuracy. A tight fit to the wrong region gives a precise wrong number." },
+        { "text": "Only that the points are collinear — the window's suitability is a separate, physical question", "correct": true,
+          "why": "Judge the window by the physics: is it kinetically controlled, iR-corrected, at least a decade wide, and away from the limiting current? Then use the statistic to describe the line within it." },
+        { "text": "That the reaction transfers half an electron per step", "correct": false,
+          "why": "Reading a mechanism off a slope is a further inference, and a weak one on its own — several mechanisms produce similar slopes, and adsorption shifts them." }
+      ],
+      "explanation": "The Tafel module demonstrates this directly: move the window into the transport-limited region and the fit returns roughly double the true slope while R² stays above 0.98.",
+      "teaches": ["method.tafel", "formula.tafel_slope"],
+      "goDeeper": { "route": "#/workstation/tafel", "label": "Watch the fitted slope move with the window" }
+    },
+
+    {
+      "id": "quiz.eds_lithium",
+      "category": "evidence",
+      "question": "EDS on your lithiated electrode shows no lithium. What follows?",
+      "options": [
+        { "text": "The lithiation failed", "correct": false,
+          "why": "The measurement could not have detected lithium either way, so it provides no evidence about whether lithiation happened." },
+        { "text": "Nothing — conventional EDS cannot detect lithium at all", "correct": true,
+          "why": "Lithium is below the detection limit of conventional EDS. For lithium-ion work this is a hard limit: the element the experiment is about is invisible. ICP after digestion is the technique that quantifies it." },
+        { "text": "The lithium is present but below the detection limit for that concentration", "correct": false,
+          "why": "Closer, but it frames a categorical limitation as a concentration problem. More lithium would not make it appear." },
+        { "text": "The sample was contaminated", "correct": false,
+          "why": "Contamination would add signals, not remove one that was never detectable." }
+      ],
+      "explanation": "Every technique record leads with what it cannot tell you, because a limitation you do not know about produces confident wrong conclusions rather than uncertain ones.",
+      "teaches": ["technique.eds", "technique.icp"],
+      "goDeeper": { "route": "#/characterization/eds", "label": "What EDS is blind to" }
+    },
+
+    {
+      "id": "quiz.scherrer",
+      "category": "convention",
+      "question": "Scherrer analysis of your XRD pattern gives 18 nm. SEM shows particles around 200 nm. Is one of them wrong?",
+      "options": [
+        { "text": "Yes — the XRD analysis must have an error", "correct": false,
+          "why": "Both can be correct simultaneously. Assuming a conflict is what leads people to discard a valid measurement." },
+        { "text": "Yes — the SEM images are not representative", "correct": false,
+          "why": "Representativeness is always worth questioning with imaging, but it is not needed to reconcile these two numbers." },
+        { "text": "No — Scherrer gives crystallite size, SEM gives particle size, and one particle can contain many crystallites", "correct": true,
+          "why": "The crystallite is the coherently diffracting domain. A 200 nm polycrystalline particle containing 18 nm domains is entirely ordinary, and the two numbers are measuring different things." },
+        { "text": "No — the difference is within the uncertainty of both techniques", "correct": false,
+          "why": "An order of magnitude is not measurement uncertainty. Explaining it away as scatter would hide the real, and more interesting, structural information." }
+      ],
+      "explanation": "Reporting Scherrer crystallite size as particle size is one of the most common characterisation errors in this field, and it usually happens because nobody said they were different quantities.",
+      "teaches": ["technique.xrd", "glossary.scherrer"],
+      "goDeeper": { "route": "#/characterization/xrd", "label": "What XRD cannot tell you" }
+    },
+
+    {
+      "id": "quiz.two_circuits",
+      "category": "evidence",
+      "question": "Your equivalent circuit fits the impedance spectrum with an excellent residual. How strongly does that support the physical picture the circuit implies?",
+      "options": [
+        { "text": "Strongly — a good fit across the whole frequency range is convincing", "correct": false,
+          "why": "Fit quality measures agreement with the data, which several different circuits can achieve at once. Agreement does not distinguish between them." },
+        { "text": "Not at all on its own — different circuits can fit the same spectrum exactly", "correct": true,
+          "why": "Two entirely different topologies can be related by exact algebra and produce identical impedance at every frequency. No residual, criterion or statistic can separate them; only evidence from outside the impedance measurement can." },
+        { "text": "Moderately — a low residual makes the circuit more likely than the alternatives", "correct": false,
+          "why": "Only if the alternatives fit worse. Where a degenerate pair exists, both fit perfectly and likelihood does not discriminate." },
+        { "text": "Strongly, provided the number of elements was kept minimal", "correct": false,
+          "why": "Parsimony is a good habit and a real constraint on over-fitting — but the degenerate pair in the Circuit Elements module has the same element count on both sides." }
+      ],
+      "explanation": "The Circuit Elements page plots two different circuits whose spectra agree to within double-precision rounding, with the parameter mapping derived algebraically. It is a demonstration rather than a caution.",
+      "teaches": ["circuit.cpe", "method.eis_fitting"],
+      "goDeeper": { "route": "#/workstation/circuits", "label": "Two circuits, one spectrum" }
+    },
+
+    {
+      "id": "quiz.first_cycle",
+      "category": "practice",
+      "question": "Your material gives 1400 mAh/g on the first discharge and 620 mAh/g on the second. Which do you report as the capacity?",
+      "options": [
+        { "text": "1400 mAh/g, with a note about the second cycle", "correct": false,
+          "why": "First-cycle capacity includes irreversible processes — SEI formation, and for conversion or alloying materials the transformation of the starting structure. It is not a capacity the material delivers again." },
+        { "text": "620 mAh/g, with the first-cycle capacity and efficiency reported separately", "correct": true,
+          "why": "The reversible capacity is what the material actually delivers. The first-cycle loss is important information in its own right and belongs in the report — as a separate quantity, not folded into the headline." },
+        { "text": "The average of the two", "correct": false,
+          "why": "An average of two quantities that mean different things is not a meaningful third quantity." },
+        { "text": "Whichever is more consistent with later cycles", "correct": false,
+          "why": "This arrives at the right number by the wrong route. The reason to report the second cycle is that the first includes irreversible processes, not that it happens to match." }
+      ],
+      "explanation": "Formation cycles must never be pooled with steady-state cycles, and retention normalised to cycle 1 flatters the result because cycle 1 is dominated by formation.",
+      "teaches": ["glossary.formation", "formula.capacity_retention", "mechanism.conversion"],
+      "goDeeper": { "route": "#/battery-tester/workflow", "label": "Where formation sits in the workflow" }
+    },
+
+    {
+      "id": "quiz.decimal_comma",
+      "category": "practice",
+      "question": "A collaborator sends a CSV where the columns are separated by semicolons and the numbers look like 1,234. Your software reads it and produces a plot with no errors. What should you check?",
+      "options": [
+        { "text": "Nothing — the absence of errors means it parsed correctly", "correct": false,
+          "why": "This is exactly the failure mode that produces no error. Reading decimal commas as thousands separators, or as field breaks, gives numbers wrong by factors of ten with a plot that looks entirely reasonable." },
+        { "text": "That the decimal mark was interpreted as a comma, and that the value ranges match what you expect", "correct": true,
+          "why": "Semicolon delimiters with decimal commas is the standard European export format. Check the parsed ranges against the measurement — a voltage column running 0 to 1000 rather than 0 to 1 is the giveaway." },
+        { "text": "That the file has no missing rows", "correct": false,
+          "why": "Worth checking as a matter of routine, and a good parser reports it — but it does not address the decimal problem, which changes every value rather than dropping some." },
+        { "text": "Re-export the file in a different format", "correct": false,
+          "why": "A reasonable practical fix, but it does not tell you whether the analysis you already ran was affected." }
+      ],
+      "explanation": "The import module chooses the delimiter by consistency across lines rather than by frequency — frequency alone picks the comma — and says so in an amber callout when the decimal mark cannot be determined with confidence.",
+      "teaches": ["concept.provenance"],
+      "goDeeper": { "route": "#/import", "label": "What the import report checks" }
+    },
+
+    {
+      "id": "quiz.loading_comparison",
+      "category": "quantity",
+      "question": "Two papers report the same material at 320 F/g and 180 F/g. The first used 0.3 mg/cm² loading, the second 4 mg/cm². What is the most useful thing to say?",
+      "options": [
+        { "text": "The first group's material is better", "correct": false,
+          "why": "It is the same material. The difference is in the electrodes, not in what they were made from." },
+        { "text": "The second group's measurement is more careful", "correct": false,
+          "why": "Higher loading is more practically relevant, but it does not make the measurement more careful — both may be perfectly well executed." },
+        { "text": "The numbers are not comparable: gravimetric values at very low loading are systematically flattering", "correct": true,
+          "why": "Thin electrodes have short transport paths and a large fraction of accessible material, so they give higher gravimetric numbers. That advantage does not survive scaling to a practical electrode." },
+        { "text": "Average them to estimate the true value", "correct": false,
+          "why": "There is no single true value being estimated. The two numbers describe two different electrodes." }
+      ],
+      "explanation": "This is why mass loading must be reported with every gravimetric result. Without it the number cannot be interpreted, let alone compared.",
+      "teaches": ["formula.mass_loading", "concept.normalisation", "glossary.loading"],
+      "goDeeper": { "route": "#/fundamentals/compare", "label": "See two electrodes swap rank across six bases" }
+    },
+
+    {
+      "id": "quiz.warburg_45",
+      "category": "evidence",
+      "question": "Your porous carbon electrode's Nyquist plot has a clear 45° region at low frequency. What does it indicate?",
+      "options": [
+        { "text": "Semi-infinite diffusion of the electrolyte ion", "correct": false,
+          "why": "The standard reading, and the most common misattribution in supercapacitor impedance work. A 45° line is consistent with diffusion, but it is not the only thing that produces one." },
+        { "text": "Either diffusion or distributed resistance in the pores — a porous electrode produces a 45° region without any diffusion limitation", "correct": true,
+          "why": "A transmission-line response from pore resistance gives the same 45° region. Distinguishing them needs a thickness or pore-size series, not a closer look at the same spectrum." },
+        { "text": "That the electrode is behaving ideally capacitively", "correct": false,
+          "why": "Ideal capacitive behaviour is a vertical line, at −90°. A 45° region is something else." },
+        { "text": "Nothing, because the axes were probably not equally scaled", "correct": false,
+          "why": "Equal axis scaling genuinely matters — on unequal axes any line can be made to look like 45° — but assuming they were wrong is not a reading of the data. Check the axes, then interpret." }
+      ],
+      "explanation": "Applying the Warburg diffusion equation to a porous electrode's 45° region returns a diffusion coefficient that describes nothing. The Circuit Elements page states this on the Warburg element itself.",
+      "teaches": ["circuit.w", "formula.warburg_diffusion", "glossary.warburg"],
+      "goDeeper": { "route": "#/workstation/circuits", "label": "What else makes a 45° line" }
+    },
+
+    {
+      "id": "quiz.recorded_current",
+      "category": "practice",
+      "question": "A constant-current step was programmed at 5 mA, but the channel hit its compliance limit partway through. How should the capacity be calculated?",
+      "options": [
+        { "text": "I·Δt using the 5 mA setpoint", "correct": false,
+          "why": "The cell did not receive 5 mA for the whole step. This overstates the capacity, and nothing in the resulting number reveals it." },
+        { "text": "By integrating the recorded current over the step", "correct": true,
+          "why": "Charge is the integral of the current that actually flowed. The integral form is the definition; I·Δt is a shortcut that only holds when the current really was constant." },
+        { "text": "Discard the step as invalid", "correct": false,
+          "why": "The step is not invalid — charge was still passed and it can be integrated correctly. But the experiment did not run as designed, which is worth noting separately." },
+        { "text": "Use the setpoint but note the compliance event", "correct": false,
+          "why": "Noting it is right and using the setpoint is not. The note does not repair the arithmetic." }
+      ],
+      "explanation": "Reaching a compliance limit is not itself dangerous, but it means the experiment did not run as designed — and the recorded current is the only trustworthy basis for anything derived from it.",
+      "teaches": ["concept.charge", "concept.ec_compliance", "glossary.compliance"],
+      "goDeeper": { "route": "#/concept/charge", "label": "Why the integral form is the definition" }
+    },
+
+    {
+      "id": "quiz.energy_window",
+      "category": "quantity",
+      "question": "Widening the operating voltage window from 1.0 V to 1.2 V, with capacitance unchanged, does what to the specific energy?",
+      "options": [
+        { "text": "Raises it by about 20%", "correct": false,
+          "why": "This assumes energy scales linearly with voltage. It does not." },
+        { "text": "Raises it by about 44%", "correct": true,
+          "why": "Energy goes as the square of the window: (1.2/1.0)² = 1.44. This is why the window dominates every energy figure, and why an energy density quoted without its window is not a result." },
+        { "text": "Leaves it unchanged, since capacitance did not change", "correct": false,
+          "why": "Capacitance is charge per volt; energy is ½CV². Holding C fixed while raising V still raises the energy." },
+        { "text": "Raises it by about 20% and lowers the power by the same", "correct": false,
+          "why": "Neither half holds. Power at a fixed discharge time rises with energy rather than falling." }
+      ],
+      "explanation": "Because energy scales with V², widening the window is the easiest way to make a material appear better without changing it — which is why where the window came from should always be stated.",
+      "teaches": ["concept.energy_power", "formula.specific_energy_capacitor", "glossary.window"],
+      "goDeeper": { "route": "#/formula/specific_energy_capacitor", "label": "The assumptions behind ½CV²" }
+    },
+
+    {
+      "id": "quiz.xps_bulk",
+      "category": "evidence",
+      "question": "XPS on a cycled electrode shows a fluorine-rich surface. Can you say the electrode's bulk fluorine content increased?",
+      "options": [
+        { "text": "Yes, if the signal is strong", "correct": false,
+          "why": "Signal strength reflects surface concentration within the information depth. It says nothing about what lies beneath it." },
+        { "text": "No — XPS probes only the outermost few nanometres, so it makes no bulk statement", "correct": true,
+          "why": "A bulk claim from a surface technique is a category error however good the spectrum. ICP after digestion, or depth profiling with its own caveats, is what addresses the bulk." },
+        { "text": "Yes, provided the sample was transferred without air exposure", "correct": false,
+          "why": "Inert transfer is essential and it fixes a different problem — measuring a surface that formed on the way to the instrument. It does not extend the information depth." },
+        { "text": "Only if the binding energies were referenced correctly", "correct": false,
+          "why": "Referencing affects which chemical state you assign, not how deep the measurement reaches." }
+      ],
+      "explanation": "XPS is the standard tool for interfacial layers precisely because it is surface-sensitive. That strength is the same fact as its limitation.",
+      "teaches": ["technique.xps"],
+      "goDeeper": { "route": "#/characterization/xps", "label": "What XPS cannot tell you" }
+    },
+
+    {
+      "id": "quiz.rate_retention",
+      "category": "practice",
+      "question": "A cell retains 96% of its capacity after 5000 cycles at 5C. What does that establish about its stability?",
+      "options": [
+        { "text": "That it is a stable material for long-term use", "correct": false,
+          "why": "It establishes stability at that rate. High-rate cycling spends less time at the potential extremes where much degradation happens, so retention at 5C can look excellent while the same cell fades quickly at C/5." },
+        { "text": "That degradation mechanisms are absent", "correct": false,
+          "why": "Retention hides mechanism. A cell can hold capacity while its resistance climbs steadily — which usually moves first." },
+        { "text": "Stability under those conditions only — a slow-rate test and the resistance trend are needed alongside it", "correct": true,
+          "why": "Retention is conditional on rate, window, temperature and the reference cycle. Pairing it with the coulombic efficiency and resistance trends is what makes it interpretable." },
+        { "text": "Nothing, because 5000 cycles is too few to matter", "correct": false,
+          "why": "5000 cycles is a substantial test. The problem is not the count but the missing context." }
+      ],
+      "explanation": "Retention says what happened, not why. Reporting it with the rate, the window, the reference cycle and the resistance trend is what turns it into evidence.",
+      "teaches": ["formula.capacity_retention", "glossary.retention"],
+      "goDeeper": { "route": "#/formula/capacity_retention", "label": "What retention does not tell you" }
+    }
+  ]
+}

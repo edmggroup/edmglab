@@ -132,6 +132,40 @@ router.route('/formulas',    () => import('./views/formulas.js'),    { title: 'F
 router.route('/formula/:id', () => import('./views/formula.js'),     { title: 'Formula' });
 router.route('/calculators', () => import('./views/calculators.js'), { title: 'Calculation Workbench' });
 
+/* ── Data import (Roadmap P4) ──
+   The only place in EDMGLAB that handles the user's own measured data. Parsing
+   runs in a Web Worker so a long cycling export cannot freeze the interface. */
+router.route('/import', () => import('./views/import.js'), { title: 'Data Import' });
+
+/* ── Electrode preparation and characterisation (Roadmap P9) ──
+   The PREPARATION and CHARACTERISATION stages of the pathway. Both are
+   methodology rather than measured values: what each choice or technique can
+   and — the field that matters — cannot tell you. */
+router.route('/preparation',            () => import('./views/preparation.js'),    { title: 'Electrode Preparation' });
+router.route('/preparation/:section',   () => import('./views/preparation.js'),    { title: 'Electrode Preparation' });
+router.route('/characterization',       () => import('./views/characterization.js'), { title: 'Characterisation' });
+router.route('/characterization/:id',   () => import('./views/characterization.js'), { title: 'Characterisation' });
+
+/* ── Storage chemistry (Roadmap P8) ──
+   The CHEMISTRY/PHYSICS stage. One differential-capacitance model generates
+   both the voltammogram and the discharge curve, so "capacitor-like" and
+   "battery-like" read as one continuum rather than two theories. */
+router.route('/chemistry',          () => import('./chemistry/index.js'), { title: 'Storage Chemistry' });
+router.route('/chemistry/:section', () => import('./chemistry/index.js'), { title: 'Storage Chemistry' });
+
+/* ── Fundamentals (Roadmap P1) ──
+   The CONCEPT stage and the entry point of the pathway. Every record carries a
+   Learn and a Research version of the same idea, so the two cannot drift. */
+router.route('/fundamentals',          () => import('./views/fundamentals.js'), { title: 'Fundamentals' });
+router.route('/fundamentals/:section', () => import('./views/fundamentals.js'), { title: 'Fundamentals' });
+
+/* ── Learning check and glossary (Roadmap P12) ──
+   The quiz tests judgement rather than recall: which quantity is valid, and
+   what a result does not license. Every option explains itself, including the
+   wrong ones, and "you cannot tell from this alone" is often the right answer. */
+router.route('/learning', () => import('./views/quiz.js'),     { title: 'Learning Check' });
+router.route('/glossary', () => import('./views/glossary.js'), { title: 'Glossary' });
+
 router.start(document.getElementById('view-outlet'));
 
 /* ══════════════════════════════════════════════════════════

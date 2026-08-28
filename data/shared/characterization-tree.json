@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "_kind": "tree",
+  "_README": "Technique-selection guide — Roadmap P9. Every leaf MUST declare cannotTell; the renderer refuses to show a recommendation without its limits. The tree is deliberately organised by the QUESTION, not by the instrument, because choosing the instrument first is how a technique gets applied outside what it can answer. DRAFT — pending review by the research group.",
+  "root": "start",
+
+  "nodes": {
+    "start": {
+      "question": "What do you actually need to know?",
+      "hint": "Start from the question, not the instrument you have access to. Almost every characterisation mistake in this field is a technique applied outside what it can answer — and the wrong answer still looks like a result.",
+      "options": [
+        { "label": "What phases is it made of?", "detail": "Crystal structure, phase purity, lattice parameters.", "next": "q_phase" },
+        { "label": "What does it look like?", "detail": "Particle shape, size, coating quality, internal structure.", "next": "q_morph" },
+        { "label": "How much surface and porosity does it have?", "detail": "Surface area, pore size, pore volume.", "next": "q_surface" },
+        { "label": "What is it made of, and how much?", "detail": "Elements, quantities, oxidation state, where they are.", "next": "q_comp" },
+        { "label": "How much of something is in it?", "detail": "Carbon content, water content, binder content, thermal stability.", "next": "leaf_tga" }
+      ]
+    },
+
+    "q_phase": {
+      "crumb": "Phase and structure",
+      "question": "Is the material crystalline, and how much do you have?",
+      "hint": "XRD is the default for phase identification, but it only sees what is periodic. If the material may be substantially amorphous, plan a second technique from the start rather than after the pattern disappoints you.",
+      "options": [
+        { "label": "Bulk powder, likely crystalline", "detail": "Standard case: identify phases and lattice parameters.", "next": "leaf_xrd" },
+        { "label": "A few nanoparticles, or a specific region", "detail": "Too little for XRD, or you need structure from one region.", "next": "leaf_tem" },
+        { "label": "Distinguishing polymorphs or carbon disorder", "detail": "Phases similar by XRD, or carbon materials.", "next": "leaf_raman" }
+      ]
+    },
+
+    "q_morph": {
+      "crumb": "Morphology",
+      "question": "At what scale, and do you need the inside?",
+      "hint": "Imaging is selection: what you photograph is a choice, and one image is never a statement about a batch. Decide before you start how many fields of view will count as evidence.",
+      "options": [
+        { "label": "Surface, micrometre scale", "detail": "Particle shape, agglomeration, coating uniformity, cracks.", "next": "leaf_sem" },
+        { "label": "Internal structure at the nanoscale", "detail": "Core–shell, coating thickness, lattice fringes.", "next": "leaf_tem" },
+        { "label": "A size distribution over the whole powder", "detail": "Statistics, not pictures.", "next": "leaf_psd" }
+      ]
+    },
+
+    "q_surface": {
+      "crumb": "Surface area and porosity",
+      "question": "What will you do with the number?",
+      "hint": "This is the branch where the mismatch between what is measured and what is meant is most common in this group's work.",
+      "options": [
+        { "label": "Compare materials on a standard basis", "detail": "A conventional specific surface area and pore-size distribution.", "next": "leaf_bet" },
+        { "label": "Explain a capacitance", "detail": "You want the area the electrolyte actually reaches.", "next": "leaf_area_warning" }
+      ]
+    },
+
+    "q_comp": {
+      "crumb": "Composition",
+      "question": "Bulk, surface, or spatially resolved?",
+      "hint": "These three questions have three different answers, and no single instrument gives all of them. Deciding which you need is most of the work.",
+      "options": [
+        { "label": "Accurate bulk quantities", "detail": "Stoichiometry, trace impurities, dissolved metals — including lithium.", "next": "leaf_icp" },
+        { "label": "The outermost few nanometres, with chemical state", "detail": "SEI composition, oxidation states, surface species.", "next": "leaf_xps" },
+        { "label": "Where the elements are, in an image", "detail": "Is the coating where you think it is?", "next": "leaf_eds" },
+        { "label": "Which functional groups are present", "detail": "Binder, surface functionalisation, residual solvent.", "next": "leaf_ftir" }
+      ]
+    },
+
+    "leaf_xrd": {
+      "technique": "Powder X-ray diffraction (XRD)",
+      "crumb": "XRD",
+      "summary": "Identify crystalline phases and measure lattice parameters from diffraction angles. The standard first structural measurement.",
+      "canTell": [
+        "Which crystalline phases are present, by matching against reference patterns",
+        "Lattice parameters and how they shift with composition or state of charge",
+        "Whether the material is crystalline at all",
+        "A crystallite-size estimate from peak broadening, after correcting for instrumental broadening"
+      ],
+      "cannotTell": [
+        "How much amorphous material is present — it makes a broad hump, not peaks, so a clean-looking pattern is not a phase-pure sample",
+        "Particle size. Scherrer gives CRYSTALLITE size, which can differ from particle size by an order of magnitude",
+        "Whether a peak shift is strain or composition — both move peaks, and one pattern cannot separate them",
+        "Anything about a surface layer thin enough to govern the electrochemistry",
+        "Lithium positions directly; lithium scatters X-rays too weakly to be seen"
+      ],
+      "next": "technique.xrd"
+    },
+
+    "leaf_sem": {
+      "technique": "Scanning electron microscopy (SEM)",
+      "crumb": "SEM",
+      "summary": "Image surface topography at the micrometre scale. The routine check on particle shape and coating quality.",
+      "canTell": [
+        "Particle shape, agglomeration and coating uniformity",
+        "Whether an electrode coating is continuous and how the binder is distributed",
+        "Relative atomic-number contrast in backscattered mode",
+        "Cross-sectional structure, if the sample is sectioned"
+      ],
+      "cannotTell": [
+        "What anything is made of — that needs EDS, with its own limits",
+        "Crystal structure; a well-faceted particle is not evidence of a phase",
+        "Anything below the imaged surface unless the sample was sectioned",
+        "Whether the field of view you chose is representative — a single image is a claim the image cannot support",
+        "The electrochemically relevant surface: what the electrolyte reaches is not what the detector sees"
+      ],
+      "next": "technique.sem"
+    },
+
+    "leaf_tem": {
+      "technique": "Transmission electron microscopy (TEM)",
+      "crumb": "TEM",
+      "summary": "Image internal structure at the nanoscale, and diffract from the same region to identify it.",
+      "canTell": [
+        "Internal structure SEM cannot reach — core–shell arrangements, coating thickness, internal porosity",
+        "Lattice fringes and d-spacings",
+        "Phase identification from selected-area diffraction of the region imaged",
+        "Whether nanoparticles are single-crystalline, polycrystalline or amorphous"
+      ],
+      "cannotTell": [
+        "Anything about the bulk. A grid holds nanograms, and the regions thin enough to image are a biased subset of those",
+        "What the material was before the beam hit it — beam damage and reduction are routine",
+        "A phase from a single lattice spacing; indexing needs more than one reflection",
+        "Three-dimensional structure from one image, since everything through the thickness is superimposed"
+      ],
+      "next": "technique.tem"
+    },
+
+    "leaf_psd": {
+      "technique": "Particle-size analysis (laser diffraction or DLS)",
+      "crumb": "Particle size",
+      "summary": "A size distribution over the whole powder, rather than a handful of imaged particles.",
+      "canTell": [
+        "A distribution, with D10, D50 and D90",
+        "Whether a powder is broadly or narrowly distributed",
+        "Whether a dispersion procedure changed the apparent size — informative about agglomeration"
+      ],
+      "cannotTell": [
+        "A meaningful size for a non-spherical particle — the result is an equivalent-sphere diameter, which for plates and rods corresponds to no dimension you could measure with a ruler",
+        "Whether you measured primary particles or agglomerates; that depends entirely on the dispersion procedure, which is therefore part of the result",
+        "A number comparable with an SEM count or with a different sizing technique",
+        "Anything about shape, which for electrode processing often matters more than size"
+      ],
+      "next": "technique.particle_size"
+    },
+
+    "leaf_bet": {
+      "technique": "Nitrogen physisorption (BET)",
+      "crumb": "BET",
+      "summary": "A specific surface area and pore-size distribution from a nitrogen adsorption isotherm at 77 K.",
+      "canTell": [
+        "A specific surface area on the assumptions of the BET model",
+        "The isotherm shape, which is the most informative output and should always be shown",
+        "A pore-size distribution, once a model is chosen and stated",
+        "Total pore volume and the micropore split"
+      ],
+      "cannotTell": [
+        "The electrochemically accessible area — nitrogen at 77 K reaches pores a solvated ion cannot, and wetting can exclude regions nitrogen entered freely",
+        "A defensible area for a strongly microporous material: the BET model's assumptions do not hold there, though the number is still universally reported",
+        "A pore size independent of the model — BJH, DFT and NLDFT give different distributions from the same isotherm",
+        "Anything about closed porosity, or pores nitrogen cannot enter within the measurement",
+        "Whether degassing was complete; incomplete degassing lowers the area and leaves no trace in the number"
+      ],
+      "next": "technique.bet"
+    },
+
+    "leaf_area_warning": {
+      "technique": "No technique measures this directly — and BET is not it",
+      "crumb": "Accessible area",
+      "summary": "There is no standard measurement of the electrochemically accessible area. BET is the number people reach for, and it answers a different question. Say what you measured and stop there, or measure the electrochemistry directly.",
+      "canTell": [
+        "BET gives a gas-accessible area on a stated model — report it as that, and never as active area",
+        "Double-layer capacitance measured across a range of scan rates in a non-faradaic window gives an electrochemically active surface area, but only relative to an assumed specific capacitance for the surface — which is itself uncertain and material-dependent",
+        "Comparing the two for the same set of materials is informative in its own right: where they disagree is where the interesting chemistry usually is"
+      ],
+      "cannotTell": [
+        "A defensible absolute accessible area. Every route requires an assumed constant, and the assumption dominates the answer",
+        "Whether a capacitance difference between two materials is an area effect or a surface-chemistry effect — area alone cannot separate them",
+        "Anything at all, if the value is quoted without the method and the assumed constants alongside it"
+      ],
+      "next": "technique.bet"
+    },
+
+    "leaf_raman": {
+      "technique": "Raman spectroscopy",
+      "crumb": "Raman",
+      "summary": "Vibrational modes from inelastic light scattering — the standard tool for carbon materials and for polymorph discrimination.",
+      "canTell": [
+        "Which bonding environments are present",
+        "For carbons, the D and G bands and their intensity ratio",
+        "Polymorphs that are hard to separate by XRD",
+        "Local information, since the probe is a focused spot"
+      ],
+      "cannotTell": [
+        "A quantitative phase fraction without a calibration built for that mixture and instrument",
+        "A transferable I_D/I_G — it depends on excitation wavelength, fitting procedure and whether heights or areas were used",
+        "Anything, if the sample fluoresces; a featureless spectrum is a measurement failure, not a finding",
+        "What the material was before the laser hit it — a laser-power series is a control, not an optional extra",
+        "Bulk composition; the spot samples a very small volume"
+      ],
+      "next": "technique.raman"
+    },
+
+    "leaf_xps": {
+      "technique": "X-ray photoelectron spectroscopy (XPS)",
+      "crumb": "XPS",
+      "summary": "Elemental composition and chemical state of the outermost few nanometres. The standard measurement for interfacial layers such as an SEI.",
+      "canTell": [
+        "Which elements are at the surface and in what proportion",
+        "Chemical state from binding-energy shifts",
+        "Depth profiles, if combined with ion sputtering",
+        "Interfacial layer composition, which is usually why it is being run"
+      ],
+      "cannotTell": [
+        "Anything about the bulk — the information depth is a few nanometres, so a bulk claim from XPS is a category error",
+        "A binding energy independent of your charge-referencing choice, which is a convention with genuine disagreement about it",
+        "A unique peak fit: several component sets fit the same envelope, and a small residual is not evidence the assignment is right",
+        "The surface you care about, if the sample met air on the way in",
+        "What the sputtering did — ion beams preferentially remove some species and reduce others"
+      ],
+      "next": "technique.xps"
+    },
+
+    "leaf_eds": {
+      "technique": "Energy-dispersive X-ray spectroscopy (EDS)",
+      "crumb": "EDS",
+      "summary": "Which elements are present and roughly where, as an attachment to an electron microscope. Best used as a map, not as a quantity.",
+      "canTell": [
+        "Which elements above the detector cutoff are present",
+        "An approximate ratio between heavier elements",
+        "Where those elements are, as a map — the most useful mode"
+      ],
+      "cannotTell": [
+        "Anything about hydrogen, helium or lithium. For lithium-ion work the element the experiment is about is invisible",
+        "Reliable quantities for light elements; carbon is further confounded by conductive coating and chamber contamination",
+        "Composition at a point — the X-ray interaction volume is much larger than the beam spot and includes the surroundings",
+        "Oxidation state, bonding, or which compound the elements are in"
+      ],
+      "next": "technique.eds"
+    },
+
+    "leaf_icp": {
+      "technique": "ICP-OES / ICP-MS",
+      "crumb": "ICP",
+      "summary": "Quantitative elemental content of a digested sample. The reference method when composition must actually be quantitative — and the one that sees lithium.",
+      "canTell": [
+        "Quantitative elemental concentrations, including light elements EDS cannot see",
+        "Trace impurities at levels no microscope-based technique reaches",
+        "Transition-metal dissolution into an electrolyte",
+        "Stoichiometry against calibration standards"
+      ],
+      "cannotTell": [
+        "Where the element was — the sample is dissolved, so all spatial information is gone",
+        "What compound it was in; this is total elemental content, not speciation",
+        "Anything correct, if digestion was incomplete — undigested residue silently under-reports and the number still looks clean",
+        "An accurate result where the matrix interferes, which needs a stated strategy rather than a hope"
+      ],
+      "next": "technique.icp"
+    },
+
+    "leaf_ftir": {
+      "technique": "Fourier-transform infrared spectroscopy (FTIR)",
+      "crumb": "FTIR",
+      "summary": "Functional groups from infrared absorption. Quick, usually needs no preparation, and identifies groups rather than compounds.",
+      "canTell": [
+        "Which functional groups are present",
+        "Whether a binder, surface functionalisation or residual solvent is there",
+        "Qualitative bonding changes after treatment or cycling",
+        "Identification against a reference spectrum of a known candidate"
+      ],
+      "cannotTell": [
+        "The compound — several compounds share a set of functional groups",
+        "A concentration without a calibration series",
+        "Anything below the contacted layer, in ATR mode",
+        "A band position that means the same in every environment; hydrogen bonding and crystallinity both shift bands"
+      ],
+      "next": "technique.ftir"
+    },
+
+    "leaf_tga": {
+      "technique": "Thermogravimetric analysis (TGA)",
+      "crumb": "TGA",
+      "summary": "Mass against temperature in a controlled atmosphere. Used for carbon content, water content and thermal stability.",
+      "canTell": [
+        "How much mass is lost and over which temperature ranges",
+        "Carbon content, when combustion is complete and the residue is stable",
+        "Water and solvent content from low-temperature loss",
+        "Thermal stability limits, in the atmosphere tested"
+      ],
+      "cannotTell": [
+        "WHAT was lost — TGA weighs, it does not identify. Naming the species needs coupled evolved-gas analysis",
+        "A result independent of atmosphere and heating rate; both change onsets and can change the residue",
+        "Two overlapping processes apart — a derivative curve suggests a separation, it does not prove one",
+        "A trustworthy small mass change without a blank, because buoyancy produces artefacts of the same order"
+      ],
+      "next": "technique.tga"
+    }
+  }
+}

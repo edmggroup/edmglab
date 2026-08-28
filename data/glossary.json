@@ -1,36 +1,181 @@
 {
   "schemaVersion": 1,
-  "_note": "SEED CONTENT — short definitions for terms not already owned by another file. Anything with a full concept, formula or method record lives there instead and is linked from here. Authored properly in Phase 12.",
+  "_README": "Glossary — Roadmap P12. Weighted towards the terms this group actually trips over, not towards completeness. Where a term is routinely used to mean two different things, the entry says so and names both, because that ambiguity is the reason the term needs an entry at all. DRAFT — pending review by the research group.",
+
   "items": [
-    {
-      "id": "glossary.ir_drop",
-      "term": "IR drop",
-      "shortDef": "The immediate voltage step seen when current starts or stops, equal to the current multiplied by the cell's ohmic resistance.",
-      "tags": ["resistance", "GCD", "diagnostics"]
-    },
-    {
-      "id": "glossary.cccv",
-      "term": "CC-CV",
-      "shortDef": "Constant current until a voltage limit is reached, then constant voltage while the current decays to a termination threshold.",
-      "tags": ["battery tester", "protocol"]
-    },
-    {
-      "id": "glossary.formation",
-      "term": "Formation",
-      "shortDef": "The first cycles of a new cell, usually at low rate, during which interfacial layers such as the SEI develop and irreversible capacity is consumed.",
-      "tags": ["battery", "SEI", "protocol"]
-    },
-    {
-      "id": "glossary.four_wire",
-      "term": "Four-wire (Kelvin) sensing",
-      "shortDef": "Separate leads carry the current and measure the voltage, so lead and contact resistance are excluded from the recorded cell voltage.",
-      "tags": ["instrument", "resistance", "measurement"]
-    },
-    {
-      "id": "glossary.active_mass",
-      "term": "Active material mass",
-      "shortDef": "The mass of electroactive material on an electrode, excluding binder, conductive additive and current collector unless explicitly stated otherwise.",
-      "tags": ["normalisation", "electrode"]
-    }
+    { "id": "glossary.active_mass", "term": "Active mass",
+      "shortDef": "The mass of electroactive material only — excluding binder, conductive additive and current collector.",
+      "trap": "Every gravimetric result is divided by this number, so a 10% error here is a 10% error in every specific capacity or capacitance you report, invisible in the data. Whether binder and additive are included must be stated once and kept consistent.",
+      "tags": ["preparation", "reporting", "mass"], "relatedIds": ["formula.mass_loading", "concept.normalisation"] },
+
+    { "id": "glossary.areal", "term": "Areal (per unit area)",
+      "shortDef": "Normalised to electrode area — usually mF/cm² or mA/cm².",
+      "trap": "Whether the area is the geometric footprint or a measured surface area such as BET is almost never stated, and the two differ by orders of magnitude on a porous electrode.",
+      "tags": ["reporting", "normalisation"], "relatedIds": ["formula.areal_capacitance", "formula.current_density"] },
+
+    { "id": "glossary.b_value", "term": "b-value",
+      "shortDef": "The exponent in i ∝ vᵇ, describing how peak current scales with scan rate.",
+      "trap": "b ≈ 0.5 is the scaling expected of a diffusion-controlled response and b ≈ 1 of a surface-controlled one — but b is an empirical descriptor, not a mechanism, and intermediate values do not decompose into percentages of two mechanisms.",
+      "tags": ["CV", "kinetics"], "relatedIds": ["formula.b_value", "concept.faradaic"] },
+
+    { "id": "glossary.bet", "term": "BET surface area",
+      "shortDef": "Specific surface area from a nitrogen adsorption isotherm, on the Brunauer–Emmett–Teller model.",
+      "trap": "Not the electrochemically accessible area. Nitrogen at 77 K reaches pores a solvated ion cannot, and wetting can exclude regions nitrogen entered freely.",
+      "tags": ["characterisation", "surface"], "relatedIds": ["technique.bet"] },
+
+    { "id": "glossary.calendering", "term": "Calendering",
+      "shortDef": "Compressing a dried electrode coating to a defined thickness and density.",
+      "trap": "Trades porosity for contact. Over-calendering shows as rate capability falling while low-rate capacity is unchanged — a transport signature, not a kinetic one.",
+      "tags": ["preparation"], "relatedIds": [] },
+
+    { "id": "glossary.capacity", "term": "Capacity",
+      "shortDef": "The total charge stored, in coulombs or mAh — the integral of current over the discharge.",
+      "trap": "Not capacitance. Capacity is ∫dQ; capacitance is dQ/dV. Converting between them requires the voltage window and an assumption about curve shape.",
+      "tags": ["battery", "reporting"], "relatedIds": ["concept.capacitance_vs_capacity", "formula.specific_capacity"] },
+
+    { "id": "glossary.capacitance", "term": "Capacitance",
+      "shortDef": "Charge stored per volt, dQ/dV, in farads.",
+      "trap": "A single capacitance is meaningful only where dQ/dV is roughly constant across the window. On a plateaued electrode C = I·Δt/ΔV returns a number that depends entirely on the window chosen.",
+      "tags": ["supercapacitor", "reporting"], "relatedIds": ["concept.capacitance_vs_capacity", "formula.specific_capacitance"] },
+
+    { "id": "glossary.cccv", "term": "CC–CV",
+      "shortDef": "Constant current to a voltage limit, then constant voltage until the current decays to a cutoff.",
+      "trap": "The termination current sets how full the cell ends up, so it must be reported with any capacity derived from it. CC-CV and CC-only capacities are not comparable.",
+      "tags": ["battery", "protocol"], "relatedIds": ["method.cccv", "method.cv_hold"] },
+
+    { "id": "glossary.ce", "term": "Coulombic efficiency (CE)",
+      "shortDef": "Discharge charge divided by charge charge, for the same cycle, as a percentage.",
+      "trap": "Above 100% is not a good result — it usually signals a soft short, a redox shuttle, carry-over from the previous cycle, or an entry error. First-cycle CE is dominated by irreversible processes and must not be pooled with steady-state cycles.",
+      "tags": ["battery", "cycling"], "relatedIds": ["formula.coulombic_efficiency", "troubleshooting.ce_above_100"] },
+
+    { "id": "glossary.compliance", "term": "Compliance voltage",
+      "shortDef": "The maximum voltage a channel can apply while trying to drive a requested current.",
+      "trap": "When it is reached, the recorded current diverges from the setpoint silently. Always integrate the recorded current, not the programmed one.",
+      "tags": ["instrument"], "relatedIds": ["concept.ec_compliance"] },
+
+    { "id": "glossary.cpe", "term": "Constant phase element (CPE)",
+      "shortDef": "A circuit element with impedance 1/(Q(jω)ⁿ), used where an ideal capacitor will not fit.",
+      "trap": "Q is not a capacitance and has no units of farads. A CPE describes non-ideality; it does not explain it, and a better fit after adding one is expected because it adds a free parameter.",
+      "tags": ["EIS", "fitting"], "relatedIds": ["circuit.cpe"] },
+
+    { "id": "glossary.c_rate", "term": "C-rate",
+      "shortDef": "Current normalised to a nominal capacity: 1C nominally empties the cell in one hour.",
+      "trap": "Whether the nominal capacity is theoretical, manufacturer-rated or measured changes what 1C means, so two labs can apply different currents for the same stated rate.",
+      "tags": ["battery", "rate"], "relatedIds": ["formula.c_rate", "concept.rate"] },
+
+    { "id": "glossary.dqdv", "term": "Differential capacitance (dQ/dV)",
+      "shortDef": "How much charge the electrode takes per additional volt — the quantity that orders every storage mechanism.",
+      "trap": "Flat gives a rectangular voltammogram and a linear discharge; peaked gives peaks and a plateau. They are the same function seen two ways, not two behaviours.",
+      "tags": ["chemistry", "CV", "GCD"], "relatedIds": ["mechanism.edl", "mechanism.intercalation"] },
+
+    { "id": "glossary.edlc", "term": "EDLC",
+      "shortDef": "Electrical double-layer capacitor — stores charge electrostatically, with no electron crossing the interface.",
+      "trap": "A near-rectangular voltammogram does not establish that storage is double-layer; broad surface redox looks much the same. Curve shape alone does not separate them.",
+      "tags": ["supercapacitor"], "relatedIds": ["mechanism.edl", "mechanism.pseudo_surface"] },
+
+    { "id": "glossary.esr", "term": "ESR — equivalent series resistance",
+      "shortDef": "The lumped ohmic resistance of the whole current path, read from the voltage step when current changes.",
+      "trap": "Two conventions. At a charge-to-discharge reversal the current changes by 2I, so R = ΔV/(2I); from rest it changes by I, so R = ΔV/I. Mixing them is a clean factor-of-two error.",
+      "tags": ["resistance", "GCD"], "relatedIds": ["formula.esr_from_ir_reversal", "formula.esr_from_ir_rest"] },
+
+    { "id": "glossary.factor_of_four", "term": "Factor of four",
+      "shortDef": "The conversion from a symmetric device's cell capacitance to a single-electrode-equivalent specific capacitance: Cs = 4·I·Δt/(m_total·ΔV).",
+      "trap": "Two electrodes in series halve the capacitance, and the total mass covers both — two times two. It does NOT apply to an asymmetric device, and it is the single most common source of a 4× discrepancy between papers on the same material.",
+      "tags": ["supercapacitor", "reporting"], "relatedIds": ["formula.specific_capacitance_symmetric"] },
+
+    { "id": "glossary.formation", "term": "Formation",
+      "shortDef": "Initial low-rate cycles during which interfacial layers form and stabilise.",
+      "trap": "Formation cycles must never be pooled with steady-state cycles when reporting efficiency or capacity, and normalising retention to cycle 1 flatters the result because cycle 1 is dominated by formation.",
+      "tags": ["battery", "protocol"], "relatedIds": ["method.formation", "concept.provenance"] },
+
+    { "id": "glossary.four_wire", "term": "Four-wire sensing",
+      "shortDef": "Separate leads for driving current and for sensing voltage, so lead resistance is not measured as cell resistance.",
+      "trap": "Where the sense leads physically attach determines what is excluded. Two-wire sensing used without realising is a common cause of an inflated ESR.",
+      "tags": ["instrument", "resistance"], "relatedIds": ["concept.bt_four_wire", "concept.resistance"] },
+
+    { "id": "glossary.gitt", "term": "GITT",
+      "shortDef": "Galvanostatic intermittent titration: short current pulses separated by relaxation, used to extract a diffusion coefficient.",
+      "trap": "The simplified analysis requires τ ≪ L²/D and a voltage linear in √t. Both must be checked from the data at every state of charge, and D depends on L², which is rarely known better than a factor of two.",
+      "tags": ["battery", "kinetics"], "relatedIds": ["formula.gitt_diffusion", "method.gitt"] },
+
+    { "id": "glossary.half_cell", "term": "Half cell",
+      "shortDef": "The electrode of interest measured against a large excess of metal, usually lithium or sodium.",
+      "trap": "The counter electrode is effectively unlimited, so coulombic efficiency flatters and full-cell behaviour cannot be inferred. A half-cell result is an electrode property, not a device property.",
+      "tags": ["battery", "configuration"], "relatedIds": ["concept.normalisation"] },
+
+    { "id": "glossary.ir_drop", "term": "IR drop",
+      "shortDef": "The immediate voltage step seen when current starts, stops or reverses, equal to the current change multiplied by the ohmic resistance.",
+      "trap": "Whether it is inside or outside the ΔV used for a capacitance must be stated. Both conventions appear in the literature and they give different answers.",
+      "tags": ["resistance", "GCD", "diagnostics"], "relatedIds": ["concept.resistance", "formula.esr_from_ir_reversal"] },
+
+    { "id": "glossary.loading", "term": "Mass loading",
+      "shortDef": "Active material mass per unit electrode area, usually mg/cm².",
+      "trap": "Must be reported with every gravimetric result. Values measured at very low loading are systematically flattering and do not transfer to a practical electrode.",
+      "tags": ["preparation", "reporting"], "relatedIds": ["formula.mass_loading"] },
+
+    { "id": "glossary.nyquist", "term": "Nyquist plot",
+      "shortDef": "−Z″ plotted against Z′ across a frequency sweep.",
+      "trap": "Only meaningful with equally scaled axes. On unequal axes a semicircle is not a semicircle and a Warburg line is not 45°, so any angle read off it is a property of the aspect ratio.",
+      "tags": ["EIS"], "relatedIds": ["method.eis", "circuit.w"] },
+
+    { "id": "glossary.ocv", "term": "OCV / OCP",
+      "shortDef": "Open-circuit voltage or potential — what the cell reads with no current flowing.",
+      "trap": "Judge readiness by the drift RATE, not by elapsed time. Slow drift and true equilibrium look identical over a short window, and a steadily falling OCV suggests self-discharge or a soft short rather than slow equilibration.",
+      "tags": ["battery", "workflow"], "relatedIds": ["method.ocv", "method.ocp"] },
+
+    { "id": "glossary.overpotential", "term": "Overpotential (η)",
+      "shortDef": "The potential applied beyond equilibrium to drive a reaction at a useful rate.",
+      "trap": "The measured value includes uncompensated iR drop, which is not overpotential. Quoting η without the current density it was measured at conveys nothing.",
+      "tags": ["kinetics"], "relatedIds": ["concept.overpotential", "formula.tafel_slope"] },
+
+    { "id": "glossary.pseudocapacitance", "term": "Pseudocapacitance",
+      "shortDef": "Charge stored by fast, reversible faradaic reactions that behave capacitively.",
+      "trap": "Faradaic in mechanism, capacitor-like in behaviour — which is why curve shape cannot separate it from double-layer storage. The distinction is whether removing the redox chemistry removes the capacity.",
+      "tags": ["supercapacitor", "chemistry"], "relatedIds": ["mechanism.pseudo_surface", "mechanism.pseudo_intercalation"] },
+
+    { "id": "glossary.ragone", "term": "Ragone plot",
+      "shortDef": "Specific energy against specific power, one point per discharge rate.",
+      "trap": "Interpretable only if every point uses the same normalisation basis. Mixing material-level and device-level points on one plot — common, usually unintended — makes the whole figure meaningless.",
+      "tags": ["reporting", "supercapacitor"], "relatedIds": ["formula.specific_energy_capacitor", "formula.specific_power_capacitor"] },
+
+    { "id": "glossary.retention", "term": "Retention",
+      "shortDef": "Capacity or capacitance at cycle n as a percentage of a reference cycle.",
+      "trap": "The reference cycle is a reporting choice that changes the answer, and it must be stated with the rate and the cycle count. High-rate cycling can show excellent retention simply because less time is spent at the potential extremes.",
+      "tags": ["cycling"], "relatedIds": ["formula.capacity_retention", "formula.capacitance_retention"] },
+
+    { "id": "glossary.scherrer", "term": "Scherrer size",
+      "shortDef": "A crystallite size estimated from X-ray peak broadening.",
+      "trap": "A crystallite is the coherently diffracting domain, not a particle. One particle can contain many crystallites, so the two numbers routinely differ by an order of magnitude and are not interchangeable.",
+      "tags": ["characterisation", "XRD"], "relatedIds": ["technique.xrd"] },
+
+    { "id": "glossary.sei", "term": "SEI",
+      "shortDef": "Solid electrolyte interphase — a passivating layer formed by electrolyte decomposition on the electrode.",
+      "trap": "Its formation consumes charge irreversibly, which is most of the first-cycle capacity loss. Analysing it by XPS requires transfer without air exposure, or you measure a surface that formed on the way to the instrument.",
+      "tags": ["battery", "interface"], "relatedIds": ["technique.xps", "glossary.formation"] },
+
+    { "id": "glossary.specific", "term": "Specific",
+      "shortDef": "Divided by something — mass, area or volume.",
+      "trap": "The most abused word in this field, because the something is almost never stated. Two electrodes can swap rank between bases from geometry alone, so 'better' has no meaning until the constraint is named.",
+      "tags": ["reporting", "normalisation"], "relatedIds": ["concept.normalisation"] },
+
+    { "id": "glossary.staging", "term": "Staging",
+      "shortDef": "Ordered arrangements of intercalated guest ions between host layers, each stable over a composition range.",
+      "trap": "Each stage transition gives a plateau in the discharge curve and a peak in dQ/dV — but a dQ/dV peak is not proof of a phase transition without structural evidence.",
+      "tags": ["battery", "chemistry"], "relatedIds": ["mechanism.intercalation", "technique.xrd"] },
+
+    { "id": "glossary.three_electrode", "term": "Three-electrode cell",
+      "shortDef": "Working, reference and counter electrodes: potential is measured against the reference, current flows to the counter.",
+      "trap": "Separating the potential path from the current path is the entire reason the third electrode exists. A two-electrode cell voltage cannot tell you what either electrode is doing.",
+      "tags": ["workstation", "configuration"], "relatedIds": ["concept.ec_three_electrode", "concept.potential"] },
+
+    { "id": "glossary.warburg", "term": "Warburg element",
+      "shortDef": "A circuit element giving a 45° line in the Nyquist plot, conventionally associated with semi-infinite diffusion.",
+      "trap": "A 45° region is not proof of diffusion. Porous electrodes produce one from distributed pore resistance with no diffusion limitation involved at all — the most common misattribution in supercapacitor impedance work.",
+      "tags": ["EIS", "kinetics"], "relatedIds": ["circuit.w", "formula.warburg_diffusion"] },
+
+    { "id": "glossary.window", "term": "Voltage window",
+      "shortDef": "The potential or voltage range over which a measurement is made.",
+      "trap": "Energy scales with the square of it, so widening the window is the easiest way to make a material look better without changing it. Where it came from — electrolyte stability, redox potentials, or convenience — should be stated.",
+      "tags": ["reporting", "supercapacitor"], "relatedIds": ["concept.energy_power"] }
   ]
 }

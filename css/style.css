@@ -707,6 +707,57 @@ body.gate-open { overflow: hidden; }
 }
 
 /* ============================================================
+   RECORD LAYOUT — method, technique, workflow, safety
+   Shared by several modules, so defined here rather than inside
+   any one of them (see the note in js/lib/method-view.js).
+   ============================================================ */
+
+.mv-block { margin-bottom: var(--sp-5); }
+.mv-head {
+  display: flex; align-items: baseline; gap: var(--sp-3); flex-wrap: wrap;
+  padding-bottom: var(--sp-2); margin-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border);
+}
+.mv-head h2 { margin: 0; font-size: var(--fs-md); }
+.mv-head span { font-size: var(--fs-xs); color: var(--text-muted); }
+.mv-body { font-size: var(--fs-sm); color: var(--text-2); display: grid; gap: var(--sp-3); }
+.mv-body p { margin: 0; }
+.mv-kv { display: grid; gap: var(--sp-2); }
+.mv-kv .k {
+  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-muted); font-weight: 650;
+}
+.mv-kv .v { color: var(--text); }
+
+.param {
+  border: 1px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface-2); padding: var(--sp-3) var(--sp-3);
+}
+.param .pn {
+  font-weight: 600; font-size: var(--fs-sm); color: var(--text);
+  display: block; margin-bottom: .15rem;
+}
+
+/* The controlled/measured bar. Its whole job is to put the §34 distinction
+   at the top of every record, before any prose. */
+.cbar { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-bottom: var(--sp-5); }
+.cbar .cb {
+  display: flex; flex-direction: column; gap: .15rem; padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface); flex: 1 1 150px;
+}
+.cbar .cb .cbk {
+  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-muted); font-weight: 650;
+}
+.cbar .cb .cbv { font-size: var(--fs-sm); font-weight: 600; }
+.cbar .cb.ctrl .cbv { color: var(--accent-strong); }
+.cbar .cb.meas .cbv { color: var(--warn); }
+.cbar .cb.cant .cbv { color: var(--danger); }
+
+.cols { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+/* ============================================================
    UTILITIES
    ============================================================ */
 
