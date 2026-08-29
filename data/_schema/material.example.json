@@ -1,0 +1,61 @@
+{
+  "_": "An electrode material. NOTHING in data/materials.json exists yet, and this template is written from the schema rather than copied from a real record — because writing one from memory is exactly what the first rule forbids. Every number here must carry a citation.",
+  "id": "material.hard_carbon",
+  "_id": "material.snake_case, unique platform-wide.",
+  "name": "Hard carbon",
+  "aliases": [
+    "non-graphitisable carbon"
+  ],
+  "family": "carbon",
+  "_family": "'carbon', 'metal oxide', 'conducting polymer', 'MXene', 'alloy', 'intercalation host'…",
+  "usedFor": [
+    "sodium-ion anode",
+    "supercapacitor electrode"
+  ],
+  "mechanism": "mechanism.intercalation",
+  "_mechanism": "The id of the storage mechanism record. Cross-checked.",
+  "summary": "One or two sentences. What it is and why anyone uses it.",
+  "properties": {
+    "_": "EVERY numeric property is a value object. provenance must be `literature` or `datasheet` with a source, or `measured` with a date. A number with a unit and no provenance is an ERROR and renders as \"Unverified\".",
+    "theoreticalCapacity": {
+      "value": null,
+      "unit": "mAh/g",
+      "provenance": "theoretical",
+      "note": "State the stoichiometry it was derived from."
+    },
+    "reportedCapacity": {
+      "value": null,
+      "unit": "mAh/g",
+      "provenance": "literature",
+      "source": "",
+      "_source": "DOI or full citation. Required — an error without it.",
+      "_note": "A single literature number is rarely meaningful on its own. Prefer a RANGE with the conditions, and say which: rate, electrolyte, voltage window, mass loading."
+    },
+    "specificSurfaceArea": {
+      "value": null,
+      "unit": "m²/g",
+      "provenance": "literature",
+      "source": "",
+      "_note": "Say which technique. BET area is not electrochemically accessible area — see technique.bet."
+    }
+  },
+  "conditions": {
+    "_": "The conditions any reported value was measured under. A capacity with no rate, electrolyte and window is not a comparable number.",
+    "electrolyte": "",
+    "voltageWindow": "",
+    "rate": "",
+    "cellType": "",
+    "massLoading": ""
+  },
+  "preparation": "Reference to the preparation route, or a short description.",
+  "characterisedBy": [
+    "technique.xrd",
+    "technique.bet"
+  ],
+  "_characterisedBy": "Technique ids normally used on this material. Cross-checked.",
+  "limitations": [
+    "What it does badly, and under what conditions."
+  ],
+  "relatedIds": [],
+  "tags": []
+}

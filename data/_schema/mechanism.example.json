@@ -1,0 +1,36 @@
+{
+  "_": "A storage mechanism. No single curve identifies one, so the record has to say how to tell it from its neighbours.",
+  "id": "mechanism.edl",
+  "name": "Electrical double layer",
+  "family": "capacitive",
+  "short": "EDL / EDLC",
+  "summary": "Charge is stored electrostatically in the layer of ions that assembles at the electrode surface. No electron crosses the interface, and no bond changes.",
+  "whatHappens": "Applying a potential attracts counter-ions to the surface and repels co-ions, forming a compact layer of separated charge a few ion diameters thick. The charge is held by electrostatics alone, like a capacitor with a very small plate separation and a very large area.",
+  "whereChargeGoes": "The surface, and only the surface. Storage scales with accessible area, not with volume.",
+  "inCV": "A rectangle. Current is roughly constant across the window and reverses sign immediately at each vertex, because there is no reaction to wait for.",
+  "inGCD": "A straight line. Voltage falls linearly with time, which is the definition of constant capacitance.",
+  "dQdV": "Flat, or nearly so — the electrode takes roughly the same charge per volt everywhere in its window.",
+  "rateBehaviour": "Fast. There is no charge-transfer step, so the rate limit is ion transport into the pores — which is why pore size and wetting dominate rate capability rather than any chemistry.",
+  "distinguishFrom": [
+    "Versus surface pseudocapacitance: both give near-rectangular CVs, and that shape alone does NOT separate them. A double layer stores no charge faradaically, so its capacitance is largely insensitive to the redox chemistry of the electrolyte; a pseudocapacitive contribution disappears when the couple is removed. Comparing electrolytes, not curve shapes, is what separates them.",
+    "Versus battery-type: look at the discharge line. A genuine double layer is linear over the whole window; a plateau anywhere means charge is going somewhere else."
+  ],
+  "_distinguishFrom": "REQUIRED — an error if absent, a warning with only one entry. Each entry names a neighbouring mechanism and the experiment that separates them.",
+  "quantityToReport": "Capacitance (F, F/g, F/cm²) is meaningful here, because a single value describes the electrode across its whole window.",
+  "_quantityToReport": "Which quantity may honestly be reported for this mechanism — capacitance in F/g, or capacity in mAh/g. Reporting the wrong one is the practical consequence of misidentifying it.",
+  "misread": [
+    "Attributing all of a carbon electrode's capacitance to the double layer when surface functional groups are contributing faradaically",
+    "Explaining a capacitance difference by BET area alone — the accessible area, not the measured area, is what stores charge"
+  ],
+  "degradation": "Slow, because nothing is transformed. What fails is usually the electrolyte at the window edges, the binder, or the contact — not the carbon.",
+  "relatedIds": [
+    "mechanism.pseudo_surface",
+    "technique.bet",
+    "formula.specific_capacitance"
+  ],
+  "tags": [
+    "supercapacitor",
+    "carbon",
+    "capacitive"
+  ]
+}

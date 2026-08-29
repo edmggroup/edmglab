@@ -1,0 +1,34 @@
+{
+  "_": "A core idea. ONE record holds both depths — that is what stops the plain and the research versions drifting apart as different people edit them over the years. The health check errors if neither is present, and warns if either is.",
+  "id": "concept.capacitance_vs_capacity",
+  "_id": "concept.snake_case, unique platform-wide.",
+  "title": "Capacitance and capacity are different quantities",
+  "symbol": "C  vs  Q",
+  "siUnit": "F (farad)  vs  C or mAh",
+  "learnMode": {
+    "simpleDefinition": "Capacity is how much charge fits. Capacitance is how much charge fits per volt. They are not two names for the same thing, and they are not interconvertible without knowing the shape of the curve.",
+    "physicalMeaning": "For a capacitor, voltage rises steadily as charge goes in, so charge-per-volt is a fixed number worth reporting. For a battery, voltage sits on a plateau while charge goes in, so charge-per-volt is enormous on the plateau and tiny off it — there is no single number to report.",
+    "example": "Ask which one your electrode has by looking at its discharge curve. A straight line means capacitance. A plateau means capacity."
+  },
+  "_learnMode": "Plain language. simpleDefinition, physicalMeaning, example. No unexplained jargon — assume a first-year undergraduate.",
+  "researchMode": {
+    "scientificDefinition": "Capacitance is the derivative dQ/dV. Capacity is the integral ∫dQ over a stated window. A capacitance is meaningful as a single value only where dQ/dV is close to constant across the window.",
+    "mathematicalTreatment": "C = I·Δt/ΔV computes the AVERAGE of dQ/dV over the window. For a genuine capacitor that average equals the value everywhere and is window-independent. For a plateaued electrode it depends entirely on where the window sits — the interactive demonstration in Storage Chemistry shows the same electrode returning values a factor of fifty apart.",
+    "experimentalInterpretation": "Test window-independence rather than assuming it: compute C over two different sub-windows. If they disagree materially, capacitance is not the quantity to report.",
+    "limitations": [
+      "Converting a quoted capacitance to a capacity, or the reverse, requires the voltage window and an assumption about curve shape. Papers that do this silently are not comparable with those that do not.",
+      "F/g and mAh/g describe the same electrode. Choosing whichever is the larger-looking number is a reporting decision, not a measurement."
+    ],
+    "researchConsiderations": [
+      "For anything between the two extremes, reporting the differential capacitance C(V) as a curve is more honest than any single averaged value."
+    ]
+  },
+  "_researchMode": "scientificDefinition, mathematicalTreatment, experimentalInterpretation, limitations[], researchConsiderations[]. Write the qualifications you would say out loud.",
+  "relatedIds": [
+    "mechanism.edl",
+    "mechanism.intercalation",
+    "formula.specific_capacitance",
+    "formula.specific_capacity"
+  ],
+  "_equationIds": "Formula ids this concept is computed by. Checked — a typo is an error, not a dead link."
+}

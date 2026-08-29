@@ -1,0 +1,55 @@
+{
+  "_": "A characterisation technique. The page leads with what it CANNOT tell you, and so should the record.",
+  "id": "technique.bet",
+  "name": "Nitrogen physisorption — BET surface area and pore analysis",
+  "abbrev": "BET",
+  "family": "surface",
+  "summary": "Measures how much gas a surface adsorbs at a series of pressures, and converts that isotherm into a specific surface area and a pore-size distribution.",
+  "probes": "nitrogen gas at successive relative pressures, at its boiling point of 77 K",
+  "detects": "the quantity of gas adsorbed and desorbed — the isotherm",
+  "answers": [
+    "A specific surface area, on the assumptions of the BET model",
+    "The shape of the isotherm, which is itself the most informative output and should always be shown",
+    "A pore-size distribution, once a model is chosen and stated",
+    "Total pore volume, and the split between micropores and larger pores"
+  ],
+  "cannotTell": [
+    "The ELECTROCHEMICALLY ACCESSIBLE area. This is the one that matters here. Nitrogen at 77 K reaches pores a solvated ion at room temperature cannot enter, and wetting can exclude regions nitrogen entered freely. A high BET area is not a promise of high capacitance, and the correlation between them across materials is weak.",
+    "A defensible surface area for a strongly microporous material. The BET model assumes multilayer physisorption on an open surface; in micropores the pores fill instead, so the model's assumptions do not hold. The number is still universally reported — which is a convention, not a justification — and the pressure range used has to be stated because it changes the answer.",
+    "A pore size independent of the model. BJH, DFT and NLDFT applied to the same isotherm give different distributions. The model is part of the result and must be reported with it.",
+    "Anything about pores that nitrogen cannot enter within the measurement, including closed porosity.",
+    "Whether the sample was properly degassed. Incomplete degassing lowers the measured area, and it leaves no signature in the final number."
+  ],
+  "_cannotTell": "REQUIRED — an error if absent, a warning if it has only one entry. Nearly every characterisation mistake in this field is a technique applied outside the question it can answer, and the wrong answer still looks like a result.",
+  "misread": [
+    "Presenting BET area as if it were the electrochemically active area",
+    "Comparing BET areas measured after different degassing conditions",
+    "Quoting a pore size without naming the model that produced it",
+    "Explaining a capacitance difference by a BET-area difference alone"
+  ],
+  "_misread": "The specific wrong conclusion people draw. BET area presented as electrochemically accessible area; Scherrer size as particle size.",
+  "sample": {
+    "form": "Dry powder",
+    "amount": "Enough total surface area for a good measurement — a low-area material needs a lot more mass than a high-area one",
+    "prep": "Degassing under vacuum or flowing gas, at a temperature and for a time that must both be reported. Too gentle leaves adsorbed water and understates the area; too harsh changes the material.",
+    "destructive": "Non-destructive if degassing conditions were mild enough — which is a judgement, not a given",
+    "notes": "Measuring a whole electrode rather than the active powder measures the binder and the conductive additive too."
+  },
+  "reportWith": [
+    "Adsorptive gas and temperature",
+    "Degassing temperature, duration and atmosphere",
+    "The relative-pressure range used for the BET fit",
+    "The model used for any pore-size distribution",
+    "The isotherm itself — a surface area quoted without its isotherm cannot be checked"
+  ],
+  "_reportWith": "What must be quoted alongside the number for it to be reproducible.",
+  "relatedIds": [
+    "technique.particle_size",
+    "technique.sem"
+  ],
+  "tags": [
+    "surface area",
+    "porosity",
+    "supercapacitor"
+  ]
+}

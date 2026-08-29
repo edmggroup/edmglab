@@ -1,0 +1,92 @@
+{
+  "_": "An equation, and — if it carries an `expression` — a calculator generated from this record. See CONTRIBUTING.md for the four extra rules a computable formula must satisfy.",
+  "id": "formula.c_rate",
+  "name": "C-rate from an applied current",
+  "domain": "battery",
+  "plainText": "C-rate = I / Q_nominal",
+  "latex": "\\mathrm{C\\text{-}rate} = \\dfrac{I}{Q_{\\mathrm{nominal}}}",
+  "expression": "I/Q_nom",
+  "_expression": "Optional. Present = the workbench offers a calculator. Parsed by js/lib/expr.js (never eval). Every symbol must appear in variables[], every variable must declare units[], and result.units[] is required — all four are ERRORS if missing.",
+  "aliases": [
+    "C rate",
+    "C-rate",
+    "charge rate",
+    "1C"
+  ],
+  "variables": [
+    {
+      "symbol": "I",
+      "name": "Applied current",
+      "siUnit": "A",
+      "units": [
+        {
+          "u": "mA",
+          "f": 0.001
+        },
+        {
+          "u": "A",
+          "f": 1
+        }
+      ],
+      "default": 0.85
+    },
+    {
+      "symbol": "Q_nom",
+      "name": "Nominal capacity",
+      "siUnit": "A·s",
+      "units": [
+        {
+          "u": "mAh",
+          "f": 3.6
+        },
+        {
+          "u": "Ah",
+          "f": 3600
+        }
+      ],
+      "default": 0.85,
+      "note": "Theoretical capacity, manufacturer rating, or the capacity this electrode actually delivered? The three give different currents for '1C' and the basis must be stated."
+    }
+  ],
+  "_variables": "units[].f is the factor converting that unit to siUnit. mg→kg is 1e-6. Check these by hand: the health check verifies the expression parses, not that your arithmetic is right, and mAh/g is 3600 rather than 3.6.",
+  "result": {
+    "name": "C-rate",
+    "siUnit": "1/s",
+    "units": [
+      {
+        "u": "C (per hour)",
+        "f": 0.0002777777777777778
+      },
+      {
+        "u": "1/h",
+        "f": 0.0002777777777777778
+      }
+    ]
+  },
+  "validContext": {
+    "cellType": "any",
+    "deviceConfig": "any",
+    "performanceLevel": "electrode or device",
+    "note": "1C nominally means the full nominal capacity in one hour. Whether Q_nominal is theoretical, rated or measured changes the meaning entirely."
+  },
+  "_validContext": "REQUIRED. cellType, deviceConfig, performanceLevel, and a note saying what a reader would otherwise get wrong. The single-electrode and symmetric-device forms of the same quantity differ by a factor of four.",
+  "assumptions": [
+    "Q_nominal is defined on the same basis as the current is applied — per gram of active material, or per cell.",
+    "The nominal capacity is appropriate to this material and window, not carried over from another chemistry."
+  ],
+  "limitations": [
+    "A convenience, not a physical property. Two laboratories quoting 1C for the same material can be applying different currents.",
+    "For materials with no well-defined nominal capacity — most carbons in supercapacitor use — current density is the clearer quantity.",
+    "A C-rate defined against the wrong nominal capacity is a common route to an unintended overcurrent."
+  ],
+  "_limitations": "Every equation has conditions it fails under. A record with none warns.",
+  "relatedIds": [
+    "glossary.cccv"
+  ],
+  "tags": [
+    "battery",
+    "rate capability",
+    "cycling",
+    "C-rate"
+  ]
+}

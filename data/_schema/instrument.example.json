@@ -1,0 +1,10 @@
+{
+  "_": "YOUR OWN HARDWARE. The full annotated template lives in the real file, data/instruments.json, under `_template` — copy it from there rather than from here, so it cannot drift. This file exists only so that every record shape has an entry in this folder.",
+  "_see": "data/instruments.json → _template",
+  "_rules": [
+    "Every specification is a value object with provenance `datasheet` and a source that names the manual AND its version. Vendors revise specifications between editions.",
+    "Copy the vendor’s accuracy wording exactly, including whether it is % of reading or % of range — those differ by a lot at low current.",
+    "The quirks are the reason the file exists. \"Channel 7 reads about 2 mV low, verified March 2026\" exists nowhere else.",
+    "A quirk with no date is a rumour. Record who verified it and when."
+  ]
+}

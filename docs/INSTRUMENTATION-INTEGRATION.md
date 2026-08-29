@@ -925,3 +925,442 @@ end to end: none lands on a placeholder or a blank page.
 **Electrode Materials (P7) is the only module still showing a phase badge**, and it stays that way
 until the group supplies sourced literature values. Building it from remembered numbers would break
 the first rule this platform was given.
+
+---
+
+## 16. Offline readiness and accessibility (Roadmap P13)
+
+Nothing new was authored in this pass. It audited what already existed against three claims the
+platform had been making, found each of them partly false, and fixed them. Every check now runs
+from `tools/`, so none of it depends on anyone remembering.
+
+### 16.1 "It works offline" was true only for pages you had already opened
+
+The service worker precached the app shell, so the interface opened without a network. But content
+files and the chart library were fetched on first use — which means they were in the cache only for
+the pages somebody had already visited. Install EDMGLAB in the office, walk into a basement lab,
+open the CV simulator for the first time: no chart library, no method records, an empty page. That
+is exactly the situation this platform exists for.
+
+The fix is a **warm-up**. A few seconds after boot, once the browser is idle, the app hands the
+service worker the list of everything else — every registered content file and the three vendor
+scripts — and the worker fetches whatever it does not already hold.
+
+Measured, on a fresh profile that opened **only the home page**: 69 shell entries and 24 content
+files in the cache. Then with the network cut at the browser, all 130 routes render and 19 chart
+canvases draw.
+
+Two decisions worth recording:
+
+- **The page owns the list, the worker owns the caches.** The list comes from the `REGISTRY` in
+  `js/data.js`, which is already the one place that knows where content lives; it crosses to the
+  worker in a message. The alternative — a second list of data files inside `service-worker.js` —
+  is the same hand-maintained duplication that made the `SHELL` list worth auditing in the first
+  place, and it would rot the first time somebody added a data file.
+- **It does not run on a metered connection.** `navigator.connection.saveData`, `2g` or `slow-2g`
+  and the warm-up is skipped with a console note. Someone on a phone plan should not have a
+  megabyte spent for them without being asked; `#/health` has a button for that case.
+
+### 16.2 The `SHELL` list was an intention nobody could check
+
+It turned out to be complete — but only by luck, and nothing would have said otherwise. Two things
+now check it. `tools/offline-audit.mjs` compares every file the app actually requests against the
+list, in both directions. And `#/health` gained an **Offline readiness** panel that asks the
+service worker what it *really* holds, per group, with the files it is missing and a button to
+fetch them. Before anyone tells a student "just use it offline", they can look.
+
+### 16.3 Four registered data files did not exist
+
+`calculators`, `troubleshooting`, `bt/protocols` and `shared/instrument-choice` were in the
+registry and 404ing on every health-check run. No view loaded any of them: the workbench is built
+from `formulas.json`, troubleshooting lives per module, and the protocol builder and instrument
+chooser are code rather than content. They are gone. `materials` stays — it is a real file that
+has not been written yet, and the health check says so honestly.
+
+### 16.4 Accessibility: what the audit found
+
+`tools/a11y-audit.mjs` walks all 130 routes in both themes. First run:
+
+| Finding | Cause | Fix |
+|---|---|---|
+| Neither overlay contained focus | `aria-modal` does not stop Tab; nothing did | `js/lib/focus-trap.js` — tab cycling plus `inert` on everything outside |
+| Neither overlay restored focus | No record of where focus came from | The trap returns it; a navigation sends it to `<main>` instead |
+| 150 contrast failures | Four tokens, measured on real backgrounds | Tokens re-derived from what the audit measures |
+| Two unlabelled selects | Result-unit pickers announced as "combo box" | `aria-label` |
+| Three targets under 24×24 | Reorder/delete buttons at 18×20 | 26×26 minimum |
+| Focus invisible on the CSV drop zone | Its focus style was identical to hover, with `outline:none` | A real outline; keyboard focus must not look like hover |
+| Heading levels skipped in 8 places | `h4` under an `h2`, `h3` under an `h1` | Levels corrected |
+
+**Contrast is measured, not asserted.** A token can be perfectly fine in isolation and fail once it
+lands on a callout that has its own wash. `--accent` read 4.34:1 for a link inside a callout while
+reading 5.9:1 on the page. The audit paints each colour into a 1×1 canvas and composites stacked
+translucent layers, because `color-mix()` and `color(srgb …)` reach computed style in forms a
+regular expression gets wrong — the first version of this audit invented 26 failures that way and
+would have sent us adjusting colours that were fine.
+
+Changed: `--text-muted` in both themes, and in the light theme `--accent`, `--ok` and `--warn`,
+with their washes, provenance colours and chart series kept in step. All 130 routes × 2 themes now
+pass AA.
+
+### 16.5 The type floor
+
+`--fs-2xs: 0.75rem` is now the floor, and every rule that was below it — nav numerals, the utility
+rail, the bottom bar, instrument vendor strings, protocol-builder labels, dashboard pathway
+numerals, method chips — goes through it. `code`/`.num`/`.unit` keep their 0.94 optical correction
+via `max(0.94em, var(--fs-2xs))` rather than dropping under the floor in small contexts.
+
+`.wf-cm` was found defined in two modules' inline `<style>` blocks. It is in `css/style.css` now.
+That is the fourth instance of the same defect (`.tabbar`, `.lim-list`, `.mv-*`): a class used by
+more than one module must live in the shared stylesheet.
+
+### 16.6 The header made every page scroll sideways at 390 px
+
+Hamburger, wordmark, search, the Learn/Research switch and the theme toggle came to 463 px in a
+flex row that cannot shrink, which pushed the whole grid to 463 px. Below 600 px the wordmark is
+now hidden — the mark still identifies the app, whereas the mode switch and search are controls.
+**Do not fix a future overflow here by shortening the mode labels**: "Learn" and "Research" are the
+two states of the entire content model, and an abbreviation of either is a guess the reader has to
+make.
+
+### 16.7 Diagram labels on a phone, and why "Enlarge" rather than bigger type
+
+The conceptual scenes are drawn on a wide viewBox — a cell is a wide thing — and the stage scales
+to the column. On a 390 px phone that is roughly half scale, so a secondary annotation declared at
+11 user units renders at about 5.7 px. Twenty labels were below the floor, all of them inside
+diagrams.
+
+Three ways out, and only one of them survives contact with the constraints:
+
+- Let the diagram scroll sideways — forbidden; nothing scrolls.
+- Raise the type until it clears 12 px in the column — that needs 21 user units at phone scale,
+  which wrecks every layout at every other width.
+- Give the diagram the whole screen when someone asks for it.
+
+`js/lib/anim-fullscreen.js` does the third. On a phone held upright the gain comes from **rotating
+the diagram onto the long edge**: 844 px instead of 390. Measured on `#/battery-tester/transport`,
+the smallest label goes from 4.5 px to 7.6 px and the largest from 8.5 px to 14.6 px; on
+`#/workstation/electrodes`, from 5.3 px to 9.3–11.9 px. On a wide screen there is nothing to gain
+from rotating, so it does not — it just uses the full viewport, and labels land at 16–31 px.
+
+The control is part of the engine's **standard control set**, so no scene can ship without it, and
+`addEnlargeControl()` gives the same thing to the diagrams that are built without a player around
+them — the three-electrode cell, the cell-format stack, and every block diagram.
+
+Alongside that, `label()` and `readout()` now clamp to a floor of 11 user units. Scenes had been
+passing 9.5 and 10 for secondary annotations: fine on the monitor they were drawn on, 4.6 px on a
+phone. A clamp in the component means no scene can reintroduce it and there is no list of call
+sites to keep in step.
+
+**What is still true**: in-column on a phone, seven diagram labels sit between 5 px and 10.5 px.
+That is a property of drawing a 720-unit-wide cell in a 348 px column, and the audit reports it
+separately rather than pretending it is fixed. Every one of those diagrams now offers a way to a
+readable size, and the audit fails if any diagram carrying text does not.
+
+### 16.8 Verification
+
+| Check | Result |
+|---|---|
+| Offline, cold start, home page visited only | 130/130 routes render · 19 chart canvases draw · 0 failures |
+| `SHELL` vs files actually requested | complete, both directions |
+| Accessible names · focus visibility · heading order · form labels · target size | 0 findings, 130 routes × 2 themes |
+| WCAG AA contrast, measured on rendered backgrounds | 0 failures, 130 routes × 2 themes |
+| Focus containment and restoration, both overlays | contained · background `inert` · focus restored |
+| Reduced motion | still frame, engine-enforced |
+| Sideways scrolling · block overflow · menu scrolling | none, 130 routes × 3 widths |
+| Charts inside their box, including pinned axes | none outside |
+| HTML text below the type floor | none |
+| Every text-bearing diagram offers Enlarge | yes, all three widths |
+| Console errors across all routes | none, except the deliberate `materials.json` probe on `#/health` |
+| Data health check | 17 files · 180 records · 0 errors · 0 warnings |
+| Sidebar fits without scrolling | 1024 / 1180 / 1280 / 1440 / 1680 px |
+
+Cache version `edmglab-v18`.
+
+---
+
+## 17. Phase 13 completed: the performance budget and the contributor guide
+
+§16 did the accessibility half of Phase 13. Its other two exit criteria were still open: *"budget met"* against the §I.1 table, and *"a new member adds content unsupervised"*.
+
+### 17.1 The budget was a table nobody had measured
+
+`tools/perf-audit.mjs` measures each of the seven targets rather than trusting the design that was meant to hit them. "Interactive" is taken as the moment the first view has actually rendered content — not `DOMContentLoaded`, which on a single-page app fires while the screen is still blank and would flatter every number. "Campus wifi" is emulated at 12 Mbit/s with a 40 ms round trip.
+
+Six of the seven passed on the first run, most of them by a wide margin. One did not:
+
+| Metric | Target | Before | After |
+|---|---|---|---|
+| Shell payload, uncompressed | 150 KB | **178.2 KB** | **137.4 KB** |
+| First visit → interactive | 1500 ms | 503 ms | 417 ms |
+| Repeat visit → interactive (offline) | 400 ms | 140 ms | 123 ms |
+| View switch, data loaded | 100 ms | 16 ms | 18 ms |
+| View switch, lazy module + data | 300 ms | 42 ms | 42 ms |
+| Search results | 50 ms | 1.7 ms | 2.8 ms |
+| CSV import, 50 000 rows → first plot | 2000 ms | 634 ms | 628 ms |
+
+### 17.2 Three features were on the boot path that had no business being there
+
+The 28 KB overshoot was not spread thinly. It was three modules, 41 KB between them, each loaded on every visit for a function almost nobody would call:
+
+- **`charts.js` (14.2 KB)** — `app.js` imported it for one line: re-theme live charts when the theme is toggled. §I.2 already claimed "Chart.js never downloads for a student who only reads concept pages" — and that was true of Chart.js itself. The *wrapper* was downloading regardless.
+- **`anim-engine.js` (12.0 KB)** — imported for one line: pause animations when the tab is hidden.
+- **`access.js` (14.8 KB)** — awaited before the shell renders, because the PIN gate must be resolved before anything paints. But the gate ships **off**, so for essentially every visit the 12 KB of PBKDF2, lockout arithmetic and gate markup answered a question that was already "no".
+
+The first two are now reached through the module cache instead of the import graph:
+
+```js
+function loadedModule(flag, path) {
+  return window[flag] ? import(path) : null;
+}
+```
+
+A bare `import()` would fetch the module, which is the thing being avoided; and there is no way to ask the module map "is this already there?" without starting that import. So each module raises a one-line flag when it first evaluates, and `app.js` asks the flag. If a view has drawn a chart, `charts.js` is in memory and re-theming works. If nobody has, there is nothing to re-theme and nothing is fetched. Verified: on `#/glossary`, toggling the theme and hiding the tab requests neither file; on `#/workstation/cv`, toggling the theme changes the chart's grid colour from `#e2e7ed` to `#232a34`.
+
+`access.js` was split rather than deferred, because it genuinely must run before first paint. What must run is small: fetch `data/access.json`, and if the gate is off, return. Everything that only matters when the gate is **on** — crypto, lockout, session, the gate screen — moved to `js/lib/access-gate.js`, which `access.js` imports dynamically once the config says so. The admin panel imports it directly, because generating a configuration must use the *same* derivation the gate verifies with, or a generated PIN would not work.
+
+Round-trip verified with a real gated config: gate shown, shell hidden, `access-gate.js` fetched **only** in the gated case, wrong PIN refused, correct PIN admits, session remembered across a reload.
+
+### 17.3 A cross-reference field nobody was checking
+
+Writing the contributor guide meant reading the health check line by line to describe it accurately, and that turned up `teaches` — the field linking each quiz question to the records it is about. It was not in `REF_FIELDS`, so roughly fifty cross-references had never been validated. They all resolve, as it happens. The point is that nothing would have said otherwise.
+
+This is the third time the same shape of defect has appeared: a list maintained by hand that nothing checks against reality — the service worker's `SHELL`, the data registry's dead keys, and now `REF_FIELDS`. The comment above it now says: if you add a field that holds ids, add it here.
+
+### 17.4 CONTRIBUTING.md, rewritten against the code rather than from memory
+
+The old guide named four files that no longer exist, missed eleven that do, and documented five of the health check's rules out of the twenty-odd it now enforces. The rewrite was generated by reading the actual `REGISTRY`, the actual rule set in `health.js`, and the actual field names in the data — then checked back: every record id used as an example resolves, and the documented expression grammar is the real `FUNCTIONS` table from `expr.js`, not a remembered subset.
+
+It also now distinguishes the two kinds of file — record collections with an `items` array, and `_kind` documents holding a tree or a guide — which is the thing that most confuses somebody opening `data/` for the first time.
+
+### 17.5 Verification
+
+| Check | Result |
+|---|---|
+| Performance budget, all seven §I.1 targets | 7/7 met |
+| Lazy modules: theme toggle re-themes a live chart | grid colour changes; module not fetched on a text-only page |
+| Lazy modules: hiding the tab pauses animations | Pause → Play; module not fetched on a text-only page |
+| PIN gate round trip with a real generated config | gate shown, wrong PIN refused, correct PIN admits, remembered on reload |
+| `access-gate.js` fetched only when the gate is on | confirmed |
+| Offline, cold start, home page visited only | 130/130 routes · 19 canvases · 0 failures |
+| Accessibility, 130 routes × 2 themes | 0 findings across all six checks |
+| Standing requirements, 130 routes × 3 widths | no scrolling · no overflow · no chart outside its box |
+| Data health check | 17 files · 180 records · 0 errors · 0 warnings |
+| Every id used as an example in CONTRIBUTING.md | resolves |
+
+Cache version `edmglab-v19`. **Phase 13 is complete.**
+
+---
+
+## 18. Corrections (Roadmap P14)
+
+Every roadmap phase through 13 is built. What was left was the thing standing between the platform and actual use: **fifty-five thousand words of draft science that nobody has reviewed**, and no way for a reader who spots an error to do anything about it.
+
+The people best placed to catch a mistake — whoever actually runs that measurement — are the least likely to open a JSON file on GitHub to fix it. So a reader who notices something wrong had nowhere to put it. It stayed in their head, and it stayed on the page.
+
+### 18.1 The rule this is built around
+
+**Never tell someone their correction was submitted when it was not.** A static site cannot write to its own repository, and a "submit" button that quietly discards what somebody typed is worse than no button at all — it converts a person who would have mentioned it in the lab into a person who thinks they already did.
+
+So everything typed is written to a local queue **before** anything is attempted, and only marked sent once a destination has actually accepted it. A closed tab, a failed request or a blocked pop-up loses nothing.
+
+### 18.2 Three destinations, and the interface names which one before you press the button
+
+| Mode | Needs | What happens |
+|---|---|---|
+| `github` | **nothing** | Opens a pre-filled GitHub issue on the repository this site is served from |
+| `endpoint` | someone to deploy the Apps Script | POSTs to a Google Sheet — the §J design, and the Phase 14 exit criterion |
+| `none` | — | Copies and stores locally, and says plainly that nothing was sent |
+
+The default needs no configuration at all, because a GitHub Pages URL is structured enough to read:
+
+```
+owner.github.io/repo/…  →  owner/repo
+owner.github.io/…       →  owner/owner.github.io
+```
+
+Anything else — a custom domain, a local server — is **not** derivable, and guessing would produce a link to somebody else's repository. `repoFromLocation()` returns `null` there and the mode drops to `none` rather than inventing an address. Verified on all five shapes.
+
+`issueUrl()` caps the body at 5800 characters: GitHub rejects a URL beyond roughly 8 KB, and a correction long enough to blow that would otherwise produce a dead link. A 20,000-character body yields a 6 KB URL, the full text goes to the clipboard, and the interface says so.
+
+A GitHub correction is reported as **"opened"**, never "sent" — the issue is not filed until the reader presses Submit on GitHub, so it stays in the local queue with a *Mark done* button until they say otherwise.
+
+### 18.3 The footer lives outside the view outlet
+
+The way in is one line under every page, carrying the route it was clicked from. It is a **sibling** of `#view-outlet`, not a child, and that is load-bearing: thirty-one places in the codebase assign to `outlet.innerHTML`, several of them in event handlers long after `render()` has resolved. Anything appended inside the outlet would vanish the first time a view redrew itself. Verified against `#/health`, which rewrites its own outlet twice after rendering.
+
+It is hidden on `/suggest`, `/admin` and `/menu` — none of those is content anyone would be correcting.
+
+### 18.4 A router fix the feature needed
+
+`#/suggest?about=#/formula/c_rate` did not match the `/suggest` route: `currentPath()` returned the whole hash including the query, so the segment matcher saw `suggest?about=…` and fell through to "not found". The query is now split off before matching and exposed as `ctx.query`. Any future view can carry context in a link.
+
+### 18.5 The optional Sheet backend
+
+`docs/apps-script/Code.gs` plus a deployment guide. It creates its own tab with a frozen header, appends rows, never overwrites the two reviewer columns (Status, Notes), and has a `selfTest()` to run from the editor before deploying.
+
+Three things in it are worth recording because each one costs an hour to rediscover:
+
+- **`Content-Type: text/plain`, not JSON.** Apps Script Web Apps do not answer the CORS preflight that `application/json` triggers, so the identical request succeeds from `curl` and fails in the browser. `text/plain` is a simple request; the script parses the body itself.
+- **Deploy as "Me", access "Anyone".** Not "anyone with a Google account" — that also demands a sign-in the browser cannot complete cross-origin.
+- **Editing is not deploying.** Apps Script keeps serving the deployed version. Everyone gets caught by this once.
+
+And the honest warning, which is in the script's own header, in the guide, and on the health page: **the endpoint URL is public in a public repository, so anyone who finds it can write a row.** There is no authentication and there cannot be one from a static page. That is an acceptable trade for a correction inbox — the worst case is junk rows, which take a moment to delete — and it is not acceptable for anything else, so the guide says not to reuse the pattern.
+
+### 18.6 Verification
+
+| Check | Result |
+|---|---|
+| Footer present on content routes, hidden on `/suggest`, `/admin`, `/menu` | correct |
+| Footer survives a view that rewrites its own outlet | survives |
+| Query string reaches the view and pre-fills page and record | correct |
+| Repo derivation: project site, deep path, org site, custom domain, localhost | 5/5 correct, `null` for the last two |
+| Issue URL: host, path, title, labels, body | well formed, 576 characters |
+| 20,000-character correction | truncated, 6 KB URL, under GitHub's limit |
+| Submission with no destination | queued, copied, and the interface says nothing was sent |
+| `Code.gs` syntax | parses |
+| Accessibility, 131 routes × 2 themes | 0 findings across all six checks |
+| Standing requirements, 131 routes × 3 widths | no scrolling · no overflow · nothing outside its box |
+| Offline, cold start, home page only | 131/131 routes · 0 failures · 26/26 content files cached |
+| Performance budget | 7/7 met, shell 141.4 KB |
+| Data health check | 17 files · 180 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v20`. **Phase 14 is built on the client side and ready; the Sheet half is a deployment the group makes when it wants it.**
+
+---
+
+## 19. Getting it onto a phone (Roadmap P15)
+
+The last roadmap item, and the one where the most useful thing to deliver was an honest account of what is not worth doing.
+
+### 19.1 The finding that saves a week
+
+**EDMGLAB already installs on a phone, and a Play Store build adds distribution rather than capability.** Add to Home Screen in Chrome gives an icon, the app's own name and mark, a full-screen window with no browser chrome, complete offline operation, and updates that arrive the next time the phone is online with no store review. A Trusted Web Activity is a window onto the same site — no copy of the content, no second build, no second codebase — and it costs a signing key kept for the life of the app, a Play Console account, and the obstacle in §19.3.
+
+So `docs/android/README.md` opens by telling the reader they probably do not need it, and only then explains how.
+
+### 19.2 The PWA was already installable — now measured
+
+`tools/pwa-audit.mjs` asks Chrome itself through `Page.getAppManifest`, rather than re-implementing its rules. All fourteen install criteria were already met. Three of six quality items were not, and those decide whether Android shows the **rich install dialog with a preview** or the one-line bar people dismiss without reading — which matters for an app a supervisor is asking students to install.
+
+| | Before | After |
+|---|---|---|
+| Install criteria | 14/14 | 14/14 |
+| `id` | missing | `"./"` — resolved against the manifest URL, so it stays correct at a domain root or a project path, and the app's identity survives a change to `start_url` |
+| Screenshots, phone | none | 2 × 412×915 |
+| Screenshots, desktop | none | 2 × 1280×800 |
+
+The screenshots are captured from the running app, not mocked, and Chrome requires every screenshot of a given form factor to share one aspect ratio — hence two fixed sizes. They are deliberately **not** in the service worker's `SHELL`: nothing requests them at boot, so they cost the payload budget nothing.
+
+**The maskable icon was checked rather than assumed.** A maskable icon whose artwork strays outside the inner 80% circle is clipped on Android, and it is not obvious by looking. Measuring the content bounding box: the artwork's furthest corner is 161 px from centre against a 205 px safe radius. It is fine. The two `purpose: "any"` icons extend to their edges, which is correct — those are never masked.
+
+### 19.3 Digital Asset Links cannot live in this repository
+
+This is the obstacle specific to how the site is hosted, and it would otherwise be discovered late.
+
+Android verifies that an app and a website share an owner by fetching `https://<domain>/.well-known/assetlinks.json` — **the domain root, not the site path.** With a GitHub Pages project site:
+
+```
+https://edmggroup.github.io/edmglab/                       ← the site
+https://edmggroup.github.io/.well-known/assetlinks.json    ← where Android looks
+```
+
+That file has to be in the `edmggroup.github.io` repository. This one cannot serve anything at the domain root; a file committed here lands at `/edmglab/.well-known/assetlinks.json`, where nothing will ever look for it. So `docs/android/assetlinks.json` ships as a **template**, not in place — a half-configured file at a path that only works in one configuration would be worse than none.
+
+Three real ways out, ranked: a custom domain for this repo (cleanest — the repo then serves its own root); the file in the org site repo (works, needs whoever controls it); or skip verification, in which case the app runs but shows the URL bar and looks like a browser tab with extra steps.
+
+### 19.4 What ships
+
+- `docs/android/README.md` — the guide, leading with "you probably do not need this"
+- `docs/android/twa-manifest.json` — a Bubblewrap configuration with everything derived from `manifest.json` and exactly two fields marked REPLACE, both of which are things only the group can supply: the package identifier and the host
+- `docs/android/assetlinks.json` — the Digital Asset Links template
+- `tools/pwa-audit.mjs` — the sixth audit
+
+The guide also records what does **not** need redoing: content changes and code changes both reach the app through GitHub Pages, and a new APK is needed only when the app's name, icon, colours or package identity change. That is the whole reason the wrapper is worth so little effort.
+
+### 19.5 Verification
+
+| Check | Result |
+|---|---|
+| Chrome install criteria | 14/14 |
+| Install-dialog quality items | 6/6 |
+| Every screenshot the manifest names resolves | 4/4 → 200 |
+| Maskable icon inside the safe zone | 161 px against a 205 px radius |
+| Manifest parse errors reported by Chrome | none |
+| Accessibility, 131 routes × 2 themes | 0 findings |
+| Standing requirements, 131 routes × 3 widths | clean |
+| Offline, cold start, home page only | 131/131 routes · 0 failures |
+| Performance budget | 7/7 |
+| Data health check | 17 files · 180 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v21`. **Every numbered roadmap phase, 0 through 15, is now either built or — for the two optional ones — built as far as it can be without credentials only the group holds.**
+
+---
+
+## 20. Scan-rate analysis (Roadmap P6)
+
+Phase 6's exit criterion was *"a scan-rate series can be analysed on the platform"*, and it was the one numbered phase never actually built. Its concepts were all present — b-value and Ragone as formula records you type numbers into, dQ/dV as a model in Storage Chemistry, Nyquist and Bode as simulator outputs — but none of it could be applied to a measurement. The import view took one file at a time and described itself, correctly, as "descriptive only".
+
+### 20.1 The demonstration
+
+Every module on this platform is built around one thing a student can see happen. This one is:
+
+> **The same electrode, the same data, two defensible scan-rate ranges, and b = 0.594 or b = 0.709.**
+
+No confounder. Nothing wrong. The reason is arithmetic rather than electrochemistry: the peak current is k₁v + k₂√v, a **sum** of two power laws, which is not itself a power law. A single fitted exponent is therefore a weighted average of 0.5 and 1 over whichever rates went in — the √v term dominating at low rate, the v term at high. Fit 5–50 mV/s and report 0.59; fit 50–500 and report 0.71. Both are honest fits of the same electrode.
+
+Alongside it, Dunn on the identical data reports **67.5% from all three ranges** — because in the clean case the two-term model is exactly the truth. Switch on any of the three confounders and it moves:
+
+| | 5–50 mV/s | 50–500 mV/s |
+|---|---|---|
+| nothing wrong | 67.5% | 67.5% |
+| an unmodelled third process (v^0.75) | 66.4% | 60.3% |
+| 60 Ω uncompensated resistance | 67.3% | 60.6% |
+| a peak drifting 120 mV per decade | 68.0% | 58.8% |
+
+All quoted at the same 50 mV/s, over the same window. Nothing in the output distinguishes the first row from the last three.
+
+### 20.2 Why the simulation is a test rather than a claim
+
+`js/echem/sim/scanrate.js` builds its forward branch as **exactly** i = k₁(E)·v + k₂(E)·√v — the equation Dunn's method assumes. That is deliberate: it makes the clean case a test of the implementation rather than an assertion about electrochemistry. `tools/analysis-test.mjs` runs 41 assertions, and the clean series recovers k₁(E) and k₂(E) to **1e-9** at potentials on the generator's own grid.
+
+The residual at off-grid potentials is 1e-4, and that is interpolation rather than algebra — linear interpolation of a Gaussian of width 85 mV across a 3 mV grid. Both are asserted separately so a future regression cannot hide in the tolerance.
+
+### 20.3 The diagnostic R² cannot give you
+
+Eight checks run on every analysis. Seven are the expected ones — too few rates, too narrow a range, a power law that does not hold, an uncertainty interval spanning both 0.5 and 1.0, a peak that moves, opposite-signed k₁ and k₂, a near-degenerate separation at b ≈ 1.
+
+The eighth is the one that matters here. **Fit the lower half of the series and the upper half separately and compare.** On the clean seven-rate series that check fires — b is 0.594 below and 0.709 above — while **R² is 0.997**. A sum of two power laws still looks like a straight line on log axes over a modest range; the goodness of fit tells you nothing, and only splitting the range exposes it. That check is why the demonstration is self-reporting rather than something the reader has to notice.
+
+Worth recording honestly: on the third-process case, **no diagnostic fires at all** while the reported fraction moves six points. The checks catch what they can. They are not a guarantee, and the page does not claim they are.
+
+### 20.4 Your own voltammograms
+
+The view takes **several CV exports at once** — one per scan rate — parses each through the shared `csv-core`, reads the scan rate from the file name where it can (`50mVs`, `100_mV_s`, `scan50`) and asks for it where it cannot, because a wrong scan rate silently corrupts every number on the page. Columns come through `csv-core.series()` so the importer's own unit factors apply: a column labelled mA and one labelled A differ by a thousand, and a k₁ wrong by that factor looks entirely normal.
+
+Fewer than three usable files is refused with the reason — three is the minimum to solve for k₁ and k₂, four the minimum worth reporting.
+
+The existing Data Import view was not touched. It works, it is single-file by design, and rewriting it would have violated the rule about not rewriting working code.
+
+### 20.5 A router fix and a fifth shared-class defect
+
+`interpolateAt()` reads the **forward branch only**. A voltammogram passes each potential twice, and a naive lookup averages the anodic and cathodic branches into a number that means nothing. There is a test for exactly that: a synthetic curve at +10 forward and −10 reverse, where the naive answer is 0 and the correct one is +10.
+
+And `.seg` / `.seg-b`, the segmented control, was defined inside `js/echem/tafel.js`'s inline `<style>`. The new view used it and got 21-pixel unstyled buttons, caught by the accessibility audit's target-size check. It is in `css/style.css` now — the **fifth** instance of the same defect, after `.tabbar`, `.lim-list`, `.mv-*` and `.wf-cm`.
+
+### 20.6 Verification
+
+| Check | Result |
+|---|---|
+| Analysis engine | 41/41 assertions · k₁, k₂ recovered to 1e-9 |
+| Routes | 132 · 0 thin views · 0 sidebar placeholders |
+| Charts drawn | 22/22 |
+| Accessibility, 132 routes × 2 themes | 0 findings across all six checks |
+| Standing requirements, 132 routes × 3 widths | clean |
+| Offline, cold start, home page only | 132/132 routes · 22 canvases · 0 failures |
+| Performance budget | 7/7 |
+| PWA install criteria | 14/14 · 6/6 quality |
+| Data health check | 17 files · 180 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v22`.
+
+**One deliberate departure from the content-as-data rule.** `LIMITS` — what a b-value and a capacitive fraction do not license — lives in `js/echem/analysis.js` rather than in a JSON file, because it is the module's contract with the reader rather than authored content. If the group wants to edit those sentences without touching code, moving them to `data/echem/analysis.json` is a small change and the right one.

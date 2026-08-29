@@ -1,0 +1,42 @@
+{
+  "_": "A judgement question, not a recall question. Ask what a result does or does not license.",
+  "id": "quiz.rectangular_cv",
+  "category": "evidence",
+  "question": "A cyclic voltammogram is near-rectangular across the whole window. What does that establish about the storage mechanism?",
+  "options": [
+    {
+      "text": "It is double-layer capacitance",
+      "correct": false,
+      "why": "The most common conclusion, and it does not follow. Broad surface redox — pseudocapacitance — gives a near-rectangular voltammogram too, which is precisely why the term exists."
+    },
+    {
+      "text": "It is pseudocapacitance",
+      "correct": false,
+      "why": "Equally unsupported from the shape alone, and in the opposite direction. Both mechanisms produce this shape."
+    },
+    {
+      "text": "Nothing on its own — the shape is shared by double-layer and broad faradaic storage",
+      "correct": true,
+      "why": "Shape constrains the explanation without selecting one. What separates them is whether the storage depends on redox chemistry: change the electrolyte or the surface functionalisation and see whether the capacity survives."
+    },
+    {
+      "text": "That the electrode is behaving ideally",
+      "correct": false,
+      "why": "Rectangularity indicates a flat differential capacitance, which is a description of the response rather than a verdict on quality. A rectangular CV from an electrode with obvious redox chemistry is worth being curious about, not reassured by."
+    }
+  ],
+  "_options": "Exactly ONE marked correct — an error otherwise. EVERY option needs a `why`, including the wrong ones: the wrong options are where the teaching is.",
+  "explanation": "This is the reason every mechanism record in Storage Chemistry has to state how to distinguish it from its neighbours. Curve shape is evidence; it is rarely identification.",
+  "teaches": [
+    "mechanism.edl",
+    "mechanism.pseudo_surface",
+    "concept.faradaic"
+  ],
+  "_teaches": "Record ids this question is about. Cross-checked like any other reference.",
+  "goDeeper": {
+    "route": "#/chemistry/mechanisms",
+    "label": "How each mechanism differs from its neighbours"
+  },
+  "_goDeeper": "The link shown after answering, pointing at the module that covers it properly.",
+  "_note": "Look at the existing questions: a large fraction of the correct answers are some form of \"you cannot tell from this alone\". That is not evasion — it is the most common correct answer in experimental work."
+}

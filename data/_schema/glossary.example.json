@@ -1,0 +1,16 @@
+{
+  "_": "The easiest contribution, and a good first commit. Two sentences.",
+  "id": "glossary.esr",
+  "term": "ESR — equivalent series resistance",
+  "shortDef": "The lumped ohmic resistance of the whole current path, read from the voltage step when current changes.",
+  "trap": "Two conventions. At a charge-to-discharge reversal the current changes by 2I, so R = ΔV/(2I); from rest it changes by I, so R = ΔV/I. Mixing them is a clean factor-of-two error.",
+  "_trap": "NOT optional decoration. Every term carries its definition AND the thing people get wrong about it, at equal visual weight. If you cannot name a trap, the term may not need an entry.",
+  "relatedIds": [
+    "formula.esr_from_ir_reversal",
+    "formula.esr_from_ir_rest"
+  ],
+  "tags": [
+    "resistance",
+    "GCD"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "_README": "Bubblewrap configuration for a Trusted Web Activity. This is a TEMPLATE, not a working file: the two fields marked REPLACE cannot come from this repository. Run `bubblewrap init --manifest <live manifest url>` and compare its output against this; everything here except those two fields is derived from manifest.json, which is the single source of truth for the app's name, colours and icons.",
+
+  "_host": "REPLACE if you use a custom domain. With a GitHub Pages project site this is the github.io host and startUrl carries the path.",
+  "host": "edmggroup.github.io",
+  "startUrl": "/edmglab/",
+
+  "name": "EDMGLAB — Energy Devices & Materials Group",
+  "launcherName": "EDMGLAB",
+
+  "_packageId": "REPLACE with your own reverse-domain identifier. It is permanent: Play treats a changed package id as a different app, and every installed copy of the old one is orphaned.",
+  "packageId": "edu.example.edmglab",
+
+  "display": "standalone",
+  "orientation": "any",
+  "themeColor": "#0e1116",
+  "themeColorDark": "#0e1116",
+  "navigationColor": "#0e1116",
+  "navigationColorDark": "#0e1116",
+  "navigationDividerColor": "#2b333e",
+  "navigationDividerColorDark": "#2b333e",
+  "backgroundColor": "#0e1116",
+
+  "_icons": "Absolute URLs, so Bubblewrap fetches the same files the site serves. The maskable icon has verified safe-zone padding: its content sits 161 px from centre against a 205 px safe radius, so a circular Android mask does not clip it.",
+  "iconUrl": "https://edmggroup.github.io/edmglab/pwa/icons/icon-512.png",
+  "maskableIconUrl": "https://edmggroup.github.io/edmglab/pwa/icons/icon-maskable-512.png",
+
+  "splashScreenFadeOutDuration": 300,
+  "enableNotifications": false,
+
+  "_shortcuts": "Long-press the launcher icon. These mirror manifest.json's shortcuts; keep them in step or drop them here and let Bubblewrap read them from the manifest.",
+  "shortcuts": [
+    { "name": "Battery Tester",  "shortName": "Tester",     "url": "/edmglab/#/battery-tester", "chosenIconUrl": "https://edmggroup.github.io/edmglab/pwa/icons/icon-192.png" },
+    { "name": "Formula Library", "shortName": "Formulas",   "url": "/edmglab/#/formulas",       "chosenIconUrl": "https://edmggroup.github.io/edmglab/pwa/icons/icon-192.png" },
+    { "name": "Calculators",     "shortName": "Calculate",  "url": "/edmglab/#/calculators",    "chosenIconUrl": "https://edmggroup.github.io/edmglab/pwa/icons/icon-192.png" }
+  ],
+
+  "_signingKey": "NEVER put a keystore or its passwords in this repository. Bubblewrap prompts for them and stores them outside the project.",
+
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "minSdkVersion": 21,
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "fallbackType": "customtabs",
+  "_fallbackType": "What happens on a device without a Chrome new enough for TWA: 'customtabs' opens the site in a Custom Tab, which still works and still runs offline. The alternative, 'webview', has a different and older JavaScript engine and is not worth the risk here."
+}

@@ -1,0 +1,44 @@
+{
+  "_": "One symptom, several candidate causes, and how to tell them apart.",
+  "id": "troubleshooting.high_ir_drop",
+  "symptom": "Large IR drop at the start of discharge",
+  "causes": [
+    "Two-wire sensing, so lead and contact resistance are included in the measured voltage",
+    "Poor or uneven contact pressure between the electrode and current collector",
+    "High electrolyte resistance — low conductivity, insufficient volume, or incomplete wetting",
+    "Current collector corrosion or a poor weld/tab connection",
+    "Test current higher than the cell can sustain without large ohmic loss",
+    "Genuinely high internal resistance of the electrode itself"
+  ],
+  "_causes": "AT LEAST TWO — a single-cause entry is an ERROR. One symptom almost never proves one cause, and an entry that implies it does teaches the habit this platform exists to prevent.",
+  "diagnostics": [
+    "Check first whether the channel is using two-wire or four-wire sensing, and where the sense leads actually attach. This is the cheapest check and a very common cause.",
+    "Repeat at a lower current: a purely ohmic drop scales linearly with current, so plot ΔV against I and look for a straight line through the origin.",
+    "Measure the high-frequency intercept of an impedance spectrum and compare with ΔV/I from the step — if they agree, the resistance is real and ohmic.",
+    "Re-assemble the cell with fresh contact and repeat. A large change points to assembly rather than material.",
+    "Compare against another cell on a different channel to rule out a channel fault."
+  ],
+  "_diagnostics": "How to separate the candidates. Without these the list of causes is just a list.",
+  "fixes": [
+    "Switch to four-wire sensing and attach the sense leads at the cell terminals",
+    "Improve contact pressure and clean the contact surfaces",
+    "Allow longer wetting before starting the test",
+    "Reduce the test current if the ohmic loss is dominating the measurement",
+    "If the resistance is genuine, report it — a high internal resistance is a result, not necessarily a fault"
+  ],
+  "safetyNotes": [
+    "A rising IR drop combined with heating can indicate a developing internal fault. Stop the test and let the cell cool before handling it."
+  ],
+  "_safetyNotes": "Anything involving a damaged, swollen, leaking or shorted cell belongs here, and the procedure must not ask anyone to handle one.",
+  "relatedIds": [
+    "glossary.ir_drop",
+    "concept.bt_four_wire",
+    "method.cc_charge_discharge",
+    "method.pulse"
+  ],
+  "tags": [
+    "battery tester",
+    "resistance",
+    "IR drop"
+  ]
+}

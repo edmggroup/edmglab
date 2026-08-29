@@ -1,0 +1,29 @@
+{
+  "_": "An equivalent-circuit element. Remember that no equivalent circuit is uniquely determined by a spectrum — two different topologies can fit the same data exactly, which the Circuits page demonstrates.",
+  "id": "circuit.r",
+  "name": "Resistor",
+  "symbol": "R",
+  "sim": "r",
+  "param": "R — resistance, in ohms",
+  "impedance": "Z = R",
+  "phaseSignature": "0° at every frequency — current and voltage stay in step.",
+  "inTheSpectrum": "A point on the real axis of a Nyquist plot. In a circuit it shifts the whole spectrum sideways; on its own it has no frequency dependence at all.",
+  "oftenAssociatedWith": [
+    "Electrolyte (solution) resistance, when in series with everything else",
+    "Charge-transfer resistance, when in parallel with an interfacial capacitance",
+    "Contact and current-collector resistance",
+    "Cable and connection resistance"
+  ],
+  "butNot": [
+    "A series resistance is not automatically 'the electrolyte'. Contact resistance, cable resistance and current-collector resistance all land in the same place, and impedance cannot separate them.",
+    "A parallel resistance is only a charge-transfer resistance if the process it sits with is actually charge transfer. The fit does not know which."
+  ],
+  "misreadAs": [
+    "Reporting the high-frequency intercept as 'solution resistance' when the cell has appreciable contact resistance",
+    "Comparing Rct between electrodes of different area without normalising"
+  ],
+  "relatedIds": [
+    "concept.ec_ir_compensation",
+    "method.eis"
+  ]
+}

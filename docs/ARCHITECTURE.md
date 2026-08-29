@@ -1,8 +1,24 @@
 # EDMGLAB — System Architecture & Development Plan
 
 *Energy Devices and Materials Group — Internal Research & Learning Platform*
-*Document version: **v0.2** — 26 August 2026*
-*Supersedes v0.1. Intended home: `/docs/ARCHITECTURE.md` in the project repository.*
+*Document version: **v0.3** — 29 August 2026*
+*Supersedes v0.2. Lives at `/docs/ARCHITECTURE.md` in the project repository.*
+
+## What changed in v0.3
+
+v0.2 was a plan. This revision brings it into line with what was actually built, so that a reader is not
+told a design decision is still open when it was settled fifteen phases ago.
+
+| # | Change | Why |
+|---|---|---|
+| 1 | **Every phase in §L now carries its real status.** All sixteen are built, or built as far as they go without credentials only the group holds. | The table read as a plan for work not yet started. |
+| 2 | **§D.2's file table replaced** with the files that actually exist. | It listed four that were never written and omitted eleven that were. The registry in `js/data.js` is the source of truth; this table now matches it. |
+| 3 | **§I.3 "Guarding it" rewritten** around `tools/perf-audit.mjs`. | The budget is now measured on every row rather than checked by eye. The shell-payload row is the one that fails first, and §I.3 says why. |
+| 4 | **"Open decisions" became a record of what was decided**, with the three that are genuinely still open kept separate. | Two of the four were answered by building; one was answered by deleting; one is still open. |
+| 5 | **"Next step" replaced** with where the project actually stands and what it is waiting on. | It proposed starting Phase 0. |
+
+Nothing in §A–§K was re-argued. Where the build departed from the plan, that is recorded in
+`docs/INSTRUMENTATION-INTEGRATION.md`, which is the running account of what was done and why.
 
 ## What changed in v0.2, and why
 
@@ -344,22 +360,32 @@ Static JSON in git is simultaneously the database, the CMS, and the peer-review 
 
 ### D.2 The data files
 
-| File | Holds | Notable fields |
-|---|---|---|
-| `concepts.json` | Fundamentals and mechanisms | `id`, `learnMode{}`, `researchMode{}`, `equationIds[]`, `relatedIds[]` |
-| `formulas.json` | Every equation | `latex`, `plainText`, `variables[]`, `validContext{}`, `assumptions[]`, `calculatorId` |
-| `calculators.json` | Calculator UI definitions | `formulaId`, `inputs[]`, `interpretationRules[]`, `modes[]` |
-| `materials.json` | Material database | Every value as `{value, unit, provenance, source}` |
-| **`instruments.json`** | **Your actual hardware** | `vendor`, `model`, `channels[]`, `ranges{}`, `specs{}` (all provenance-tagged), `sop[]`, `quirks[]` |
-| **`techniques.json`** | **Vendor-neutral instrument functions** | `id`, `instrumentClass`, `parameters[]`, `outputs[]`, `relatedFormulaIds[]`, `pitfalls[]` |
-| **`protocols.json`** | **Your group's standard schedules** | `steps[]`, `purpose`, `typicalDuration`, `relatedTechniqueIds[]` |
-| `characterization.json` | XRD / Raman / FTIR / BET / SEM-TEM / XPS | `interpretationGuide[]`, `relatedFormulaIds[]` |
-| `electrochemistry.json` | CV / GCD / EIS interpretation science | `plotConfig`, `teachingPoints[]` |
-| `troubleshooting.json` | Symptom → cause → diagnosis → fix | `symptom`, `causes[]`, `diagnostics[]`, `fixes[]`, `safetyNotes[]` |
-| `quiz.json` | Question bank | `conceptId`, `level`, `question`, `answer`, `explanation` |
-| `glossary.json` | Standalone terms | `term`, `shortDef`, `linkId` |
+Every file here is registered in `js/data.js`, which is the single list the health check validates, the
+offline warm-up caches and the search index reads. **A file not in that registry is never loaded.**
 
-**The boundary between `techniques.json` and `electrochemistry.json` matters and is easy to blur.** `electrochemistry.json` holds the *science of the resulting curve* — what a CV shape means, why a Nyquist semicircle appears, how to read a plateau. `techniques.json` holds *how to actually run the measurement* — which parameters to set, in what ranges, what the instrument outputs, what commonly goes wrong during acquisition. A student asking "what scan rate should I use and why" is in `techniques.json`; asking "why does my CV have that shape" is in `electrochemistry.json`. Each links to the other.
+| File | Holds | ids |
+|---|---|---|
+| `concepts.json` | Core quantities, each with a Learn and a Research version | `concept.…` |
+| `formulas.json` | Every equation; an `expression` also generates its calculator | `formula.…` |
+| `glossary.json` | Terms, each as a definition plus the trap | `glossary.…` |
+| `quiz.json` | Judgement questions | `quiz.…` |
+| `characterization.json` | Techniques, each leading with `cannotTell` | `technique.…` |
+| `electrochemistry.json` | Storage mechanisms, each with `distinguishFrom` | `mechanism.…` |
+| `preparation.json` | The electrode-preparation chain | `_kind: preparation` |
+| `import-profiles.json` | Instrument column vocabularies and plot definitions | `_kind: profiles` |
+| **`instruments.json`** | **Your actual hardware.** Ships empty; specs from your manuals, quirks from your benches | `instrument.…` |
+| **`materials.json`** | **Not yet written** — it needs literature values with citations | `material.…` |
+| `battery-tester/*.json` | Concepts, instrument diagram, cell formats, workflow, methods, troubleshooting, safety | mixed |
+| `echem/*.json` | Concepts, potentiostat and electrode diagrams, methods, circuit elements, Tafel, troubleshooting | mixed |
+| `shared/*.json` | The two decision trees | `_kind: tree` |
+| `access.json`, `feedback.json` | Configuration, not content — loaded directly, not through the registry | — |
+
+Files holding a tree, a diagram set or a grouped guide rather than a list of records declare `_kind`, and the
+health check exempts them from the `items` rule instead of misreading them as broken.
+
+Four keys that appeared in v0.2 are gone: `calculators.json` (the workbench is generated from `formulas.json`),
+`techniques.json` (methods live per module), `protocols.json` (the protocol builder is code, not content) and
+a shared instrument-chooser file (likewise). Each of them was 404ing on every health-check run.
 
 ### D.3 Provenance — extended to hardware
 
@@ -664,7 +690,9 @@ then open `localhost:8000`. A local server is required (not just double-clicking
 
 ### I.3 Guarding it
 
-Performance regressions creep in quietly. Two cheap habits: a Lighthouse run before each phase is called done (also required for Play Store submission later, per K.5), and the payload budget in I.1 checked whenever a dependency is added. If a proposed feature cannot fit the budget, that is a design conversation, not something to absorb silently.
+Performance regressions creep in quietly, so the budget is now measured rather than remembered: `tools/perf-audit.mjs` checks every row of the I.1 table against a real browser — throttled first load, offline repeat load, view switches, search, a genuine 50,000-row CSV, and the uncompressed shell payload. Run it before calling a phase done.
+
+The payload row is the one that will fail first, and it fails for a specific reason: a module imported statically by `app.js` is on the critical path of every visit, however rarely its function is called. Three were, costing 41 KB, before anyone noticed. When adding a dependency, ask whether `app.js` must import it or whether the view that needs it can. If a proposed feature cannot fit the budget, that is a design conversation, not something to absorb silently.
 
 ## J. Google Apps Script integration (optional)
 
@@ -739,16 +767,16 @@ Reordered from v0.1 to put the highest-value bench tools early. Instruments and 
 | **3** | **Battery Tester module** — concepts, step language, `protocols.json` with your standard schedules, instrument registry template | A new student can be handed the module instead of a verbal explanation of the cycler |
 | **4** | **Data import + charting** — Web Worker parser, column mapping, GCD/cycle-life/Ragone plots, auto-calculation | A student drags in a cycler CSV and gets specific capacity, CE and retention |
 | **5** | **Electrochemical Workstation module** — concepts, technique library, cell configuration teaching | Wiring decisions and their consequences are documented and linked to the calculators |
-| **6** | **Electrochemical analysis depth** — CV/EIS import, b-value, Dunn deconvolution, Nyquist/Bode, dQ/dV | A scan-rate series can be analyzed on the platform |
+| **6** | **Electrochemical analysis depth** — CV/EIS import, b-value, Dunn deconvolution, Nyquist/Bode, dQ/dV | ✅ **Done.** `#/analysis` runs b-value and Dunn on a simulated series whose decomposition is planted in advance (41 assertions, k₁/k₂ recovered to 1e-9) and on your own multi-file CV exports. Eight diagnostics, including the sub-range check that fires where R² = 0.997. See INSTRUMENTATION-INTEGRATION §20. |
 | **7** | **Materials database** — provenance-tagged schema, browse/filter/detail | Several real materials fully populated with cited values |
 | **8** | **Energy Storage Chemistry** — supercapacitor / LIB / SIB / ion-capacitor structures | At least one storage class complete end to end |
 | **9** | **Preparation + Characterization** — SOP guides; XRD/Raman/FTIR/BET/SEM-TEM/XPS with Bragg and Scherrer linked | One full prep-to-characterization pathway for a real material |
 | **10** | **Troubleshooting engine** — symptom search; smart links from calculator and import results | Instrument, IR drop, cycling stability and distorted-CV entries all live |
 | **11** | **Animations** — reusable controller; EDLC adsorption, Li/Na-ion movement, GCD, CV | 4–5 animations matching your list |
 | **12** | **Quiz + Glossary** — engine, progress tracking, aggregated glossary | A student can complete a quiz tied to a fundamentals topic |
-| **13** | **Hardening** — performance audit against the I.1 budget, accessibility pass, Lighthouse, `CONTRIBUTING.md` finalized | Budget met; a new member adds content unsupervised |
-| **14** | **Optional: Apps Script layer** | A submitted correction reaches a Sheet you review |
-| **15** | **Optional: Android packaging** — TWA build, internal distribution | Installable build on group phones |
+| **13** | **Hardening** — performance audit against the I.1 budget, accessibility pass, `CONTRIBUTING.md` finalized | ✅ **Done.** 7/7 budget targets met (shell payload 178→137 KB); accessibility clean on 130 routes × 2 themes; offline verified from a cold install; contributor guide rewritten against the code. See INSTRUMENTATION-INTEGRATION §16–17. |
+| **14** | **Optional: Apps Script layer** | ✅ **Client side done.** Corrections are collected from a link under every page and open as pre-filled GitHub issues with no setup at all; the Sheet receiver is written and documented in `docs/apps-script/`, awaiting a deployment. See INSTRUMENTATION-INTEGRATION §18. |
+| **15** | **Optional: Android packaging** — TWA build, internal distribution | ✅ **Installable now, without an APK.** All 14 Chrome install criteria met and measured; the rich install dialog is enabled. The TWA scaffold, asset-links template and guide are in `docs/android/`, needing only a signing key and a decision about where asset links are hosted. See INSTRUMENTATION-INTEGRATION §19. |
 
 ### L.3 The incremental rule
 
@@ -839,19 +867,69 @@ The number is lower than the literature range recorded for that material class, 
 
 Every link in that sequence is derived from `relatedIds`, `measuredBy`, `feedsFormulaIds` and `calculatorId`. Nobody hand-wrote a "see also" section anywhere — and adding a new material, protocol, or troubleshooting entry extends the graph automatically.
 
-## Open decisions
+## What was decided
 
-1. **Which electrochemical workstation do you have?** The module is vendor-neutral, which is the right default, but naming the model lets me add its technique vocabulary as aliases and record its specs in `instruments.json` from your manual. Needed by Phase 5, not before.
-2. **Do you want the single-page change?** Section A.1 explains the reasoning and the trade-off. It is the one structural departure from v0.1 and it is easy to revert — but it is also where most of the speed and simplicity you asked for comes from.
-3. **Colors and typography.** The system is fully specified; the specific values are not. Easier to choose from two or three live options than from a description — I can prepare those at the start of Phase 0.
-4. **Where should protocols come from?** I can build `protocols.json` as empty templates for your group to fill, or seed it with standard protocol *structures* (formation, rate ladder, long-term cycling) carrying no invented parameter values, for you to adjust. I would suggest the latter — the structure is generic, the numbers are yours.
+The four questions v0.2 left open, and what happened to them.
 
-## Next step
+**1. Which electrochemical workstation do you have?** — *still open.* The module was built vendor-neutral,
+which remains the right default: the concepts and functions are common to Autolab, Gamry, BioLogic, CH
+Instruments, Ivium and PalmSens, and technique names are cross-referenced across those vocabularies. Naming
+your model would add its own technique aliases to search and let its specifications go into
+`instruments.json` from your manual. Nothing is blocked on it.
 
-Per your incremental rule, this document still stops at architecture. The natural first build is **Phase 0**: `index.html`, the router, the nav model, the theme tokens, `data.js`, the service worker, and the health-check view — a navigable, installable, empty application deployed to GitHub Pages, with every later phase slotting into it.
+**2. The single-page change** — *adopted, and it earned its place.* A view switch is 18 ms against a budget
+of 100; a repeat visit is interactive in 0.12 s with no network at all. Neither number is reachable with
+fifteen HTML files, and the offline behaviour the lab actually needs would have been far harder.
 
-If you would rather see something scientific working sooner, an alternative is a combined Phase 0+1 delivering the shell *and* the Fundamentals and Formula Library with a handful of real entries, so the first thing you see is recognisably EDMGLAB rather than an empty frame. Say which you prefer and I will start there.
+**3. Colours and typography** — *settled, then corrected by measurement.* The palette in `css/tokens.css` is
+the one that shipped. Four tokens were later re-derived from contrast measured on the rendered page rather
+than on the colour in isolation: an inline link inside a callout sits on that callout's wash, and read
+4.34:1 there while reading 5.9:1 on the page. All 132 routes now pass AA in both themes, checked by
+`tools/a11y-audit.mjs`.
+
+**4. Where should protocols come from?** — *answered by deleting the question.* `protocols.json` was never
+written and has been removed from the registry. The protocol builder at `#/battery-tester/protocol`
+assembles a schedule from step *structures* in code — formation, rate ladder, long-term cycling — and every
+parameter value in it is one the user types. That is the outcome v0.2 recommended, reached without a content
+file to maintain.
+
+## What is still open
+
+Three things, none of which is a design question.
+
+**Electrode Materials (P7)** is the one module still carrying a phase badge. It needs literature values with
+citations. Building it from remembered numbers would break the first rule this platform was given, so it
+stays unbuilt until the group supplies a reference list. `data/_schema/material.example.json` is the shape it
+will take.
+
+**`instruments.json` is empty**, by design. The specifications have to come from your manuals and the quirks
+from your benches; §E.5 explains why the quirks are the part that matters. The file, its annotated template
+and the view that renders it are all in place — only the content is missing, and only you can write it.
+
+**The content itself is draft.** Roughly 64,000 words across 181 records, every page marked as such. The
+health check validates structure, not truth: nothing in it can tell you a definition is wrong, only that it
+is shaped correctly. The safety section needs your safety officer specifically. A correction flow now exists
+at `#/suggest`, reachable from a line under every page, so what a reader notices can be recorded rather than
+remembered.
+
+## Where the project stands
+
+Every numbered phase, 0 through 15, is built — the two marked optional as far as they go without credentials
+only the group holds. 132 routes, 22 charts, a data health check reporting zero errors across 17 files and
+180 records, and six audit scripts in `tools/` that re-check the claims in this document rather than leaving
+them as assertions:
+
+| | |
+|---|---|
+| Performance budget (§I.1) | 7/7 targets met · shell 141 KB against 150 |
+| Accessibility, 132 routes × 2 themes | 0 findings across six checks |
+| Offline, from a cold install that opened only the home page | 132/132 routes render with no network |
+| PWA install criteria | 14/14 · plus 6/6 of the things that decide whether Android shows the rich dialog |
+| Standing layout requirements, 3 widths | no sideways scrolling, nothing outside its box |
+| Scan-rate analysis engine | 41 numerical assertions |
+
+The work left is not architectural. It is content, review, and a deployment.
 
 ---
 
-*Technical claims in Sections H, J and K verified against: [Google Apps Script quotas](https://developers.google.com/apps-script/guides/services/quotas), [GitHub Pages site visibility documentation](https://docs.github.com/en/enterprise-cloud@latest/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site), [Bubblewrap (GoogleChromeLabs)](https://github.com/GoogleChromeLabs/bubblewrap), [publishing PWAs to app stores, 2026](https://www.mobiloud.com/blog/publishing-pwa-app-store). Instrument specifications are deliberately absent — `instruments.json` ships as a template for your own manual and calibration values.*
+*Technical claims in Sections H, J and K verified against: [Google Apps Script quotas](https://developers.google.com/apps-script/guides/services/quotas), [GitHub Pages site visibility documentation](https://docs.github.com/en/enterprise-cloud@latest/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site), [Bubblewrap (GoogleChromeLabs)](https://github.com/GoogleChromeLabs/bubblewrap), [publishing PWAs to app stores, 2026](https://www.mobiloud.com/blog/publishing-pwa-app-store). Instrument specifications are deliberately absent: `data/instruments.json` ships empty with an annotated `_template`, and `#/instruments` renders whatever your group puts in it.*
