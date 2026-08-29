@@ -67,8 +67,7 @@ export async function renderWorkflow(host) {
       .wf-step.is-active { background:var(--accent-wash); border-color:var(--accent); border-left-color:var(--ph); }
       .wf-n { font-family:var(--font-mono); font-size:var(--fs-xs); color:var(--ph); font-weight:700; }
       .wf-name { font-size:var(--fs-sm); font-weight:600; line-height:1.25; }
-      .wf-cm { font-family:var(--font-mono); font-size:.6875rem; color:var(--text-muted); }
-      .wf-grid { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+          .wf-grid { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
     </style>`;
 
   const detail = host.querySelector('#wf-detail');

@@ -120,7 +120,7 @@ export function render(outlet) {
       .pw-stage.is-pending { background:color-mix(in srgb, var(--surface) 72%, var(--bg)); }
       .pw-stage.is-pending .pw-n { color:var(--text-muted); }
       .pw-stage.is-pending .pw-l { color:var(--text-muted); }
-      .pw-n { font-family:var(--font-mono); font-size:.65rem; color:var(--accent);
+      .pw-n { font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--accent);
         font-weight:650; letter-spacing:.06em; }
       .pw-l { font-size:.8125rem; font-weight:550; line-height:1.3; }
       @media (max-width:560px){ .pathway { grid-template-columns:repeat(2, 1fr); } }

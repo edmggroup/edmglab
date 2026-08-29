@@ -22,6 +22,8 @@
 import * as data from '../data.js';
 import { esc, pageHead, callout } from '../ui.js';
 import { compile } from '../lib/expr.js';
+import { status, warm, shouldHoldBack } from '../lib/offline.js';
+import { config as feedbackConfig } from '../lib/feedback.js';
 
 const SEV = { error: 'error', warn: 'warning', info: 'info' };
 
@@ -259,8 +261,12 @@ export async function render(outlet) {
   }
 
   /* ── Pass 2: cross-reference integrity ── */
+  /* Every field that holds ids of other records. `teaches` was missing until an
+     audit for CONTRIBUTING.md went looking: fifty-odd quiz cross-references
+     were never being checked, which is exactly the silent rot this pass
+     exists to catch. If you add a field that holds ids, add it here. */
   const REF_FIELDS = ['relatedIds', 'equationIds', 'relatedFormulaIds', 'feedsFormulaIds',
-                      'troubleshootingIds', 'relatedTechniqueIds', 'measuredBy'];
+                      'troubleshootingIds', 'relatedTechniqueIds', 'measuredBy', 'teaches'];
   for (const { key, payload } of files) {
     for (const rec of payload.items || []) {
       for (const field of REF_FIELDS) {
@@ -363,9 +369,158 @@ export async function render(outlet) {
           <li>Any simulated content declares the model it is based on.</li>
         </ul>
       </div></div>
+    </section>
+
+    <section class="section" id="corrections-section">
+      <div class="section-head"><h2>Corrections</h2>
+        <span class="section-note">where a reader's report goes</span></div>
+      <div class="panel"><div class="panel-body" id="corrections-body">
+        <div class="loading-row"><span class="spinner"></span> Checking…</div>
+      </div></div>
+    </section>
+
+    <section class="section" id="offline-section">
+      <div class="section-head"><h2>Offline readiness</h2>
+        <span class="section-note">what is actually in the cache</span></div>
+      <div class="panel"><div class="panel-body" id="offline-body">
+        <div class="loading-row"><span class="spinner"></span> Asking the service worker…</div>
+      </div></div>
     </section>`;
 
+  renderOffline(outlet.querySelector('#offline-body'));
+  renderCorrections(outlet.querySelector('#corrections-body'));
   return { destroy() {} };
+}
+
+/* ══════════════════════════════════════════════════════════
+   Corrections
+   ══════════════════════════════════════════════════════════
+   The correction form is only useful if what it collects actually reaches
+   someone. Which of the three destinations is live depends on the URL the
+   site is served from and on data/feedback.json, so it is not something
+   anyone can tell by reading the code — hence reporting it here.        */
+
+async function renderCorrections(el) {
+  if (!el) return;
+  const conf = await feedbackConfig().catch(() => null);
+  if (!conf) {
+    el.innerHTML = callout('The correction configuration could not be read.', 'warn');
+    return;
+  }
+
+  const rows = {
+    endpoint: ['ok', `<strong>Going to the group's correction sheet.</strong>
+      Submitted to the Apps Script endpoint in <code>data/feedback.json</code>. Readers need no
+      GitHub account. Check the sheet is still receiving them —
+      see <code>docs/apps-script/README.md</code>.`],
+    github: ['info', `<strong>Opening pre-filled GitHub issues on <code>${esc(conf.repo)}</code>.</strong>
+      ${conf.derivedRepo
+        ? 'That repository was derived from the address this site is served from, with no configuration.'
+        : 'That repository is set explicitly in <code>data/feedback.json</code>.'}
+      Readers need a GitHub account. To accept corrections from people without one, deploy the optional
+      Sheet backend in <code>docs/apps-script/</code>.`],
+    none: ['warn', `<strong>Nothing is sent anywhere.</strong> This build cannot derive a repository
+      from its address — it is being served from a custom domain or a local server — and no endpoint is
+      configured. The correction form still works, but it only copies and stores locally, and it says so
+      to the reader. Set <code>repo</code> or <code>endpoint</code> in <code>data/feedback.json</code>.`]
+  };
+  const [kind, text] = rows[conf.mode] || rows.none;
+  el.innerHTML = callout(text, kind);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Offline readiness
+   ══════════════════════════════════════════════════════════
+   "It works offline" is a claim nobody can check by looking at the code: the
+   SHELL list in the service worker is an INTENTION, and what a phone in a
+   basement actually has is whatever ended up in its cache. So this asks the
+   worker what it really holds, and gives whoever is about to tell a student
+   "just use it offline" a way to be sure before they say it.               */
+
+async function renderOffline(el) {
+  if (!el) return;
+
+  if (!('serviceWorker' in navigator)) {
+    el.innerHTML = callout(`<strong>No service worker support in this browser.</strong>
+      EDMGLAB still works, but only while online.`, 'warn');
+    return;
+  }
+  if (!navigator.serviceWorker.controller) {
+    el.innerHTML = callout(`<strong>No service worker is controlling this page yet.</strong>
+      That is normal on the very first visit — reload once and it will take over. It also happens
+      when the site is opened over plain <code>http://</code> from another machine, or straight from
+      disk: service workers require <code>https://</code> or <code>localhost</code>.`, 'info');
+    return;
+  }
+
+  let s;
+  try {
+    s = await status();
+  } catch (e) {
+    el.innerHTML = callout(`<strong>The service worker did not answer.</strong> ${esc(e.message)}.
+      This usually means an old worker from a previous build is still in control — reload the page.`, 'warn');
+    return;
+  }
+
+  const rows = [
+    ['App shell', s.shell, 'The interface itself. Precached on install — without this nothing opens offline.'],
+    ['Content', s.content, 'Every registered data file. Without these the app opens to empty pages.'],
+    ['Plot libraries', s.vendor, 'Chart.js and its zoom plugin. Without these every graph view is blank.']
+  ];
+  const complete = rows.every(([, g]) => g.have === g.total);
+
+  el.innerHTML = `
+    ${complete
+      ? callout(`<strong>Fully available offline.</strong> Every file this platform needs is in the cache
+         on this device. Cache version <code>${esc(s.version)}</code>.`, 'ok')
+      : callout(`<strong>Not yet fully cached.</strong> The app will still open offline, but the parts listed
+         below would be missing. They are normally fetched a few seconds after a first visit; on a metered
+         or data-saver connection that is skipped deliberately.`, 'warn')}
+
+    <div class="table-wrap"><table class="stackable">
+      <thead><tr><th>Group</th><th>Cached</th><th>What it is</th></tr></thead>
+      <tbody>
+        ${rows.map(([name, g, why]) => `<tr>
+          <td data-label="Group"><strong>${esc(name)}</strong></td>
+          <td data-label="Cached" class="num">${g.have} / ${g.total}
+            ${g.have === g.total ? '<span class="badge badge-literature">complete</span>'
+                                 : '<span class="badge badge-measured">partial</span>'}</td>
+          <td data-label="What it is" class="small muted">${why}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+
+    ${rows.some(([, g]) => g.missing.length) ? `
+      <details style="margin-top:.8rem">
+        <summary class="small">Show the ${rows.reduce((n, [, g]) => n + g.missing.length, 0)} file(s) not cached</summary>
+        <ul class="small muted" style="margin:.5rem 0 0;padding-left:1.1rem">
+          ${rows.flatMap(([, g]) => g.missing).map((m) => `<li><code>${esc(m)}</code></li>`).join('')}
+        </ul>
+      </details>` : ''}
+
+    <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">
+      <button type="button" class="btn" id="warm-now">Cache everything now</button>
+      <span class="small muted" id="warm-msg">${shouldHoldBack()
+        ? 'This browser reports a metered or slow connection, so the automatic warm-up was skipped.'
+        : 'Downloads roughly 0.8&nbsp;MB. Safe to run repeatedly — it only fetches what is missing.'}</span>
+    </div>`;
+
+  el.querySelector('#warm-now').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const msg = el.querySelector('#warm-msg');
+    btn.disabled = true;
+    msg.textContent = 'Fetching…';
+    try {
+      const r = await warm();
+      msg.textContent = r.failed.length
+        ? `${r.fetched} fetched, ${r.cached} already held, ${r.failed.length} failed: ${r.failed.join('; ')}`
+        : `Done — ${r.fetched} fetched, ${r.cached} already held.`;
+      setTimeout(() => renderOffline(el), 1200);
+    } catch (err) {
+      msg.textContent = `Failed: ${err.message}`;
+      btn.disabled = false;
+    }
+  });
 }
 
 /** Recursively find numeric value objects and check their provenance. */

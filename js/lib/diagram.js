@@ -18,6 +18,7 @@
  */
 
 import { esc } from '../ui.js';
+import { addEnlargeControl } from './anim-fullscreen.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const n = (t, a = {}) => {
@@ -70,6 +71,10 @@ export function renderDiagram(container, spec) {
 
   /** (Re)build the SVG for the current width. */
   function build() {
+    // While the diagram is enlarged the stage lives in the overlay, not here.
+    // Rebuilding then would wipe the drawing the reader is looking at.
+    if (!wrap.contains(stage)) return;
+
     const narrow = (container.clientWidth || 800) < NARROW_PX;
     if (narrow === isNarrow) return;
     isNarrow = narrow;
@@ -80,6 +85,12 @@ export function renderDiagram(container, spec) {
     stage.innerHTML = '';
     blockEls = new Map();
     buildSvgInto(stage, spec, layout, blockEls, select);
+    /* Block diagrams are the one family of drawings a view mounts without an
+       animation player around it, so the Enlarge control has to come from
+       here — otherwise the four instrument diagrams would be the only ones on
+       the platform with no way to make their labels bigger on a phone. It is
+       added INSIDE build() because build() clears the stage. */
+    addEnlargeControl(stage, spec.title || 'Diagram');
     select(selectedId);
   }
 
@@ -273,7 +284,7 @@ function connector(a, b, c) {
   if (c.label) {
     const t = n('text', {
       x: midX, y: (y1 + y2) / 2 - 6, 'text-anchor': 'middle',
-      'font-size': 10, 'font-family': 'var(--font-mono)', fill: 'var(--text-muted)'
+      'font-size': 12, 'font-family': 'var(--font-mono)', fill: 'var(--text-muted)'
     });
     t.textContent = c.label;
     g.appendChild(t);

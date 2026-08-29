@@ -24,7 +24,12 @@
   /* ── Text ─────────────────────────────────────────────── */
   --text:          #e6edf3;
   --text-2:        #a3b1c0;
-  --text-muted:    #74828f;
+  /* Muted text must still clear WCAG AA (4.5:1) on the LIGHTEST surface it
+     can land on — --surface-3, not --bg. Measured on every route in both
+     themes: the old #74828f gave 3.47:1 on --surface-3 and failed on cards
+     everywhere. Do not darken this back for the sake of a calmer look;
+     a chart hint nobody can read is not a calmer look. */
+  --text-muted:    #8d98a3;
   --text-on-accent:#04222b;
 
   /* ── Accent — interactive elements and active state only ─ */
@@ -49,14 +54,14 @@
   --prov-datasheet:   #4fb3c9;
   --prov-measured:    #e0a458;
   --prov-user:        #a3b1c0;
-  --prov-illustrative:#c98fd6;   /* simulations — must be visually distinct */
+  --prov-illustrative:#cb93d7;   /* simulations — must be visually distinct */
 
   /* ── Data visualisation series ────────────────────────── */
   --series-1: #4fb3c9;
   --series-2: #e0a458;
   --series-3: #8b9fe8;
   --series-4: #6cbf84;
-  --series-5: #c98fd6;
+  --series-5: #cb93d7;
   --series-6: #e0705f;
   --grid:     #232a34;
 
@@ -69,6 +74,12 @@
   /* Type scale — raised one step across the board for bench readability.
      These are the ONLY place sizes are defined; nothing else hard-codes a
      font-size, so the whole app moves together if this is tuned again. */
+  /* THE FLOOR. Nothing in EDMGLAB renders text smaller than this. An audit
+     found badges, legends and instrument labels at 10px and 11px — readable
+     on a desk monitor, not on a phone held over a glovebox. If a label does
+     not fit at 12px, the label is too long or the box is too small; shrinking
+     the type is not the fix. */
+  --fs-2xs:  0.75rem;     /* 12px */
   --fs-xs:   0.8125rem;   /* 13px */
   --fs-sm:   0.875rem;    /* 14px */
   --fs-base: 1rem;        /* 16px */
@@ -125,34 +136,42 @@
 
   --text:          #161a21;
   --text-2:        #4a5563;
-  --text-muted:    #6b7785;
+  --text-muted:    #5c6672;   /* AA on --surface-3; see the dark-theme note */
   --text-on-accent:#ffffff;
 
-  --accent:        #0e7490;
+  /* An inline link inside a callout sits on that callout's wash, not on the
+     page. Measured across every route: the old #0e7490 gave 4.34:1 there.
+     These values are set from what the audit MEASURES on real backgrounds,
+     not from the colour in isolation — run tools/a11y-audit.mjs before
+     changing any of them. */
+  --accent:        #0d6e89;
   --accent-strong: #0a5a70;
   --accent-dim:    #a8d8e4;
-  --accent-wash:   rgba(14, 116, 144, 0.09);
+  --accent-wash:   rgba(13, 110, 137, 0.09);
 
-  --ok:            #2f7d4a;
-  --ok-wash:       rgba(47, 125, 74, 0.10);
-  --warn:          #a86412;
-  --warn-wash:     rgba(168, 100, 18, 0.10);
+  --ok:            #2c7445;
+  --ok-wash:       rgba(44, 116, 69, 0.10);
+  /* The light-theme amber is the one semantic colour used BOTH as text on a
+     pale surface and as a fill with pale text on top of it. #a86412 gave
+     4.39:1 in both directions — a near miss in two places at once. */
+  --warn:          #9c5d11;
+  --warn-wash:     rgba(156, 93, 17, 0.10);
   --danger:        #b3402f;
   --danger-wash:   rgba(179, 64, 47, 0.10);
   --info:          #41539c;
   --info-wash:     rgba(65, 83, 156, 0.10);
 
   --prov-theoretical: #41539c;
-  --prov-literature:  #2f7d4a;
-  --prov-datasheet:   #0e7490;
-  --prov-measured:    #a86412;
+  --prov-literature:  #2c7445;
+  --prov-datasheet:   #0d6e89;
+  --prov-measured:    #9c5d11;
   --prov-user:        #4a5563;
   --prov-illustrative:#7d3f90;
 
-  --series-1: #0e7490;
-  --series-2: #a86412;
+  --series-1: #0d6e89;
+  --series-2: #9c5d11;
   --series-3: #41539c;
-  --series-4: #2f7d4a;
+  --series-4: #2c7445;
   --series-5: #7d3f90;
   --series-6: #b3402f;
   --grid:     #e2e7ed;

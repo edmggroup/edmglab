@@ -134,13 +134,6 @@ export async function render(host) {
         background:var(--accent-wash); color:var(--accent-strong); font-family:var(--font-mono);
         font-size:var(--fs-xs); font-weight:700; }
       .chk h3 { font-size:var(--fs-base); margin:0; }
-      .seg { display:flex; gap:2px; background:var(--surface-2); border:1px solid var(--border);
-        border-radius:var(--r-sm); padding:2px; }
-      .seg-b { flex:1 1 0; padding:.4rem .5rem; font:inherit; font-size:var(--fs-xs); font-weight:600;
-        color:var(--text-2); background:transparent; border:0; border-radius:calc(var(--r-sm) - 2px);
-        cursor:pointer; min-height:32px; }
-      .seg-b:hover { color:var(--text); }
-      .seg-b.is-active { background:var(--accent-wash); color:var(--accent-strong); }
       .pit { border:1px solid var(--border); border-left:3px solid var(--series-5);
         border-radius:var(--r-md); background:var(--surface); padding:.85rem 1rem; }
       .pit h3 { font-size:var(--fs-base); margin:0 0 .5rem; }

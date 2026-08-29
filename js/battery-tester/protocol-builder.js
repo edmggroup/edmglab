@@ -162,10 +162,14 @@ export function render(mount) {
       .pb-dot { width:9px; height:9px; border-radius:2px; flex:none; }
       .pb-step-name { font-size:var(--fs-sm); font-weight:600; flex:1; }
       .pb-step-body { display:grid; gap:.5rem; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); padding:.55rem .6rem; }
-      .pb-step-body .field-label { font-size:.625rem; }
+      .pb-step-body .field-label { font-size:var(--fs-2xs); }
       .pb-step-body input { padding:.3rem .45rem; min-height:30px; font-family:var(--font-mono); font-size:var(--fs-sm);
         background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:var(--r-sm); width:100%; }
+      /* 24×24 is the WCAG 2.2 AA minimum target size, and these three sit
+         side by side — an 18px reorder button next to a delete button is a
+         mis-tap waiting to happen on a phone at the bench. */
       .pb-mini { background:none; border:0; color:var(--text-muted); cursor:pointer; font-size:1rem; line-height:1;
+        min-width:26px; min-height:26px; display:inline-flex; align-items:center; justify-content:center;
         padding:2px 5px; border-radius:var(--r-sm); }
       .pb-mini:hover { background:var(--surface-3); color:var(--text); }
       .pb-mini:disabled { opacity:.3; cursor:not-allowed; }
@@ -175,7 +179,7 @@ export function render(mount) {
         border-radius:var(--r-sm); padding:.4rem .5rem; min-height:34px; font-family:var(--font-mono); width:100%; }
       .pb-timeline { display:flex; height:40px; border-radius:var(--r-sm); overflow:hidden; border:1px solid var(--border); background:var(--bg); }
       .pb-seg { display:flex; align-items:center; justify-content:center; min-width:2px;
-        font-size:.625rem; font-family:var(--font-mono); font-weight:700; color:var(--bg); overflow:hidden; white-space:nowrap; }
+        font-size:var(--fs-2xs); font-family:var(--font-mono); font-weight:700; color:var(--bg); overflow:hidden; white-space:nowrap; }
       .pb-legend { display:flex; flex-wrap:wrap; gap:.35rem .9rem; margin-top:.6rem; font-size:var(--fs-xs); color:var(--text-muted); }
       .pb-legend span { display:inline-flex; align-items:center; gap:.35rem; }
       .pb-empty { padding:1.2rem; text-align:center; color:var(--text-muted); font-size:var(--fs-sm); }

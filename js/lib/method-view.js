@@ -54,8 +54,8 @@ export function renderMethodList(host, methods, opts = {}) {
       .ml-name { font-weight:600; font-size:var(--fs-sm); margin-bottom:.2rem; display:block; }
       .ml-sum { font-size:var(--fs-xs); color:var(--text-2); line-height:1.5; }
       .ml-cm { display:flex; gap:.35rem; margin-top:.55rem; flex-wrap:wrap; }
-      .ml-cm .chip { font-size:.625rem; }
-      .ml-vendor { font-family:var(--font-mono); font-size:.625rem; color:var(--text-muted);
+      .ml-cm .chip { font-size:var(--fs-2xs); }
+      .ml-vendor { font-family:var(--font-mono); font-size:var(--fs-2xs); color:var(--text-muted);
         margin-top:.4rem; display:block; }
     </style>`;
 

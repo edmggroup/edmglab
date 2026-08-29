@@ -40,7 +40,11 @@ a:hover { color: var(--accent-strong); text-decoration: underline; }
    convention that visually signals "this is a measured quantity". */
 code, kbd, samp, .num, .unit, .eqn {
   font-family: var(--font-mono);
-  font-size: 0.94em;
+  /* Monospace runs optically small, hence the 0.94 — but 0.94em of an
+     already-small parent lands under the floor, and these are the elements
+     that carry the NUMBERS. max() keeps the optical correction without ever
+     going below --fs-2xs. */
+  font-size: max(0.94em, var(--fs-2xs));
   font-variant-numeric: tabular-nums;
 }
 .unit { color: var(--text-2); }
@@ -116,6 +120,29 @@ code, kbd, samp, .num, .unit, .eqn {
 .header-actions { margin-left: auto; display: flex; align-items: center; gap: var(--sp-2); }
 
 .app-main { grid-area: main; min-width: 0; }
+
+/* Correction footer — a sibling of the view outlet, NOT a child of it.
+   Thirty-one places assign to #view-outlet.innerHTML, several long after the
+   view has rendered, so anything inside it would be wiped the first time a
+   view redrew itself. js/router.js owns this element. */
+.page-foot {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
+  display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); align-items: baseline;
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-sm); color: var(--text-muted);
+}
+.page-foot strong { color: var(--warn); font-weight: 650; }
+/* 24×24 is the WCAG 2.2 AA minimum target. This is a flex item, so it is
+   blockified and the padding really does set its height — an inline link in
+   a sentence would be exempt, but this one stands alone. */
+.page-foot-link {
+  margin-left: auto; font-weight: 550;
+  display: inline-flex; align-items: center; min-height: 24px; padding: 2px 0;
+}
+@media (min-width: 1024px) { .page-foot { padding-left: var(--sp-6); padding-right: var(--sp-6); } }
+
 .view-outlet { max-width: var(--content-max); margin: 0 auto; padding: var(--sp-5) var(--sp-4) var(--sp-7); }
 
 /* ============================================================
@@ -244,7 +271,7 @@ code, kbd, samp, .num, .unit, .eqn {
 /* Roadmap phase marker — a bare dimmed numeral. A bordered pill on every
    unbuilt module reads as clutter and competes with the labels. */
 .nav-phase {
-  flex: none; font-size: 0.6875rem; font-family: var(--font-mono);
+  flex: none; font-size: var(--fs-2xs); font-family: var(--font-mono);
   color: var(--text-muted); opacity: 0.6; font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -261,7 +288,7 @@ code, kbd, samp, .num, .unit, .eqn {
 .nav-util {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   padding: 4px 2px; border-radius: var(--r-sm);
-  color: var(--text-muted); font-size: 0.6875rem; font-weight: 550;
+  color: var(--text-muted); font-size: var(--fs-2xs); font-weight: 550;
   letter-spacing: 0.01em; text-align: center; line-height: 1.2;
 }
 .nav-util:hover { background: var(--surface-2); color: var(--text-2); text-decoration: none; }
@@ -285,7 +312,7 @@ code, kbd, samp, .num, .unit, .eqn {
 .bottomnav-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   min-height: var(--bottomnav-h); padding: var(--sp-2) var(--sp-1);
-  color: var(--text-muted); font-size: 0.75rem; font-weight: 550;
+  color: var(--text-muted); font-size: var(--fs-2xs); font-weight: 550;
   background: none; border: 0; cursor: pointer; font-family: inherit;
 }
 .bottomnav-item:hover { text-decoration: none; color: var(--text-2); }
@@ -542,6 +569,61 @@ td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-
 /* Labels toggle — driven by the engine's Labels button */
 .anim[data-labels="off"] .anim-label { display: none; }
 
+/* ── Enlarged diagram (js/lib/anim-fullscreen.js) ──────────
+   Nothing here scrolls: the fit is computed in JS from the viewport and the
+   scene's own aspect ratio, so the diagram is always wholly inside the
+   window — the same rule the charts follow. */
+.dg-full {
+  position: fixed; inset: 0; z-index: 80;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+}
+.dg-full-bar {
+  flex: none; height: 64px;
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 0 var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+/* The bar is a fixed 64px, so nothing in it may wrap — a three-word diagram
+   title on a phone otherwise runs to three lines and collides with the
+   button. The title truncates; the hint disappears before the title does. */
+.dg-full-title {
+  font-weight: 650; font-size: var(--fs-md);
+  flex: 0 1 auto; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dg-full-hint  {
+  font-size: var(--fs-xs); color: var(--text-muted);
+  flex: 1 1 auto; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+@media (max-width: 599px) { .dg-full-hint { display: none; } }
+.dg-full-close { margin-left: auto; flex: none; }
+.dg-full-fit {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  /* The rotated stage is centred on its own middle, so it must be allowed to
+     paint outside this box's inline size. */
+  overflow: visible;
+}
+/* flex: none is load-bearing. Without it the rotator is a shrinkable flex
+   item, so the width JS computes for the TURNED orientation (wider than the
+   viewport, by design — it is about to be rotated onto the long edge) gets
+   silently clamped back to the viewport width and the rotation gains
+   nothing. */
+.dg-full-rot { flex: none; transform-origin: center center; }
+.dg-full-rot .anim-stage { width: 100%; height: 100%; }
+.dg-full-rot .anim-stage svg { width: 100%; height: 100%; }
+.dg-full-rot > *:not(.anim-stage) { width: 100%; height: 100%; }
+.dg-full-rot > *:not(.anim-stage) > svg { width: 100%; height: 100%; }
+/* The control on a static diagram — the animated scenes have their own
+   control bar, these do not. */
+.has-enlarge { position: relative; }
+.dg-enlarge { position: absolute; top: var(--sp-2); right: var(--sp-2); z-index: 2; }
+.dg-full .dg-enlarge { display: none; }   /* already enlarged */
+
 /* ============================================================
    INTERACTIVE DIAGRAM  (js/lib/diagram.js)
    ============================================================ */
@@ -561,8 +643,8 @@ td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-
   fill: var(--surface-2); stroke: var(--border-strong); stroke-width: 1.5;
   transition: fill var(--dur-fast) var(--ease), stroke var(--dur-fast) var(--ease);
 }
-.dg-block text { fill: var(--text); font-size: 13px; font-family: var(--font-ui); font-weight: 550; pointer-events: none; }
-.dg-block .dg-sub { fill: var(--text-muted); font-size: 10.5px; font-weight: 500; font-family: var(--font-mono); }
+.dg-block text { fill: var(--text); font-size: 14px; font-family: var(--font-ui); font-weight: 550; pointer-events: none; }
+.dg-block .dg-sub { fill: var(--text-muted); font-size: 13px; font-weight: 500; font-family: var(--font-mono); }
 .dg-block:hover rect { fill: var(--surface-3); stroke: var(--accent); }
 .dg-block:focus { outline: none; }
 .dg-block:focus-visible rect { stroke: var(--accent-strong); stroke-width: 2.5; }
@@ -778,6 +860,34 @@ body.gate-open { overflow: hidden; }
 
 /* Limitation / consideration lists. Moved out of method-view.js for the same
    reason: workflow, safety, cells, circuits and Tafel pages all use it. */
+/* Step commentary under a workflow or preparation step. Defined here rather
+   than in either module because BOTH the battery-tester workflow and the
+   electrode-preparation sequence render it — it was duplicated in two inline
+   <style> blocks, which is how the two copies drift apart. */
+.wf-cm { font-family: var(--font-mono); font-size: var(--fs-2xs); color: var(--text-muted); }
+
+/* Segmented control. Lived in js/echem/tafel.js's inline <style> until the
+   scan-rate module used it and got 21px unstyled buttons — the FIFTH time a
+   class used by more than one module was found defined inside one of them
+   (.tabbar, .lim-list, .mv-*, .wf-cm, and now this). A class more than one
+   module uses belongs here.
+   min-height is 32px, not decoration: these are the WCAG 2.2 target size. */
+.seg {
+  display: flex; gap: 2px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 2px;
+}
+.seg-b {
+  flex: 1 1 0; padding: .4rem .5rem;
+  font: inherit; font-size: var(--fs-xs); font-weight: 600;
+  color: var(--text-2); background: transparent; border: 0;
+  border-radius: calc(var(--r-sm) - 2px);
+  cursor: pointer; min-height: 32px;
+}
+.seg-b:hover { color: var(--text); }
+.seg-b.is-active { background: var(--accent-wash); color: var(--accent-strong); }
+
+
 .lim-list { margin: 0; padding-left: 1.15rem; font-size: var(--fs-sm); color: var(--text-2); }
 .lim-list li { margin-bottom: .35rem; }
 .lim-list li:last-child { margin-bottom: 0; }

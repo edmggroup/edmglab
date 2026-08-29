@@ -16,6 +16,11 @@
 
 import { esc } from '../ui.js';
 
+/* Tells app.js this module is loaded, so it can call into it on a theme
+   change or a tab switch WITHOUT importing it and putting it back on the
+   boot path. One line here, 14 KB off every first visit. */
+window.__edmglabCharts = true;
+
 /* ── Lazy vendor loading ─────────────────────────────────── */
 
 let loadPromise = null;

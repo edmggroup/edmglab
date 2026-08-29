@@ -50,7 +50,16 @@ function match(path) {
 }
 
 export function currentPath() {
-  return (location.hash || '#/').replace(/^#/, '') || '/';
+  // The query string is not part of the route. `#/suggest?about=…` must match
+  // the `/suggest` pattern, or a link that carries context to a view would
+  // land on "not found" instead.
+  return ((location.hash || '#/').replace(/^#/, '').split('?')[0]) || '/';
+}
+
+/** Anything after `?` in the hash, as URLSearchParams. */
+export function currentQuery() {
+  const q = (location.hash || '').split('?')[1] || '';
+  return new URLSearchParams(q);
 }
 
 async function resolve() {
@@ -82,13 +91,14 @@ async function resolve() {
     clearTimeout(slow);
 
     outlet.innerHTML = '';
-    const ctx = { params: hit.params, path, outlet };
+    const ctx = { params: hit.params, query: currentQuery(), path, outlet };
     const result = await view.render(outlet, ctx);
     current = result && typeof result === 'object' ? result : null;
 
     document.title = (hit.r.meta.title ? hit.r.meta.title + ' — ' : '') + 'EDMGLAB';
     setActive('#' + path);
     updateBreadcrumb(hit.r.meta, hit.params, path);
+    updateFooter(path);
   } catch (err) {
     clearTimeout(slow);
     console.error('[router] view failed', err);
@@ -145,6 +155,39 @@ function updateBreadcrumb(meta, params, path = '/') {
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+/* ── The correction footer ────────────────────────────────────
+   One line under every view: "something wrong here? say so", carrying the
+   route it was clicked from.
+
+   It lives OUTSIDE #view-outlet, as a sibling inside <main>. Thirty-one
+   places in the codebase assign to `outlet.innerHTML`, several of them in
+   event handlers long after render() has resolved, so anything appended
+   inside the outlet would vanish the first time a view redrew itself. A
+   sibling cannot be clobbered by any of them.
+
+   Not shown on the correction page itself, and not on the admin panel —
+   neither is content anyone would be correcting. */
+const NO_FOOTER = ['/suggest', '/admin', '/menu'];
+
+function updateFooter(path) {
+  const main = document.getElementById('main');
+  if (!main) return;
+  let foot = document.getElementById('page-foot');
+
+  if (NO_FOOTER.includes(path)) { if (foot) foot.hidden = true; return; }
+
+  if (!foot) {
+    foot = document.createElement('footer');
+    foot.id = 'page-foot';
+    foot.className = 'page-foot';
+    main.appendChild(foot);
+  }
+  foot.hidden = false;
+  const q = new URLSearchParams({ about: '#' + path });
+  foot.innerHTML = `<span>All content here is <strong>draft</strong>, pending review by the group.</span>
+    <a class="page-foot-link" href="#/suggest?${q}">Something wrong on this page?</a>`;
 }
 
 export function start(outletEl) {

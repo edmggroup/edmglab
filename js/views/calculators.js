@@ -71,7 +71,7 @@ export async function render(outlet) {
         cursor:pointer; font:inherit; font-size:var(--fs-sm); font-weight:550; }
       .wb-choice { border:1px solid var(--border); border-left:3px solid var(--accent);
         border-radius:var(--r-md); background:var(--surface); padding:.85rem 1rem; margin-bottom:.75rem; }
-      .wb-choice h3 { font-size:var(--fs-base); margin:0 0 .2rem; }
+      .wb-choice h2 { font-size:var(--fs-base); margin:0 0 .2rem; }
       .wb-why { font-size:var(--fs-sm); color:var(--text-2); margin:0 0 .6rem; }
       .wb-opts { display:grid; gap:.4rem; grid-template-columns:1fr; }
       @media (min-width:760px){ .wb-opts { grid-template-columns:1fr 1fr; } }
@@ -161,7 +161,7 @@ export async function render(outlet) {
 
       ${groups.map((g) => `
         <div class="wb-choice">
-          <h3>${esc(g.question)}</h3>
+          <h2>${esc(g.question)}</h2>
           <p class="wb-why">${esc(g.why)}</p>
           <div class="wb-opts" role="radiogroup" aria-label="${esc(g.question)}">
             ${g.options.map((o) => `<button type="button" class="wb-opt${choice[g.id] === o.id ? ' is-on' : ''}"
@@ -272,7 +272,7 @@ export async function render(outlet) {
           <span class="wb-rname"><a href="#/formula/${esc(idTail(f.id))}">${esc(f.name)}</a></span>
           <span class="wb-rval">${r?.ok ? esc(sig(r.value, 5)) : '—'}
             ${f.result?.units?.length > 1
-              ? `<select class="wb-runit" data-ru="${esc(f.id)}">${f.result.units.map((u) =>
+              ? `<select class="wb-runit" data-ru="${esc(f.id)}" aria-label="Unit for the result of ${esc(f.title || f.id)}">${f.result.units.map((u) =>
                   `<option value="${esc(u.u)}"${u.u === (vals[`__u_${f.id}`] ?? f.result.units[0].u) ? ' selected' : ''}>${esc(u.u)}</option>`).join('')}</select>`
               : `<span class="wb-tag">${esc(f.result?.units?.[0]?.u || '')}</span>`}
           </span>

@@ -9,6 +9,22 @@
      >= 1024px  desktop  — persistent sidebar, no bottom nav
    ============================================================ */
 
+/* ── Phone ───────────────────────────────────────────────── */
+@media (max-width: 599px) {
+
+  /* The header is a flex row that cannot shrink below its content: hamburger,
+     wordmark, search, the Learn/Research switch and the theme toggle came to
+     463px, which pushed the WHOLE grid to 463px and made every page scroll
+     sideways at 390px. The wordmark is the right thing to drop — the mark
+     alone still identifies the app, whereas the mode switch and search are
+     controls. Do not "fix" a future overflow here by shrinking the mode
+     labels: "Learn" and "Research" are the two states of the entire content
+     model, and an abbreviation of either is a guess the reader has to make. */
+  .brand-text { display: none; }
+  .app-header { padding: 0 var(--sp-2); }
+  .mode-btn   { padding: var(--sp-1) var(--sp-2); }
+}
+
 /* ── Tablet ──────────────────────────────────────────────── */
 @media (min-width: 600px) {
 

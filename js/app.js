@@ -17,12 +17,37 @@ import * as router from './router.js';
 import * as store from './lib/storage.js';
 import * as data from './data.js';
 import { search, renderResults } from './search.js';
-import { retheme } from './lib/charts.js';
-import { pauseAll } from './lib/anim-engine.js';
 import { requireAccess } from './lib/access.js';
+/* charts.js and anim-engine.js are NOT imported here.
+   Between them they are 26 KB, and app.js wants one function from each: one
+   to re-theme live charts when the theme is toggled, one to stop animations
+   when the tab is hidden. Neither can matter until a view has actually drawn
+   a chart or mounted a scene — and that view imports the module itself. So
+   they are reached through the module cache when they are already loaded and
+   skipped entirely when they are not. A student reading concept pages never
+   downloads either. (Architecture §I.2: "Chart.js never downloads for a
+   student who only reads concept pages" — the WRAPPERS were still doing so.)
+   loadedModule() below returns the module only when a view has already
+   imported it, and null otherwise. */
+import { trap } from './lib/focus-trap.js';
+import { warmOnIdle } from './lib/offline.js';
 
 const root = document.documentElement;
 const app = document.querySelector('.app');
+
+/**
+ * Reach a module ONLY if something else has already loaded it.
+ *
+ * A bare dynamic import would fetch it, which is exactly what we are avoiding.
+ * A module that has been imported once is in the module map, so a second
+ * import() of the same specifier resolves from memory without a request — but
+ * there is no way to ask "is it there?" without starting that import. The flag
+ * is set by the modules themselves on first evaluation, which costs each of
+ * them one line and makes the question answerable.
+ */
+function loadedModule(flag, path) {
+  return window[flag] ? import(path) : null;
+}
 
 /* ══════════════════════════════════════════════════════════
    0 · Optional PIN gate
@@ -57,20 +82,44 @@ if (access.user) {
 nav.renderSidebar(document.getElementById('app-sidebar'));
 nav.renderBottomNav(document.getElementById('app-bottomnav'));
 
-/* ── Mobile / tablet nav drawer ── */
+/* ── Mobile / tablet nav drawer ──
+   The drawer is modal over the content, so while it is open the rest of the
+   shell must be unreachable — by Tab and by a screen reader alike. That is
+   what focus-trap.js does; without it a keyboard user tabs out of the open
+   drawer into links they cannot see. */
 const navToggle = document.getElementById('nav-toggle');
 const scrim = document.getElementById('sidebar-scrim');
+const sidebar = document.getElementById('app-sidebar');
+let releaseNav = null;
 
-function setNav(open) {
+function setNav(open, restoreTo) {
+  const was = app.classList.contains('nav-open');
   app.classList.toggle('nav-open', open);
   navToggle.setAttribute('aria-expanded', String(open));
   scrim.hidden = !open;
+
+  if (open && !was) {
+    /* Only trap when the drawer is actually overlaying content. At desktop
+       width the sidebar is permanent furniture, not a dialog, and trapping
+       focus in it would strand the user. The scrim is the reliable tell:
+       responsive.css hides it above 1024px. */
+    if (getComputedStyle(scrim).display !== 'none') {
+      releaseNav = trap(sidebar, { also: [navToggle, scrim], onEscape: () => setNav(false) });
+    }
+  } else if (!open && was) {
+    releaseNav?.(restoreTo);
+    releaseNav = null;
+  }
 }
 navToggle.addEventListener('click', () => setNav(!app.classList.contains('nav-open')));
 scrim.addEventListener('click', () => setNav(false));
-// Any navigation closes the drawer — otherwise it hangs open over the new view.
-window.addEventListener('hashchange', () => setNav(false));
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setNav(false); });
+/* Any navigation closes the drawer — otherwise it hangs open over the new
+   view. Focus goes to <main> rather than back to the hamburger: the user
+   asked for a new page, so that is where a screen reader should land. */
+window.addEventListener('hashchange', () => setNav(false, document.getElementById('main')));
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && app.classList.contains('nav-open')) setNav(false);
+});
 
 /* ══════════════════════════════════════════════════════════
    2 · Theme and mode
@@ -82,7 +131,8 @@ document.getElementById('theme-btn').addEventListener('click', () => {
   store.set('theme', next);
   document.querySelector('meta[name="theme-color"]')?.setAttribute(
     'content', next === 'light' ? '#f6f8fa' : '#0e1116');
-  retheme();   // live charts pick up the new palette
+  // Only when a chart actually exists to re-theme.
+  loadedModule('__edmglabCharts', './lib/charts.js')?.then((m) => m.retheme());
 });
 
 document.querySelectorAll('[data-mode-set]').forEach((btn) => {
@@ -166,6 +216,20 @@ router.route('/fundamentals/:section', () => import('./views/fundamentals.js'), 
 router.route('/learning', () => import('./views/quiz.js'),     { title: 'Learning Check' });
 router.route('/glossary', () => import('./views/glossary.js'), { title: 'Glossary' });
 
+/* ── Corrections (Roadmap P14) ──
+   The one route that takes a query string: `#/suggest?about=#/formula/c_rate`
+   arrives from the footer of the page being corrected. */
+router.route('/suggest', () => import('./views/suggest.js'), { title: 'Suggest a correction' });
+
+/* ── Scan-rate analysis (Roadmap P6) ──
+   b-value and Dunn deconvolution, on a simulated series whose decomposition is
+   known in advance and on the user's own voltammograms. */
+router.route('/analysis', () => import('./views/analysis.js'), { title: 'Scan-rate Analysis' });
+
+/* ── Our instruments (Architecture §E.5) ──
+   The one view whose content this platform will never write. */
+router.route('/instruments', () => import('./views/instruments.js'), { title: 'Our Instruments' });
+
 router.start(document.getElementById('view-outlet'));
 
 /* ══════════════════════════════════════════════════════════
@@ -173,21 +237,37 @@ router.start(document.getElementById('view-outlet'));
    ══════════════════════════════════════════════════════════ */
 
 const overlay = document.getElementById('search-overlay');
+const panel = overlay.querySelector('.overlay-panel');
 const input = document.getElementById('search-input');
 const results = document.getElementById('search-results');
+let releaseSearch = null;
 
 function openSearch() {
+  if (!overlay.hidden) return;
   overlay.hidden = false;
   input.value = '';
   renderResults(results, [], '');
+  // aria-modal alone does not stop Tab. The trap does, and it also restores
+  // focus to the search button on close instead of dropping it to the top
+  // of the document.
+  releaseSearch = trap(panel, { onEscape: closeSearch });
   input.focus();
 }
-function closeSearch() { overlay.hidden = true; }
+function closeSearch(restoreTo) {
+  if (overlay.hidden) return;
+  overlay.hidden = true;
+  releaseSearch?.(restoreTo);
+  releaseSearch = null;
+}
 
 document.getElementById('search-btn').addEventListener('click', openSearch);
-document.getElementById('search-close').addEventListener('click', closeSearch);
+document.getElementById('search-close').addEventListener('click', () => closeSearch());
 overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSearch(); });
-overlay.addEventListener('click', (e) => { if (e.target.closest('.result-item')) closeSearch(); });
+// Following a result is a navigation: land on the new view, not back on the
+// search button the user has finished with.
+overlay.addEventListener('click', (e) => {
+  if (e.target.closest('.result-item')) closeSearch(document.getElementById('main'));
+});
 
 let searchTimer = null;
 input.addEventListener('input', () => {
@@ -200,7 +280,7 @@ input.addEventListener('input', () => {
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !overlay.hidden) { closeSearch(); return; }
+  if (e.key === 'Escape' && !overlay.hidden) { closeSearch(); return; }   // belt and braces: the trap also handles this
   // "/" opens search, but never while the user is typing in a field.
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '');
   if (e.key === '/' && !typing && overlay.hidden) { e.preventDefault(); openSearch(); }
@@ -215,13 +295,22 @@ document.addEventListener('keydown', (e) => {
 
 data.loadCore().catch((e) => console.warn('[app] core data warm-up failed', e));
 
+/* Once the page is quiet, pull the REST of the content and the plot libraries
+   into the cache so the platform is usable offline in full — not just on the
+   pages this visit happened to open. Skipped on a metered connection; see
+   js/lib/offline.js. */
+warmOnIdle();
+
 /* ══════════════════════════════════════════════════════════
    6 · Housekeeping
    ══════════════════════════════════════════════════════════ */
 
 // Stop every animation when the tab is hidden — no point burning a phone
 // battery drawing frames nobody is looking at.
-document.addEventListener('visibilitychange', () => { if (document.hidden) pauseAll(); });
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) return;
+  loadedModule('__edmglabAnim', './lib/anim-engine.js')?.then((m) => m.pauseAll());
+});
 
 /* ══════════════════════════════════════════════════════════
    7 · Service worker

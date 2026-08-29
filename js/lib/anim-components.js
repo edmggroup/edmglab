@@ -210,12 +210,25 @@ export function particle(o) {
    ANNOTATION
    ════════════════════════════════════════════════════════════ */
 
-/** A text label. Hidden by the engine's Labels toggle. */
+/**
+ * A text label. Hidden by the engine's Labels toggle.
+ *
+ * 12.5 user units, not 11.5. A scene's viewBox is about 640 wide and the
+ * stage scales to the column, so on a phone every one of these renders at
+ * roughly half its declared size — 11.5 became 6.4 px, about a millimetre.
+ * The bump helps a little everywhere; the real answer for a phone is the
+ * engine's Enlarge control (js/lib/anim-fullscreen.js), which turns the
+ * diagram onto the long edge of the screen.
+ */
 export function label(x, y, text, opts = {}) {
   const t = n('text', {
     class: 'anim-label', x, y,
     'text-anchor': opts.anchor || 'start',
-    'font-size': opts.size || 11.5,
+    /* A FLOOR, not a default. Scenes were passing 9.5 and 10 for secondary
+       annotations, which is fine on the desk monitor they were drawn on and
+       4.6 px on a phone. Clamping here means no scene can reintroduce it, and
+       there is no list of call sites to keep in step. */
+    'font-size': Math.max(opts.size || 12.5, 11),
     'font-family': opts.mono ? 'var(--font-mono)' : 'var(--font-ui)',
     'font-weight': opts.weight || 550,
     fill: opts.fill || 'var(--text-2)'
@@ -228,7 +241,7 @@ export function label(x, y, text, opts = {}) {
 export function readout(x, y, opts = {}) {
   const t = n('text', {
     x, y, 'text-anchor': opts.anchor || 'start',
-    'font-size': opts.size || 13,
+    'font-size': Math.max(opts.size || 13, 11),   // same floor as label()
     'font-family': 'var(--font-mono)', 'font-weight': 600,
     fill: opts.fill || 'var(--text)'
   });

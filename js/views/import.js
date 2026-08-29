@@ -67,8 +67,14 @@ export async function render(outlet) {
       .im-drop { border:2px dashed var(--border); border-radius:var(--r-md);
         background:var(--surface); padding:2rem 1.25rem; text-align:center; cursor:pointer;
         transition:border-color var(--dur-fast), background var(--dur-fast); margin:1.25rem 0; }
-      .im-drop:hover, .im-drop:focus-visible, .im-drop.is-over {
-        border-color:var(--accent); background:var(--accent-wash); outline:none; }
+      .im-drop:hover, .im-drop.is-over {
+        border-color:var(--accent); background:var(--accent-wash); }
+      /* Keyboard focus must NOT look identical to hover: a keyboard user has
+         no pointer to tell them where they are. Suppressing the outline here
+         left this control with no visible focus state at all. */
+      .im-drop:focus-visible {
+        border-color:var(--accent); background:var(--accent-wash);
+        outline:2px solid var(--accent); outline-offset:3px; }
       .im-drop-in { display:grid; gap:.35rem; }
       .im-drop-in strong { font-size:var(--fs-md); color:var(--text); }
       .im-drop-in span { font-size:var(--fs-sm); color:var(--text-2); }

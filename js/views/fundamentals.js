@@ -106,15 +106,15 @@ function conceptCard(c) {
     <div class="concept-body">
       <div data-mode-only="learn">
         ${l.simpleDefinition ? `<p>${esc(l.simpleDefinition)}</p>` : ''}
-        ${l.physicalMeaning ? `<div><h4>What it means in practice</h4><p style="margin:0">${esc(l.physicalMeaning)}</p></div>` : ''}
-        ${l.example ? `<div><h4>Example</h4><p style="margin:0">${esc(l.example)}</p></div>` : ''}
+        ${l.physicalMeaning ? `<div><h3>What it means in practice</h3><p style="margin:0">${esc(l.physicalMeaning)}</p></div>` : ''}
+        ${l.example ? `<div><h3>Example</h3><p style="margin:0">${esc(l.example)}</p></div>` : ''}
       </div>
       <div data-mode-only="research">
         ${r.scientificDefinition ? `<p>${esc(r.scientificDefinition)}</p>` : ''}
-        ${r.mathematicalTreatment ? `<div><h4>Mathematical treatment</h4><p style="margin:0">${esc(r.mathematicalTreatment)}</p></div>` : ''}
-        ${r.experimentalInterpretation ? `<div><h4>Experimental interpretation</h4><p style="margin:0">${esc(r.experimentalInterpretation)}</p></div>` : ''}
-        ${r.limitations?.length ? `<div><h4>Limitations</h4><ul class="lim-list warn">${r.limitations.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
-        ${r.researchConsiderations?.length ? `<div><h4>Research considerations</h4><ul class="lim-list">${r.researchConsiderations.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+        ${r.mathematicalTreatment ? `<div><h3>Mathematical treatment</h3><p style="margin:0">${esc(r.mathematicalTreatment)}</p></div>` : ''}
+        ${r.experimentalInterpretation ? `<div><h3>Experimental interpretation</h3><p style="margin:0">${esc(r.experimentalInterpretation)}</p></div>` : ''}
+        ${r.limitations?.length ? `<div><h3>Limitations</h3><ul class="lim-list warn">${r.limitations.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+        ${r.researchConsiderations?.length ? `<div><h3>Research considerations</h3><ul class="lim-list">${r.researchConsiderations.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
       </div>
       ${c.interactive?.route ? `<div class="callout callout-info" style="margin-top:.5rem">
         <strong>Interactive.</strong>

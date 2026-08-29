@@ -1,0 +1,113 @@
+{
+  "_README": "YOUR ACTUAL MACHINES. This file ships EMPTY and stays empty until your group fills it from your own manuals and calibration records. Nothing in EDMGLAB will ever write a specification here, and neither should anyone working from memory or from what a similar model does — a wrong number here is worse than a missing one, because it looks authoritative. Copy the block in _template into items[] and fill what you know. Leave out what you do not: an absent field renders as 'not recorded', which is honest.",
+  "schemaVersion": 1,
+
+  "_why": "The specifications matter, but the QUIRKS are the reason this file exists. 'Channel 7 reads about 2 mV low, verified March 2026' is institutional knowledge that currently lives in one senior student's head and leaves when they graduate. It is also useless to anyone outside the lab, so it is safe in a public repository — unlike anything about unpublished results.",
+
+  "items": [],
+
+  "_template": {
+    "_": "Copy this object into items[] and delete every field you cannot fill from a document in front of you. Delete these underscore notes too.",
+
+    "id": "instrument.neware_bts_4000",
+    "_id": "instrument.<vendor>_<model>, lowercase, underscores. Unique across the whole platform — every cross-reference points at this string.",
+
+    "kind": "cycler",
+    "_kind": "'cycler' for a battery tester, 'workstation' for a potentiostat/galvanostat, 'furnace', 'balance', 'other'.",
+
+    "vendor": "",
+    "model": "",
+    "serial": "",
+    "location": "",
+    "_location": "Which room, bench or chamber. Useful when there are two of the same model.",
+
+    "commissioned": "",
+    "_commissioned": "YYYY-MM. When the lab got it. Helps date the quirks below.",
+
+    "manual": {
+      "title": "",
+      "version": "",
+      "url": "",
+      "_": "EVERY datasheet value below must be traceable to this. Record the manual's version — vendors revise specifications between editions, and a value from the wrong edition is a wrong value with a citation attached."
+    },
+
+    "channels": [
+      {
+        "id": "1",
+        "group": "",
+        "_group": "Which bank, rack or chamber this channel is on.",
+        "range": "",
+        "_range": "The current range this channel is wired for, if channels differ.",
+        "notes": ""
+      }
+    ],
+    "_channels": "One entry per channel, or one per group if they are identical. This is what lets somebody find out which channels share a temperature chamber without asking.",
+
+    "specs": {
+      "_": "Every entry is a value OBJECT, never a bare number. provenance must be 'datasheet' with a source, or 'measured' with a date — nothing else belongs in this file. The health check errors on a value with a unit and no provenance.",
+      "currentMax": {
+        "value": null,
+        "unit": "A",
+        "provenance": "datasheet",
+        "source": "",
+        "_source": "Manual title and version, and the page or table number."
+      },
+      "currentResolution": { "value": null, "unit": "mA", "provenance": "datasheet", "source": "" },
+      "currentAccuracy": {
+        "value": null,
+        "unit": "% of range",
+        "provenance": "datasheet",
+        "source": "",
+        "_note": "Copy the vendor's wording exactly, including whether it is % of reading or % of range. The two differ by a lot at low current, and it is the commonest place a specification is quoted wrongly."
+      },
+      "voltageMax": { "value": null, "unit": "V", "provenance": "datasheet", "source": "" },
+      "voltageResolution": { "value": null, "unit": "mV", "provenance": "datasheet", "source": "" },
+      "voltageAccuracy": { "value": null, "unit": "% of range", "provenance": "datasheet", "source": "" },
+      "minStepTime": {
+        "value": null,
+        "unit": "s",
+        "provenance": "datasheet",
+        "source": "",
+        "_note": "The shortest step or logging interval. This is what sets whether a fast rate test is even recordable on this machine."
+      }
+    },
+
+    "calibration": [
+      {
+        "date": "",
+        "by": "",
+        "what": "",
+        "_what": "What was calibrated or checked — 'voltage, all channels', 'channel 3 current only'.",
+        "result": "",
+        "_result": "What was found, in plain words. 'Within specification' is a result. So is 'channel 3 out by 4 mV, adjusted'.",
+        "certificate": ""
+      }
+    ],
+
+    "sop": [
+      {
+        "title": "",
+        "_title": "e.g. 'Mounting a CR2032 in the four-position fixture'",
+        "steps": [""],
+        "_steps": "The lab's own procedure, in order. This exists nowhere else — not in the manual, and not in any paper."
+      }
+    ],
+
+    "quirks": [
+      {
+        "what": "",
+        "_what": "e.g. 'Channel 7 reads about 2 mV low against the calibrator'",
+        "verified": "",
+        "_verified": "YYYY-MM. A quirk with no date is a rumour.",
+        "by": "",
+        "workaround": "",
+        "_workaround": "What to do about it. 'Use channel 8 for anything under 10 mV of resolution' is more useful than the observation alone.",
+        "affects": ""
+      }
+    ],
+    "_quirks": "The most valuable part of this file. Write down what you would otherwise tell a new student verbally in their first week.",
+
+    "relatedIds": [],
+    "_relatedIds": "Ids of methods this machine runs, or troubleshooting entries where its quirks matter. e.g. ['method.cc_charge_discharge']"
+  }
+}

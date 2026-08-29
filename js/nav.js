@@ -19,6 +19,7 @@ const I = {
   flask:     '<path d="M9 3v6.5L4.2 18a2 2 0 0 0 1.7 3h12.2a2 2 0 0 0 1.7-3L15 9.5V3"/><path d="M8 3h8"/><path d="M7.2 15h9.6"/>',
   layers:    '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
   scope:     '<circle cx="12" cy="12" r="8"/><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/>',
+  flag:      '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
   battery:   '<rect x="2" y="7" width="17" height="10" rx="2"/><path d="M22 10.5v3"/><path d="M6 11v2M9.5 11v2M13 11v2"/>',
   wave:      '<path d="M2 12c2.5-6 5-6 7.5 0s5 6 7.5 0 5-6 5 0"/>',
   clipboard: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4"/><path d="M8.5 10h7M8.5 14h5"/>',
@@ -82,11 +83,13 @@ export const MODULES = [
   { id: 'battery-tester',  label: 'Battery Tester',      route: '#/battery-tester',      icon: 'battery',   tab: 'lab',   group: 'lab',   phase: 3,  view: 'battery-tester/index' },
   { id: 'workstation',     label: 'Echem Workstation',   route: '#/workstation',         icon: 'wave',      tab: 'lab',   group: 'lab',   phase: 5,  view: 'echem/index' },
   { id: 'protocols',       label: 'Test Protocols',      route: '#/battery-tester/protocol', icon: 'clipboard', tab: 'lab', group: 'lab', view: 'battery-tester/index' },
+  { id: 'instruments',     label: 'Our Instruments',     route: '#/instruments',         icon: 'clipboard', tab: 'lab',   group: 'lab',   view: 'instruments' },
   { id: 'which-instrument',label: 'Which Instrument?',   route: '#/workstation/choose',  icon: 'compass',   tab: 'lab',   group: 'lab',   phase: 5,  view: 'echem/index' },
 
   { id: 'formulas',        label: 'Formula Library',     route: '#/formulas',            icon: 'sigma',     tab: 'tools', group: 'tools', view: 'formulas' },
   { id: 'calculators',     label: 'Calculators',         route: '#/calculators',         icon: 'calc',      tab: 'tools', group: 'tools', view: 'calculators' },
   { id: 'import',          label: 'Data Import',         route: '#/import',              icon: 'upload',    tab: 'tools', group: 'tools', view: 'import' },
+  { id: 'analysis',        label: 'Scan-rate Analysis',   route: '#/analysis',            icon: 'sigma',     tab: 'tools', group: 'tools', view: 'analysis' },
   { id: 'troubleshooting', label: 'Troubleshooting',     route: '#/troubleshooting',     icon: 'wrench',    tab: 'tools', group: 'tools', phase: 10, view: 'troubleshooting' },
 
   // Utilities — footer rail, not the main list (see GROUPS above).
@@ -94,7 +97,11 @@ export const MODULES = [
   // used everywhere else, so cards and page titles stay unambiguous.
   { id: 'demo',   label: 'Engine Demo',       shortLabel: 'Demo',   route: '#/demo',   icon: 'grid',  tab: 'menu', group: null, util: true, phase: 0, view: 'demo' },
   { id: 'health', label: 'Data Health Check', shortLabel: 'Health', route: '#/health', icon: 'scope', tab: 'menu', group: null, util: true, phase: 0, view: 'health' },
-  { id: 'admin',  label: 'Access Control',    shortLabel: 'Access', route: '#/admin',  icon: 'lock',  tab: 'menu', group: null, util: true, phase: 0, view: 'admin' }
+  { id: 'admin',  label: 'Access Control',    shortLabel: 'Access', route: '#/admin',  icon: 'lock',  tab: 'menu', group: null, util: true, phase: 0, view: 'admin' },
+  /* The main way in is the footer link under every page, which carries the
+     route it was clicked from. This entry is for someone who has already
+     navigated away and wants to come back to their queued corrections. */
+  { id: 'suggest', label: 'Suggest a correction', shortLabel: 'Report', route: '#/suggest', icon: 'flag', tab: 'menu', group: null, util: true, phase: 0, view: 'suggest' }
 ];
 
 export function moduleByRoute(hash) {

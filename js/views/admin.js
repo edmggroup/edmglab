@@ -15,6 +15,10 @@
 
 import { esc, pageHead, section, callout } from '../ui.js';
 import * as access from '../lib/access.js';
+/* The derivation MUST be the same code the gate uses — a PIN generated with
+   different parameters would not verify. So this imports the gate module
+   rather than reimplementing PBKDF2 for the admin panel. */
+import { ITERATIONS, randomSalt, derive } from '../lib/access-gate.js';
 import * as store from '../lib/storage.js';
 
 export async function render(outlet) {
@@ -156,7 +160,7 @@ export async function render(outlet) {
     ${section('What gets stored', `
       <div class="panel"><div class="panel-body">
         <p class="small">The PIN itself is never written to the file. What is stored is a
-        <strong>PBKDF2-SHA256</strong> derivation with a random salt and ${access.ITERATIONS.toLocaleString()}
+        <strong>PBKDF2-SHA256</strong> derivation with a random salt and ${ITERATIONS.toLocaleString()}
         iterations.</p>
         <p class="small">That is there to protect <em>the PIN</em>, not the site. People reuse four-digit
         numbers on phones, lockers and bank cards, and a plaintext PIN in a public repository would leak a
@@ -235,9 +239,9 @@ export async function render(outlet) {
 
     status.textContent = 'Hashing…';
     try {
-      const salt = access.randomSalt();
-      const hash = await access.derive(pin, salt);
-      draft.users.push({ name, slug, salt, hash, iterations: access.ITERATIONS });
+      const salt = randomSalt();
+      const hash = await derive(pin, salt);
+      draft.users.push({ name, slug, salt, hash, iterations: ITERATIONS });
       $('#f-uname').value = ''; $('#f-upin').value = '';
       status.textContent = `Added ${name}.`;
       drawUsers();
@@ -266,8 +270,8 @@ export async function render(outlet) {
         if (typed.length !== 4) { status.textContent = 'PIN must be exactly 4 digits.'; return; }
         status.textContent = 'Hashing…';
         try {
-          const salt = access.randomSalt();
-          out.pin = { salt, hash: await access.derive(typed, salt), iterations: access.ITERATIONS };
+          const salt = randomSalt();
+          out.pin = { salt, hash: await derive(typed, salt), iterations: ITERATIONS };
         } catch (e) { status.textContent = 'Could not hash: ' + e.message; return; }
       } else if (draft.pin) {
         out.pin = draft.pin;                       // keep the existing one

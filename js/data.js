@@ -18,14 +18,29 @@ const BASE = new URL('../data/', import.meta.url).href;
 /** Loaded at boot — small, needed almost everywhere. */
 export const CORE = ['concepts', 'formulas', 'glossary'];
 
-/** Everything else, loaded on demand. Path is relative to /data/. */
+/**
+ * Everything else, loaded on demand. Path is relative to /data/.
+ *
+ * This registry is the ONE list of content files. It is what the health check
+ * validates, what the offline warm-up caches, and what search indexes — so a
+ * key that no view loads is not harmless: it makes every one of those three
+ * probe a file that will never exist. Four such keys (calculators,
+ * troubleshooting, bt/protocols, shared/instrument-choice) were removed after
+ * an audit found them 404ing on every health-check run; the workbench is built
+ * from formulas.json, troubleshooting lives per-module, and the protocol
+ * builder and instrument chooser are code, not content.
+ *
+ * `materials` is different and stays: it is a real file that has not been
+ * written yet, because it needs literature values with citations.
+ */
 const REGISTRY = {
   concepts:              'concepts.json',
   formulas:              'formulas.json',
   glossary:              'glossary.json',
-  calculators:           'calculators.json',
-  materials:             'materials.json',
-  troubleshooting:       'troubleshooting.json',
+  materials:             'materials.json',   // Roadmap P7 — awaiting references
+  /* Ships EMPTY on purpose and is never filled by this platform — the specs
+     come from the group's own manuals, the quirks from their own benches. */
+  instruments:           'instruments.json',
   quiz:                  'quiz.json',
   characterization:      'characterization.json',
   electrochemistry:      'electrochemistry.json',
@@ -34,7 +49,6 @@ const REGISTRY = {
   'bt/cells':            'battery-tester/cells.json',
   'bt/workflow':         'battery-tester/workflow.json',
   'bt/methods':          'battery-tester/methods.json',
-  'bt/protocols':        'battery-tester/protocols.json',
   'bt/troubleshooting':  'battery-tester/troubleshooting.json',
   'bt/safety':           'battery-tester/safety.json',
   'ec/concepts':         'echem/concepts.json',
@@ -46,7 +60,6 @@ const REGISTRY = {
   'ec/troubleshooting':  'echem/troubleshooting.json',
   'preparation':         'preparation.json',
   'import-profiles':     'import-profiles.json',
-  'shared/instrument-choice':    'shared/instrument-choice.json',
   'shared/method-decision-tree': 'shared/method-decision-tree.json',
   'shared/characterization-tree': 'shared/characterization-tree.json'
 };
@@ -177,6 +190,25 @@ export function loadedFiles() {
 /** All registered keys — used by the health check to load everything at once. */
 export function allKeys() {
   return Object.keys(REGISTRY);
+}
+
+/**
+ * Keys that are registered but deliberately not written yet. The offline
+ * warm-up skips these so it does not report a permanent "1 file missing";
+ * the health check still lists them, which is where that belongs.
+ */
+export const PENDING = new Set(['materials']);
+
+/** Absolute URL of one registered file. The only place outside this module
+ *  that needs it is the offline warm-up, which caches by URL. */
+export function fileUrl(key) {
+  const f = REGISTRY[key];
+  return f ? BASE + f : null;
+}
+
+/** Every content URL worth having available offline. */
+export function cacheableUrls() {
+  return Object.keys(REGISTRY).filter((k) => !PENDING.has(k)).map(fileUrl);
 }
 
 /** Which keys were requested but not found (not yet authored). */

@@ -20,6 +20,7 @@
 import { esc } from '../ui.js';
 import * as data from '../data.js';
 import { n as svg, label } from '../lib/anim-components.js';
+import { addEnlargeControl } from '../lib/anim-fullscreen.js';
 
 const FILL = {
   metal: { f: 'var(--border-strong)', s: 'var(--text-muted)' },
@@ -118,6 +119,7 @@ export async function render(host) {
 
     const stage = body.querySelector('#fmt-stage');
     const els = buildStack(stage, f, select);
+    addEnlargeControl(stage, `Cell format: ${f.label || f.id}`);
     function select(layerId) {
       const l = f.layers.find((x) => x.id === layerId);
       els.forEach((el, k) => el.classList.toggle('is-selected', k === layerId));

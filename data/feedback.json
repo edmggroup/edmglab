@@ -1,0 +1,50 @@
+{
+  "_README": "Where a reader's correction goes. This file is OPTIONAL — delete it and EDMGLAB still works: on GitHub Pages the repository is derived from the URL, and corrections open as pre-filled GitHub issues with no configuration at all. Edit this only to override that, or to add the optional Google Sheet backend (docs/apps-script/README.md).",
+  "schemaVersion": 1,
+
+  "_mode": "'auto' picks the best available: the Sheet endpoint if one is set, otherwise GitHub issues if the repository is known, otherwise local-only. Force a choice with 'github', 'endpoint' or 'none'.",
+  "mode": "auto",
+
+  "_repo": "Only needed if the site is served from a custom domain, where the repository cannot be derived from the URL. Format: owner/name",
+  "repo": "",
+
+  "_endpoint": "Optional. The /exec URL of the Apps Script Web App from docs/apps-script/. Leave empty and corrections go to GitHub instead. NOTE: this URL is public in a public repository — see the warning in that guide.",
+  "endpoint": "",
+
+  "_issueLabels": "Labels applied to a GitHub issue raised from a correction. They must already exist in the repository, or GitHub ignores them.",
+  "issueLabels": ["content"],
+
+  "_categories": "What kinds of problem a reader can report. The first five are about the science; the last is for things that are simply broken.",
+  "categories": [
+    {
+      "id": "wrong",
+      "label": "Something is scientifically wrong",
+      "hint": "A definition, a number, an equation or a claim that is not correct."
+    },
+    {
+      "id": "missing_source",
+      "label": "A value needs a source",
+      "hint": "A number is presented without a citation, or the citation does not support it."
+    },
+    {
+      "id": "misleading",
+      "label": "Correct but misleading",
+      "hint": "True as written, but a reader would draw the wrong conclusion from it."
+    },
+    {
+      "id": "unclear",
+      "label": "Unclear or hard to follow",
+      "hint": "The science is right; the explanation is not doing its job."
+    },
+    {
+      "id": "missing",
+      "label": "Something is missing",
+      "hint": "A technique, a failure mode, a caveat or a limitation that should be here."
+    },
+    {
+      "id": "broken",
+      "label": "Something is broken",
+      "hint": "A link, a calculator, a plot or a page that does not work."
+    }
+  ]
+}

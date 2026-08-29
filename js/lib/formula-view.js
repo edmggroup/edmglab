@@ -136,7 +136,7 @@ export function renderCalculator(host, f, opts = {}) {
         <span class="fx-rlabel">${esc(f.result?.name || 'Result')}</span>
         <span class="fx-rvalue">${esc(sig(r.value, 5))}
           ${f.result?.units?.length > 1
-            ? `<select id="fx-runit" class="fx-runit">${f.result.units.map((u) =>
+            ? `<select id="fx-runit" class="fx-runit" aria-label="Unit for the result">${f.result.units.map((u) =>
                 `<option value="${esc(u.u)}"${u.u === state.__resultUnit ? ' selected' : ''}>${esc(u.u)}</option>`).join('')}</select>`
             : `<span class="fx-runit-static">${esc(r.unit)}</span>`}
         </span>
@@ -339,7 +339,8 @@ export const FORMULA_CSS = `
   .fx-runit-static { font-size:var(--fs-md); color:var(--text-2); }
   .fx-rnote { font-size:var(--fs-xs); color:var(--text-muted); }
   .fx-prov { font-size:var(--fs-xs); color:var(--text-muted); line-height:1.45; }
-  .fx-work summary { cursor:pointer; font-size:var(--fs-sm); color:var(--text-2); }
+  .fx-work summary { cursor:pointer; font-size:var(--fs-sm); color:var(--text-2);
+    min-height:24px; display:flex; align-items:center; }
   .fx-work-body { padding-top:.6rem; }
   .fx-wtable { width:100%; border-collapse:collapse; font-size:var(--fs-xs); }
   .fx-wtable td { padding:.25rem .35rem; border-bottom:1px solid var(--border); }

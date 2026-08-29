@@ -26,6 +26,12 @@
  */
 
 import { esc } from '../ui.js';
+import { enlarge } from './anim-fullscreen.js';
+
+/* Tells app.js this module is loaded, so it can call into it on a theme
+   change or a tab switch WITHOUT importing it and putting it back on the
+   boot path. One line here, 12 KB off every first visit. */
+window.__edmglabAnim = true;
 
 /* ── Global loop ─────────────────────────────────────────── */
 
@@ -248,6 +254,18 @@ export function mountScene(container, scene) {
     });
     controls.appendChild(explainBtn);
   }
+
+  /* Enlarge. Part of the STANDARD control set, not a per-scene option: the
+     scenes are drawn wide, and on a phone that puts their smaller annotations
+     below the readable floor. Every scene therefore gets a way out of the
+     column. js/lib/anim-fullscreen.js explains the rotation. */
+  const bigBtn = document.createElement('button');
+  bigBtn.type = 'button';
+  bigBtn.className = 'btn btn-sm';
+  bigBtn.textContent = 'Enlarge';
+  bigBtn.setAttribute('aria-label', `Enlarge the diagram: ${scene.title || scene.id}`);
+  bigBtn.addEventListener('click', () => enlarge(stage, scene.title || scene.id));
+  controls.appendChild(bigBtn);
 
   const labelBtn = document.createElement('button');
   labelBtn.type = 'button';

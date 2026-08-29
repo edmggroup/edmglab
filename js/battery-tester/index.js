@@ -135,14 +135,14 @@ function conceptCard(c) {
     <div class="concept-body">
       <div data-mode-only="learn">
         ${l.simpleDefinition ? `<p>${esc(l.simpleDefinition)}</p>` : ''}
-        ${l.physicalMeaning ? `<div><h4>What it means in practice</h4><p style="margin:0">${esc(l.physicalMeaning)}</p></div>` : ''}
-        ${l.example ? `<div><h4>Example</h4><p style="margin:0">${esc(l.example)}</p></div>` : ''}
+        ${l.physicalMeaning ? `<div><h3>What it means in practice</h3><p style="margin:0">${esc(l.physicalMeaning)}</p></div>` : ''}
+        ${l.example ? `<div><h3>Example</h3><p style="margin:0">${esc(l.example)}</p></div>` : ''}
       </div>
       <div data-mode-only="research">
         ${r.scientificDefinition ? `<p>${esc(r.scientificDefinition)}</p>` : ''}
-        ${r.experimentalInterpretation ? `<div><h4>Experimental interpretation</h4><p style="margin:0">${esc(r.experimentalInterpretation)}</p></div>` : ''}
-        ${r.limitations?.length ? `<div><h4>Limitations</h4><ul>${r.limitations.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
-        ${r.researchConsiderations?.length ? `<div><h4>Research considerations</h4><ul>${r.researchConsiderations.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+        ${r.experimentalInterpretation ? `<div><h3>Experimental interpretation</h3><p style="margin:0">${esc(r.experimentalInterpretation)}</p></div>` : ''}
+        ${r.limitations?.length ? `<div><h3>Limitations</h3><ul>${r.limitations.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+        ${r.researchConsiderations?.length ? `<div><h3>Research considerations</h3><ul>${r.researchConsiderations.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
       </div>
     </div>
   </details></div>`;
@@ -185,19 +185,19 @@ function sectionPrinciples(host) {
       the cell is deciding. A real cell's voltage curve depends entirely on its chemistry.`, 'info')}
 
     <div class="anim-block" style="margin-top:1.25rem">
-      <h3>1 · Constant current (CC)</h3>
+      <h2>1 · Constant current (CC)</h2>
       <p class="lede">The tester holds the current on its setpoint and records whatever the voltage does.</p>
       <div id="a-cc"></div>
     </div>
 
     <div class="anim-block">
-      <h3>2 · Constant voltage (CV)</h3>
+      <h2>2 · Constant voltage (CV)</h2>
       <p class="lede">The roles swap: voltage is held, and the current becomes the measured response.</p>
       <div id="a-cv"></div>
     </div>
 
     <div class="anim-block">
-      <h3>3 · CC-CV</h3>
+      <h2>3 · CC-CV</h2>
       <p class="lede">The two joined together — constant current up to the voltage limit, then constant
         voltage while the current decays to its cutoff. Watch the moment the instrument swaps which
         quantity it controls.</p>
@@ -219,7 +219,7 @@ function sectionPrinciples(host) {
 function sectionTransport(host) {
   host.innerHTML = `
     <div class="anim-block">
-      <h3>Charge and discharge</h3>
+      <h2>Charge and discharge</h2>
       <p class="lede">Ions moving through the electrolyte and electrons moving through the external
         circuit — always coupled, always in the same overall direction. Charge cannot accumulate
         anywhere, which is why the two motions can never be considered separately.</p>

@@ -22,6 +22,7 @@ import { esc } from '../ui.js';
 import * as data from '../data.js';
 import { detailHtml } from '../lib/diagram.js';
 import { n as svg, label } from '../lib/anim-components.js';
+import { addEnlargeControl } from '../lib/anim-fullscreen.js';
 
 /* Geometry */
 const G = {
@@ -74,6 +75,9 @@ export async function render(host) {
   const detail = host.querySelector('#tec-detail');
   const s = buildSvg();
   stage.appendChild(s.el);
+  // 720-unit diagram in a 348 px phone column is half scale; its labels land
+  // at about 5 px. Give it the same way out the animated scenes have.
+  addEnlargeControl(stage, 'Three-electrode cell');
 
   /* ── Selection ── */
   function select(id) {

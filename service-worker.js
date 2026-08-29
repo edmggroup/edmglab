@@ -24,7 +24,7 @@
  * after a fix has shipped.
  */
 
-const CACHE_VERSION = 'edmglab-v17';
+const CACHE_VERSION = 'edmglab-v23';
 const DATA_CACHE = 'edmglab-data-v1';
 
 /* Paths are RELATIVE so the app works both at a domain root and at a
@@ -44,8 +44,12 @@ const SHELL = [
   './js/ui.js',
   './js/search.js',
   './js/lib/storage.js',
+  './js/lib/focus-trap.js',
+  './js/lib/offline.js',
   './js/lib/access.js',
+  './js/lib/access-gate.js',
   './js/lib/anim-engine.js',
+  './js/lib/anim-fullscreen.js',
   './js/lib/anim-components.js',
   './js/lib/diagram.js',
   './js/lib/sim-label.js',
@@ -61,6 +65,12 @@ const SHELL = [
   './js/views/fundamentals.js',
   './js/views/quiz.js',
   './js/views/glossary.js',
+  './js/views/suggest.js',
+  './js/views/analysis.js',
+  './js/views/instruments.js',
+  './js/echem/analysis.js',
+  './js/echem/sim/scanrate.js',
+  './js/lib/feedback.js',
   './js/chemistry/index.js',
   './js/chemistry/sim/mechanism.js',
   './js/views/formulas.js',
@@ -95,8 +105,12 @@ const SHELL = [
   './pwa/icons/icon-512.png'
 ];
 
-/* Vendor libraries are large and only needed on plot views. They are cached
-   on first use rather than precached, so the first load stays small. */
+/* Vendor libraries and content files are NOT precached: the install must stay
+   small enough that a first visit on campus wifi is quick. They are pulled in
+   a few seconds later by the WARM message below, once the app has painted and
+   the browser is idle — so the platform is fully offline-capable within
+   seconds of a first visit, not only for the pages somebody happened to open.
+   js/lib/offline.js has the full reasoning. */
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -121,10 +135,82 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
+/* ══════════════════════════════════════════════════════════════════
+   Messages from the page
+   ══════════════════════════════════════════════════════════════════
+   The page owns the LIST of content files (js/data.js is the one registry).
+   This worker owns the CACHES. Neither needs to know the other's business,
+   so the list arrives by message rather than being duplicated here — which
+   is what would rot the moment somebody adds a data file.               */
+
 self.addEventListener('message', (event) => {
+  const msg = event.data || {};
+
   // Sent by app.js when the user clicks "Refresh" on the update banner.
-  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+  if (msg.type === 'SKIP_WAITING') { self.skipWaiting(); return; }
+
+  /* ── WARM ──
+     Fetch everything the app will need offline that is not already held.
+     Called after boot on a connection the browser has not flagged as
+     metered, and on demand from the health page. */
+  if (msg.type === 'WARM') {
+    const port = event.ports[0];
+    event.waitUntil((async () => {
+      const result = { cached: 0, fetched: 0, failed: [], total: (msg.urls || []).length };
+      for (const url of msg.urls || []) {
+        const cache = await caches.open(cacheFor(url));
+        try {
+          if (await cache.match(url)) { result.cached++; continue; }
+          const res = await fetch(url, { cache: 'no-cache' });
+          // A 404 here is a registered file nobody has written yet. That is
+          // an authoring state, not a cache failure — do not store it, and
+          // do not report it as an error the user can act on.
+          if (res.ok) { await cache.put(url, res.clone()); result.fetched++; }
+          else if (res.status !== 404) result.failed.push(`${short(url)} → ${res.status}`);
+        } catch (e) {
+          result.failed.push(`${short(url)} → ${e.message}`);
+        }
+      }
+      port?.postMessage(result);
+    })());
+    return;
+  }
+
+  /* ── CACHE_STATUS ──
+     What is REALLY in the cache. The health page reports this rather than
+     the SHELL list, because the list is only an intention. */
+  if (msg.type === 'CACHE_STATUS') {
+    const port = event.ports[0];
+    const vendorSet = new Set(msg.vendor || []);
+    event.waitUntil((async () => {
+      const shell = await group(SHELL.map((p) => new URL(p, self.location).href), CACHE_VERSION);
+      const content = await group((msg.urls || []).filter((u) => !vendorSet.has(u)), DATA_CACHE);
+      const vendor = await group([...vendorSet], CACHE_VERSION);
+      port?.postMessage({ shell, content, vendor, version: CACHE_VERSION });
+    })());
+  }
 });
+
+/** Vendor libraries belong with the shell; content goes to the data cache. */
+function cacheFor(url) {
+  return url.includes('/data/') ? DATA_CACHE : CACHE_VERSION;
+}
+
+function short(url) {
+  try { return new URL(url).pathname.replace(/^.*\/(?=[^/]+\/[^/]+$)/, ''); }
+  catch { return url; }
+}
+
+async function group(urls, cacheName) {
+  const cache = await caches.open(cacheName);
+  const missing = [];
+  let have = 0;
+  for (const u of urls) {
+    if (await cache.match(u)) have++;
+    else missing.push(short(u));
+  }
+  return { have, total: urls.length, missing };
+}
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;

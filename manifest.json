@@ -2,13 +2,18 @@
   "name": "EDMGLAB — Energy Devices & Materials Group",
   "short_name": "EDMGLAB",
   "description": "Interactive research and learning platform for supercapacitors, batteries, electrode materials, characterisation and electrochemical analysis.",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0e1116",
   "theme_color": "#0e1116",
-  "categories": ["education", "science", "productivity"],
+  "categories": [
+    "education",
+    "science",
+    "productivity"
+  ],
   "lang": "en",
   "dir": "ltr",
   "icons": [
@@ -31,9 +36,48 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "pwa/screenshots/phone-dashboard.png",
+      "sizes": "412x915",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "The pathway: concept through to interpretation"
+    },
+    {
+      "src": "pwa/screenshots/phone-formula.png",
+      "sizes": "412x915",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Every formula states the configuration it is valid for"
+    },
+    {
+      "src": "pwa/screenshots/desktop-dashboard.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "The pathway: concept through to interpretation"
+    },
+    {
+      "src": "pwa/screenshots/desktop-cv.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Cyclic voltammetry simulator, labelled as a simulation"
+    }
+  ],
   "shortcuts": [
-    { "name": "Battery Tester",  "url": "./#/battery-tester" },
-    { "name": "Formula Library", "url": "./#/formulas" },
-    { "name": "Calculators",     "url": "./#/calculators" }
+    {
+      "name": "Battery Tester",
+      "url": "./#/battery-tester"
+    },
+    {
+      "name": "Formula Library",
+      "url": "./#/formulas"
+    },
+    {
+      "name": "Calculators",
+      "url": "./#/calculators"
+    }
   ]
 }
