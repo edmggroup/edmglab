@@ -30,6 +30,14 @@
  * clicked last. A disagreement about content is the most useful thing this
  * exercise can surface and the last thing it should hide.
  *
+ * ── OPEN TO EVERYONE IN THE GROUP ──
+ *
+ * Not admin-only. The person best placed to check a diffraction entry is
+ * whoever runs the diffractometer, and restricting this to whoever administers
+ * the website would lose exactly the expertise the exercise needs. What a
+ * reviewer cannot do is CHANGE anything: verdicts are recorded, the edit is
+ * made in the JSON and committed, and sign-off is a separate deliberate step.
+ *
  * Units come from js/lib/review-units.js, which the Word export also imports,
  * so the document and the page can never disagree about what there is.
  */
@@ -133,10 +141,17 @@ function shell(modules, cfg, state, liveError, finalised) {
       page.`, 'warn') : ''}
 
     ${!state.endpoint ? callout(`<strong>Verdicts are being kept in this browser only.</strong>
-      That is enough for one person working through a module. For several people at once — seeing each
-      other's progress and each other's disagreements — deploy the small script in
+      That is enough for one person working through a module alone. For several people at once — seeing
+      each other's progress and each other's disagreements — deploy the small script in
       <code>docs/apps-script/</code> and put its URL in <code>data/review.json</code>.
       Either way, use <strong>Export</strong> at the bottom to send what you have recorded.`, 'info') : ''}
+
+    ${callout(`<strong>Anyone in the group can review, and that is the point.</strong> The person best
+      placed to check an X-ray diffraction entry is whoever runs the diffractometer, not whoever
+      administers the website. Put your name in — a verdict nobody can follow up is not much use — and
+      work through whatever you actually know about. <strong>"I cannot judge this" is a real answer</strong>
+      and often the most useful one: it says the entry needs a different reviewer, which is something
+      nobody knows until you say it.`, 'info')}
 
     <section class="section">
       <div class="section-head"><h2>Where it stands</h2>
@@ -195,7 +210,8 @@ function shell(modules, cfg, state, liveError, finalised) {
                  value="${esc(state.reviewer)}" placeholder="so a verdict can be followed up">
         </label>
         ${state.endpoint ? `<label class="field" style="flex:1 1 200px">
-          <span class="field-label">Review key <span class="muted">(shared with the group)</span></span>
+          <span class="field-label">Review key
+            <span class="muted">(the group's shared key — ask whoever set this up)</span></span>
           <input type="password" id="rv-key" autocomplete="off" value="${esc(state.key)}">
         </label>` : ''}
         <div class="rv-filter">
@@ -217,7 +233,11 @@ function shell(modules, cfg, state, liveError, finalised) {
         <div class="row">
           <button type="button" class="btn" id="rv-export">Export my verdicts</button>
           <button type="button" class="btn btn-sm" id="rv-clear">Clear what is on this device</button>
+          ${state.endpoint ? `<button type="button" class="btn btn-sm" id="rv-forget">Forget the review key</button>` : ''}
         </div>
+        <p class="xsmall muted" style="margin:.6rem 0 0">The review key is remembered on this device so
+          you do not retype it once per verdict. On a shared lab machine, forget it when you are
+          done.</p>
       </div></div>
     </section>
 
@@ -413,6 +433,12 @@ function wire(outlet, modules, state, finalised) {
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     say(`Exported ${rows.length} verdicts.`);
+  });
+
+  $('#rv-forget')?.addEventListener('click', () => {
+    state.live?.remembered.forget();
+    const f = $('#rv-key'); if (f) f.value = '';
+    say('Key forgotten on this device. Verdicts already sent are unaffected.');
   });
 
   $('#rv-clear').addEventListener('click', (e) => {

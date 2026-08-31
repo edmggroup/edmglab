@@ -80,8 +80,9 @@ export async function render(outlet) {
           Read from ${esc({ endpoint: 'the live endpoint', cache: 'the last known list (endpoint unreachable)',
                             file: 'data/access.json' }[live._source] || live._source)}.</div>` : ''}
         ${store.getUser() ? `<div class="xsmall muted" style="margin-top:.7rem">
-          Signed in on this device as <code>${esc(store.getUser())}</code> —
-          <a href="#" id="admin-signout">sign out</a></div>` : ''}
+          Signed in on this device as <code>${esc(store.getUser())}</code>. Use the
+          <strong>lock</strong> button in the top bar to sign out — it is next to Learn / Research, where
+          somebody leaving a shared machine will actually look for it.</div>` : ''}
       </div></div>`)}
 
     <section class="section" id="live-section" hidden>
@@ -217,7 +218,8 @@ export async function render(outlet) {
 
   const $ = (s) => outlet.querySelector(s);
 
-  $('#admin-signout')?.addEventListener('click', (e) => { e.preventDefault(); access.signOut(); });
+  /* Sign-out moved to the lock button in the header — see index.html and
+     app.js. Nobody hunts through a settings page on their way out of a room. */
 
   /* Live management appears only when data/access.json names an endpoint, and
      the module behind it is only downloaded then — a group that has not

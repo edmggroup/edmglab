@@ -110,10 +110,13 @@ export async function verify(pin, cfg) {
          was meant to stop. */
       const got = await derive(pin, u.salt, u.iterations || ITERATIONS);
       if (got === u.hash && u.enabled !== false) {
-        return { ok: true, user: u.slug || slugify(u.name), label: u.name };
+        return {
+          ok: true, user: u.slug || slugify(u.name), label: u.name,
+          role: u.role === 'admin' ? 'admin' : 'member'
+        };
       }
     }
-    return { ok: false, user: null, label: null };
+    return { ok: false, user: null, label: null, role: null };
   }
 
   // Single shared PIN.
@@ -172,11 +175,13 @@ function showGate(cfg) {
 
         <button type="button" class="btn btn-primary gate-submit" id="gate-go">Unlock</button>
 
-        <p class="gate-note">
-          <strong>This is a soft gate, not security.</strong> EDMGLAB is a static site: this PIN keeps the
-          app tidy on shared machines and separates each person's saved progress. It does not protect any
-          file from anyone who knows the URL, so nothing confidential belongs in this repository.
-        </p>
+        <!-- The "soft gate, not security" note used to sit here and was removed
+             at the group's request. It was in the wrong place: a student typing
+             a PIN cannot act on it, and the person who CAN — whoever decides
+             what gets committed — sees it in full on #/admin, where it belongs.
+             It is still stated at the top of js/lib/access.js, on the admin
+             page, in data/access.json and in the architecture. Do not restore
+             it here; do not remove it from those. -->
       </div>`;
 
     document.body.appendChild(root);

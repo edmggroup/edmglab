@@ -5,16 +5,17 @@
  * data/review.json names an endpoint. A group that has not deployed Review.gs
  * downloads none of this.
  *
- * The review key is shared with the whole group, so unlike the admin key it IS
- * remembered on the device — a reviewer working through ninety entries should
- * not retype it ninety times. That is a deliberate difference in treatment and
- * it follows from a deliberate difference in consequence: the worst a leaked
- * review key allows is junk verdicts, which are appended rather than
- * overwritten and can be voted over. The admin key can lock the group out, so
- * it is never stored anywhere.
+ * The review key IS remembered on the device, unlike the admin key. Two
+ * reasons, and both matter: it is shared with the whole group so it is not a
+ * high-value secret, and it would otherwise be typed once per verdict rather
+ * than once per session. The worst a leaked review key allows is junk
+ * verdicts, which are appended rather than overwritten and can be voted over;
+ * the admin key can lock the group out, so it is never stored anywhere.
  *
- * The reviewer's NAME is also remembered, for the same reason and with no
- * downside — it is written into every row they submit anyway.
+ * Because it IS stored, the review page offers a "forget the review key"
+ * control, which matters on a shared lab machine. The reviewer's name is
+ * remembered on the same terms; it is written into every row they submit
+ * anyway.
  */
 
 const TIMEOUT_MS = 20000;

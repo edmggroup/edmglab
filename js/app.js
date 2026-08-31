@@ -16,7 +16,6 @@ import * as nav from './nav.js';
 import * as router from './router.js';
 import * as store from './lib/storage.js';
 import * as data from './data.js';
-import { search, renderResults } from './search.js';
 import { requireAccess } from './lib/access.js';
 /* charts.js and anim-engine.js are NOT imported here.
    Between them they are 26 KB, and app.js wants one function from each: one
@@ -30,6 +29,14 @@ import { requireAccess } from './lib/access.js';
    loadedModule() below returns the module only when a view has already
    imported it, and null otherwise. */
 import { trap } from './lib/focus-trap.js';
+
+/* search.js is not imported here either, for the same reason as charts and
+   animations: 5 KB on every visit for a panel that opens on a click or a "/".
+   It is fetched the first time the overlay is opened, which is imperceptible —
+   a worst-case query already runs in under 3 ms against a 50 ms budget, and
+   after the first visit the service worker has the file anyway. */
+let searchMod = null;
+const loadSearch = () => (searchMod ??= import('./search.js'));
 
 const root = document.documentElement;
 const app = document.querySelector('.app');
@@ -133,6 +140,29 @@ document.getElementById('theme-btn').addEventListener('click', () => {
   // Only when a chart actually exists to re-theme.
   loadedModule('__edmglabCharts', './lib/charts.js')?.then((m) => m.retheme());
 });
+
+/* ── Lock ──
+   Shown only when the gate is on, because that is the only case where locking
+   means anything: it clears the session so the PIN screen returns. On an
+   ungated site the button would reload the page and change nothing, which is
+   a worse answer than not offering it.
+
+   It lives next to Learn/Research rather than on the access page, because
+   locking a shared lab machine is something you do on the way out of the room
+   — not something you go looking for in a settings screen. */
+if (access.gated) {
+  const lock = document.getElementById('lock-btn');
+  if (lock) {
+    lock.hidden = false;
+    if (access.user) {
+      lock.title = `Lock — signed in as ${access.user}. You will need your PIN again.`;
+      lock.setAttribute('aria-label', lock.title);
+    }
+    lock.addEventListener('click', () => {
+      import('./lib/access.js').then((m) => m.signOut());
+    });
+  }
+}
 
 document.querySelectorAll('[data-mode-set]').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -271,7 +301,7 @@ function openSearch() {
   if (!overlay.hidden) return;
   overlay.hidden = false;
   input.value = '';
-  renderResults(results, [], '');
+  loadSearch().then((m) => { if (!overlay.hidden) m.renderResults(results, [], ''); });
   // aria-modal alone does not stop Tab. The trap does, and it also restores
   // focus to the search button on close instead of dropping it to the top
   // of the document.
@@ -299,8 +329,9 @@ input.addEventListener('input', () => {
   clearTimeout(searchTimer);
   // 90 ms is below the threshold where typing feels laggy, but enough to
   // avoid re-ranking on every keystroke of a fast typist.
-  searchTimer = setTimeout(() => {
-    renderResults(results, search(input.value), input.value);
+  searchTimer = setTimeout(async () => {
+    const m = await loadSearch();
+    m.renderResults(results, m.search(input.value), input.value);
   }, 90);
 });
 
