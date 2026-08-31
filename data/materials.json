@@ -1,0 +1,1591 @@
+{
+  "_README": "Electrode materials. READ THIS BEFORE ADDING ANYTHING. Not one number in this file is a measured or reported value, and none may be added without a citation somebody has actually read. What IS here is stoichiometry: each record states the electrode reaction, the formula unit the capacity is quoted per, and how many electrons that unit transfers. The theoretical capacity is then COMPUTED by the app from Q = n·F / (3.6·M), with M summed from IUPAC standard atomic weights — so there is no stored number to be wrong, and the derivation is shown next to the answer. Reported capacities, first-cycle efficiencies, rate performance and cycle life are all ABSENT on purpose: they vary by more than an order of magnitude with synthesis and testing conditions, and a number here without the conditions it was measured under is not information.",
+  "schemaVersion": 1,
+  "_atomicWeights": "Molar masses are computed in js/views/materials.js from the IUPAC conventional standard atomic weights, which are stated in that file as a single cited table rather than repeated per record. Change them in one place or not at all.",
+  "_halfVsFull": "Every record states what its capacity means in a HALF CELL and what changes in a FULL CELL. That distinction is the single largest source of incomparable numbers in this literature: a half-cell capacity is a property of one electrode against an effectively infinite counter-electrode, and it tells you almost nothing about what the same material delivers in a device where the other electrode is finite, the electrolyte is finite, and the mass that matters includes both.",
+  "items": [
+    {
+      "id": "material.graphite",
+      "name": "Graphite",
+      "role": "anode",
+      "chemistry": [
+        "Li",
+        "K"
+      ],
+      "family": "carbon",
+      "summary": "The anode almost every commercial lithium-ion cell uses. Lithium inserts between the graphene layers in stages, which is why its voltage profile is a staircase rather than a slope.",
+      "reaction": "LiC₆ ⇌ Li⁺ + e⁻ + 6 C",
+      "basisFormula": "C₆",
+      "composition": {
+        "C": 6
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of carbon, assuming the fully intercalated stage-1 compound LiC₆ is reached.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal",
+        "whatItMeasures": "How much lithium this graphite will take up when lithium is not the limiting reagent — because the counter electrode is a lithium foil holding orders of magnitude more than the working electrode needs.",
+        "whatItHides": "The first-cycle irreversible loss to SEI formation is invisible in the capacity you quote afterwards, and in a full cell that loss is paid for out of the cathode's lithium inventory, permanently."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.lifepo4",
+          "material.lco",
+          "material.nmc111"
+        ],
+        "whatChanges": "The cathode is now the only source of lithium, so every coulomb the anode consumes irreversibly is a coulomb the cell never gets back. The pairing ratio, not the anode's own capacity, sets what the cell delivers."
+      },
+      "cannotTell": [
+        "It does not tell you the capacity will be reached. LiC₆ is the fully lithiated limit; whether the last staging step happens depends on the potential window, the rate and the electrolyte.",
+        "It says nothing about the first-cycle efficiency, which is where graphite's real cost in a full cell lies.",
+        "It is per gram of active material. Binder, conductive additive, current collector, electrolyte, separator and casing are all excluded, and together they usually outweigh it."
+      ],
+      "notes": "For potassium the intercalation limit is KC₈ rather than LiC₆ — a different formula unit, and therefore a different capacity from the same material. See material.graphite_k.",
+      "relatedIds": [
+        "concept.capacitance_vs_capacity",
+        "mechanism.intercalation",
+        "formula.theoretical_capacity"
+      ],
+      "tags": [
+        "anode",
+        "lithium-ion",
+        "intercalation"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "The electrolyte is outside its own stability window at this electrode and decomposes on the first charge, forming a passivating solid-electrolyte interphase. That layer is what makes the cell work — and its formation is the first-cycle capacity loss.",
+          "watch": "A \"capacity\" quoted for the first cycle here includes electrolyte decomposition. Compare cycle 2 onwards, and report first-cycle Coulombic efficiency separately."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Lithium intercalates into graphite within a few hundred millivolts of lithium plating. The operating potential sits far below the lower limit of water's stability window — below it at pH 0 and still below it at pH 14, because the whole window slides down together and never widens.",
+          "watch": "Concentrated \"water-in-salt\" electrolytes push the practical limit outward by starving the water of free molecules. That is a KINETIC extension, not a thermodynamic one: the window in the panel above does not move, and a cell built this way is living on slow kinetics."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.graphite_k",
+      "name": "Graphite (potassium)",
+      "role": "anode",
+      "chemistry": [
+        "K"
+      ],
+      "family": "carbon",
+      "summary": "The same material as the lithium anode, with a different intercalation limit — which is why the theoretical capacity differs even though nothing about the graphite has changed.",
+      "reaction": "KC₈ ⇌ K⁺ + e⁻ + 8 C",
+      "basisFormula": "C₈",
+      "composition": {
+        "C": 8
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of carbon, assuming the stage-1 compound KC₈.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "K metal",
+        "whatItMeasures": "Uptake against a potassium counter electrode that is not limiting.",
+        "whatItHides": "Potassium metal is more reactive and mechanically softer than lithium; a half cell built with it degrades in ways that are attributed to the working electrode more often than they should be."
+      },
+      "fullCell": {
+        "pairedWith": [],
+        "whatChanges": "Potassium full cells are far less established than lithium ones, and the pairing is where most of the difficulty is. Nothing here should be read as a claim that a practical full cell exists."
+      },
+      "cannotTell": [
+        "The larger ion expands the lattice far more than lithium does. A theoretical capacity says nothing about whether the electrode survives that expansion.",
+        "Comparing this number with the lithium one is comparing two different formula units, not two materials."
+      ],
+      "relatedIds": [
+        "material.graphite",
+        "mechanism.intercalation",
+        "concept.reversibility",
+        "formula.theoretical_capacity"
+      ],
+      "tags": [
+        "anode",
+        "potassium-ion",
+        "intercalation"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "The electrolyte is outside its own stability window at this electrode and decomposes on the first charge, forming a passivating solid-electrolyte interphase. That layer is what makes the cell work — and its formation is the first-cycle capacity loss.",
+          "watch": "A \"capacity\" quoted for the first cycle here includes electrolyte decomposition. Compare cycle 2 onwards, and report first-cycle Coulombic efficiency separately."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Potassium intercalation sits close to potassium plating, and K⁺/K is lower than Na⁺/Na. The operating potential sits far below the lower limit of water's stability window — below it at pH 0 and still below it at pH 14, because the whole window slides down together and never widens.",
+          "watch": "Concentrated \"water-in-salt\" electrolytes push the practical limit outward by starving the water of free molecules. That is a KINETIC extension, not a thermodynamic one: the window in the panel above does not move, and a cell built this way is living on slow kinetics."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.hard_carbon",
+      "name": "Hard carbon",
+      "role": "anode",
+      "chemistry": [
+        "Na"
+      ],
+      "family": "carbon",
+      "summary": "The working anode for sodium-ion cells, because sodium does not intercalate into graphite the way lithium does. Storage is a combination of insertion between disordered layers and filling of closed pores.",
+      "reaction": "No single stoichiometric compound. Storage is not described by one formula unit.",
+      "basisFormula": null,
+      "composition": null,
+      "electrons": null,
+      "capacityBasis": "THERE IS NO THEORETICAL CAPACITY FOR THIS MATERIAL, and the app will not compute one.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Na metal",
+        "whatItMeasures": "Sodium uptake against a non-limiting sodium counter electrode. This is how essentially every hard-carbon capacity in the literature is measured.",
+        "whatItHides": "Hard carbon's first-cycle irreversible capacity is large and varies strongly with precursor and pyrolysis temperature. Against sodium foil that loss is invisible; in a full cell it is the dominant design problem."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.nafepo4",
+          "material.nnfm"
+        ],
+        "whatChanges": "The cathode supplies all the sodium, so hard carbon's first-cycle loss is subtracted from the cell directly. Pre-sodiation exists precisely because of this."
+      },
+      "cannotTell": [
+        "Nothing, because there is nothing to state. Hard carbon has no defined stoichiometry, so Faraday's law has no formula unit to act on and no theoretical capacity can be derived.",
+        "Any capacity quoted for hard carbon is a MEASURED value for one particular synthesis, and it belongs with its precursor, its pyrolysis temperature, its electrolyte and its rate — not on its own."
+      ],
+      "notes": "This record exists to say that plainly. A materials database that quietly omitted the field would leave a reader assuming the number was merely unrecorded, when in fact it is undefined.",
+      "relatedIds": [
+        "material.graphite",
+        "mechanism.intercalation",
+        "technique.xrd",
+        "concept.reversibility",
+        "formula.coulombic_efficiency"
+      ],
+      "tags": [
+        "anode",
+        "sodium-ion",
+        "no-theoretical-capacity"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "Ether electrolytes and carbonate electrolytes give measurably different first-cycle efficiency and plateau capacity on the SAME hard carbon. The electrolyte is part of the result here, not a background condition — record it.",
+          "watch": "Two hard-carbon papers with different electrolytes are not comparable, and neither are two of your own runs. This is the commonest reason a synthesis \"improvement\" fails to reproduce."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Sodium storage in hard carbon happens close to sodium plating, particularly the low-voltage plateau. The operating potential sits far below the lower limit of water's stability window — below it at pH 0 and still below it at pH 14, because the whole window slides down together and never widens.",
+          "watch": "Concentrated \"water-in-salt\" electrolytes push the practical limit outward by starving the water of free molecules. That is a KINETIC extension, not a thermodynamic one: the window in the panel above does not move, and a cell built this way is living on slow kinetics."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation",
+      "mechanismNote": "Only partly. Insertion between disordered layers is intercalation-like, but the low-voltage plateau is widely attributed to filling of closed pores, which is a different process and is not described by any mechanism record here. Treat the sloping and plateau regions as potentially different mechanisms rather than one."
+    },
+    {
+      "id": "material.lco",
+      "name": "Lithium cobalt oxide (LCO)",
+      "role": "cathode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "layered oxide",
+      "summary": "The original lithium-ion cathode. Its theoretical capacity is high; the capacity actually used is roughly half of it, for reasons that have nothing to do with stoichiometry.",
+      "reaction": "LiCoO₂ ⇌ Li₁₋ₓCoO₂ + x Li⁺ + x e⁻",
+      "basisFormula": "LiCoO₂",
+      "composition": {
+        "Li": 1,
+        "Co": 1,
+        "O": 2
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of LiCoO₂, for FULL extraction of one lithium — x = 1.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal",
+        "whatItMeasures": "Extraction up to whatever upper cut-off voltage was chosen — and that choice, not the material, sets the number.",
+        "whatItHides": "Extracting much beyond half the lithium destabilises the layered structure. The theoretical value assumes an extraction nobody performs."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.graphite"
+        ],
+        "whatChanges": "The usable fraction is narrower still once cycle life matters, and the cathode is the lithium source for the anode's SEI."
+      },
+      "cannotTell": [
+        "This is the clearest case in the file of a theoretical capacity that is not an engineering target. Roughly half of it is accessible in practice, and the gap is structural stability rather than kinetics.",
+        "Because the accessible fraction depends on the upper cut-off voltage, two papers can report very different capacities for identical material. The cut-off must be quoted with the number."
+      ],
+      "relatedIds": [
+        "material.graphite",
+        "material.nmc111",
+        "mechanism.intercalation",
+        "concept.reversibility",
+        "formula.capacity_retention"
+      ],
+      "tags": [
+        "cathode",
+        "lithium-ion",
+        "layered"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "Charging past the standard cut-off extracts more lithium and gives more capacity, while oxidising the electrolyte and destabilising the delithiated lattice. The extra capacity and the degradation are the same event.",
+          "watch": "A capacity quoted without its upper cut-off voltage is meaningless for a layered oxide. Always report the window."
+        },
+        {
+          "system": "aqueous",
+          "viable": "conditional",
+          "typical": "Neutral Li₂SO₄, deaerated.",
+          "whatChanges": "The working potential sits inside the water window in acid and neutral solution, but the oxygen line falls with pH — by pH 14 the upper limit is 0.401 V vs SHE and a layered-oxide cathode is above it. Aqueous operation is a pH-dependent claim, not a yes or no.",
+          "watch": "Cobalt dissolution in aqueous electrolyte, and proton exchange into the layered structure. Both are irreversible and neither shows up in the first few cycles."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.li_metal",
+      "name": "Lithium metal",
+      "role": "anode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "metal",
+      "summary": "The highest specific capacity of any lithium anode, and the reference electrode against which nearly every other lithium electrode is reported.",
+      "reaction": "Li ⇌ Li⁺ + e⁻",
+      "basisFormula": "Li",
+      "composition": {
+        "Li": 1
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of lithium metal, stripping one electron per atom.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "itself — it is the counter electrode",
+        "whatItMeasures": "In most half cells lithium metal is not the material under test; it is the reference and the counter. Its own capacity is almost never what is being measured.",
+        "whatItHides": "Using lithium foil as the counter electrode is what makes a half cell easy to interpret and what makes it unlike a device: the lithium inventory is effectively infinite and the counter electrode's own degradation is not counted."
+      },
+      "fullCell": {
+        "pairedWith": [],
+        "whatChanges": "As a working anode in a full cell it is limited by plating morphology and by electrolyte consumption, neither of which appears in the number above."
+      },
+      "cannotTell": [
+        "The theoretical capacity of lithium metal has never been the obstacle. Dendrite formation, dead lithium and continuous electrolyte reduction are.",
+        "A half-cell result obtained against lithium foil says nothing about lithium's suitability as the working anode in a device."
+      ],
+      "relatedIds": [
+        "material.graphite",
+        "concept.ec_three_electrode",
+        "mechanism.plating",
+        "concept.overpotential",
+        "concept.reversibility",
+        "formula.coulombic_efficiency"
+      ],
+      "tags": [
+        "anode",
+        "metal",
+        "lithium"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "Every non-aqueous electrolyte is thermodynamically unstable against lithium metal — Li⁺/Li is 3.04 V below the hydrogen line and below the reduction limit of every practical solvent. The electrode survives only behind an interphase it forms itself, and every stripping/plating cycle breaks and reforms part of it.",
+          "watch": "Excess lithium foil hides consumption completely. A half cell with 50× excess can cycle for a thousand hours while consuming lithium the whole time."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Lithium metal reduces water directly and vigorously, producing hydrogen and heat. This is not a marginal case to be optimised — it is a reaction, not an electrode.",
+          "watch": "SAFETY. Never attempt an aqueous cell containing alkali metal. Handle and disassemble lithium and sodium cells only in a glovebox or under the group’s own written procedure."
+        }
+      ],
+      "mechanismId": "mechanism.plating"
+    },
+    {
+      "id": "material.lifepo4",
+      "name": "Lithium iron phosphate (LFP)",
+      "role": "cathode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "polyanion",
+      "summary": "A flat-plateau cathode with a lower capacity and voltage than the layered oxides, and a much better safety and cycle-life record.",
+      "reaction": "LiFePO₄ ⇌ FePO₄ + Li⁺ + e⁻",
+      "basisFormula": "LiFePO₄",
+      "composition": {
+        "Li": 1,
+        "Fe": 1,
+        "P": 1,
+        "O": 4
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of LiFePO₄, full extraction of one lithium per formula unit.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal",
+        "whatItMeasures": "Lithium extraction and reinsertion against a lithium counter electrode. Unusually close to the theoretical value, because the two-phase reaction goes nearly to completion.",
+        "whatItHides": "The half cell has lithium to spare. In a full cell this cathode is the ONLY lithium source, and its capacity sets the cell's."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.graphite",
+          "material.lto"
+        ],
+        "whatChanges": "Cell capacity is set by whichever electrode runs out first, after the loading ratio is applied — and by the lithium the anode consumed forming its SEI on the first cycle. The cathode's own 170 is not the cell's number."
+      },
+      "cannotTell": [
+        "A flat voltage plateau makes state of charge hard to read from voltage — an operational consequence no capacity figure carries.",
+        "The capacity says nothing about the electronic conductivity problem that carbon coating and particle-size reduction exist to solve, and those additions reduce the capacity per gram of ELECTRODE while leaving the number above unchanged."
+      ],
+      "relatedIds": [
+        "material.graphite",
+        "mechanism.intercalation",
+        "formula.theoretical_capacity",
+        "concept.potential"
+      ],
+      "tags": [
+        "cathode",
+        "lithium-ion",
+        "polyanion"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "Operates below the oxidation limit of carbonate electrolytes, so the positive-side electrolyte decomposition that troubles high-voltage oxides is largely absent. This is a large part of LFP’s cycle life.",
+          "watch": "The flat plateau makes state of charge nearly unreadable from voltage. This is a real operational problem, not a curiosity."
+        },
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Li₂SO₄ or LiNO₃, neutral.",
+          "whatChanges": "LFP’s working potential falls inside the water window over most of the pH range, so aqueous lithium cells using it are genuinely built and studied.",
+          "watch": "Iron dissolution and the oxygen dissolved in the electrolyte both attack an aqueous cell in ways a non-aqueous cell never sees. Deaerate, and say in the method that you did."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation",
+      "mechanismNote": "A two-phase intercalation: LiFePO₄ and FePO₄ coexist rather than forming a continuous solid solution, which is where the flat plateau comes from."
+    },
+    {
+      "id": "material.lmo",
+      "name": "Lithium manganese oxide (LMO)",
+      "role": "cathode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "spinel",
+      "summary": "A spinel cathode with a high rate capability and a lower capacity than the layered oxides, historically limited by manganese dissolution.",
+      "reaction": "LiMn₂O₄ ⇌ Mn₂O₄ + Li⁺ + e⁻",
+      "basisFormula": "LiMn₂O₄",
+      "composition": {
+        "Li": 1,
+        "Mn": 2,
+        "O": 4
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of LiMn₂O₄, extraction of the single lithium from the 8a sites.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal",
+        "whatItMeasures": "Extraction and reinsertion at around 4 V.",
+        "whatItHides": "Manganese dissolution into the electrolyte, which shows up as capacity fade over many cycles and at elevated temperature, and which a short half-cell test will not reveal."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.graphite",
+          "material.lto"
+        ],
+        "whatChanges": "Dissolved manganese deposits on the anode and accelerates its degradation — a cross-electrode effect that a half cell, by construction, cannot show at all."
+      },
+      "cannotTell": [
+        "Nothing about the temperature dependence, which is where this material's practical limit sits.",
+        "Nothing about cross-talk between electrodes, which only exists in a full cell."
+      ],
+      "relatedIds": [
+        "material.lto",
+        "material.lifepo4",
+        "mechanism.intercalation",
+        "formula.capacity_retention",
+        "concept.reversibility"
+      ],
+      "tags": [
+        "cathode",
+        "lithium-ion",
+        "spinel"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "Manganese dissolution accelerates with temperature and with acidic decomposition products of the electrolyte, so the same cell fades far faster at 45 °C than at 25 °C.",
+          "watch": "Report the temperature. An LMO cycle-life number without one is not comparable to anything."
+        },
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Li₂SO₄, neutral. This is the classic aqueous lithium-ion cathode.",
+          "whatChanges": "The spinel’s working potential falls inside the water window in neutral solution, and it was the cathode in the first aqueous lithium-ion cells. Paired with LiTi₂(PO₄)₃ it makes a complete aqueous lithium cell.",
+          "watch": "Manganese dissolution is worse in aqueous electrolyte, and it is pH-dependent. Also: an aqueous cell has a hard upper voltage limit set by the solvent, so the achievable cell voltage is under about 1.5 V whatever the electrode chemistry allows."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.lto",
+      "name": "Lithium titanate (LTO)",
+      "role": "anode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "oxide",
+      "summary": "A low-capacity, high-rate anode that operates well above the potential where most electrolytes reduce — which is why it is safe and long-lived, and why the cell voltage is low.",
+      "reaction": "Li₄Ti₅O₁₂ + 3 Li⁺ + 3 e⁻ ⇌ Li₇Ti₅O₁₂",
+      "basisFormula": "Li₄Ti₅O₁₂",
+      "composition": {
+        "Li": 4,
+        "Ti": 5,
+        "O": 12
+      },
+      "electrons": 3,
+      "capacityBasis": "Per gram of Li₄Ti₅O₁₂, three lithium inserted per formula unit.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal",
+        "whatItMeasures": "Insertion capacity against excess lithium. LTO's flat plateau makes this unusually reproducible.",
+        "whatItHides": "The capacity is the least interesting thing about LTO. Its value is rate capability and the near-absence of SEI, neither of which is a capacity number."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.lmo",
+          "material.nmc111"
+        ],
+        "whatChanges": "LTO operates around 1.55 V vs Li/Li⁺ rather than near 0.1 V, so the full-cell voltage — and therefore the energy — is roughly 1.4 V lower than the same cathode against graphite. The capacity comparison hides that entirely; only the energy shows it."
+      },
+      "cannotTell": [
+        "Comparing an LTO cell with a graphite cell on capacity alone is meaningless: the two operate at different anode potentials and therefore at different cell voltages.",
+        "Its low capacity is by construction, not a defect, and a specific-capacity ranking penalises it for the property that makes it useful."
+      ],
+      "relatedIds": [
+        "material.graphite",
+        "concept.energy_power",
+        "mechanism.intercalation",
+        "formula.c_rate",
+        "formula.specific_energy_capacitor"
+      ],
+      "tags": [
+        "anode",
+        "lithium-ion",
+        "insertion",
+        "high-rate"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "LTO operates well above the potential at which carbonate electrolytes reduce, so it forms little or no interphase. That is the source of its cycle life and its safety, and the reason it wastes over a volt of cell voltage.",
+          "watch": "LTO’s excellent stability is a property of WHERE it operates, not of some intrinsic robustness. Do not generalise it to other titanates at other potentials."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "LTO operates roughly one and a half volts above lithium plating, which is a long way up — but still around a volt and a half BELOW the hydrogen line even at pH 14. Not viable in a dilute aqueous electrolyte.",
+          "watch": "Aqueous titanium-based anodes exist, but they are the phosphates (LiTi₂(PO₄)₃, NaTi₂(PO₄)₃), not LTO. Those are separate records here."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.ltp",
+      "name": "Lithium titanium phosphate (LTP)",
+      "role": "anode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "polyanion",
+      "summary": "The NASICON-framework anode that made aqueous lithium-ion cells possible — a titanium phosphate whose working potential sits inside the stability window of water, which almost no other lithium anode does.",
+      "reaction": "LiTi₂(PO₄)₃ + 2 Li⁺ + 2 e⁻ ⇌ Li₃Ti₂(PO₄)₃",
+      "basisFormula": "LiTi₂(PO₄)₃",
+      "composition": {
+        "Li": 1,
+        "Ti": 2,
+        "P": 3,
+        "O": 12
+      },
+      "electrons": 2,
+      "capacityBasis": "Per gram of the discharged framework LiTi₂(PO₄)₃, inserting two further lithium per formula unit.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal in a non-aqueous electrolyte",
+        "whatItMeasures": "The Ti⁴⁺/Ti³⁺ insertion capacity of the framework, measured the conventional way.",
+        "whatItHides": "Everything the material is actually for. Its point is aqueous operation, and a non-aqueous half cell says nothing about hydrogen evolution, dissolution or the pH dependence that decide whether it works in water."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.lmo",
+          "material.lifepo4"
+        ],
+        "whatChanges": "Against LiMn₂O₄ in Li₂SO₄ this makes a complete aqueous lithium-ion cell. The cell voltage is then capped by the solvent rather than by the electrodes — around 1.5 V, against roughly 3.7 V for a carbonate cell."
+      },
+      "cannotTell": [
+        "A capacity measured against lithium metal in a carbonate electrolyte tells you nothing about the aqueous behaviour that is the entire reason to use this material.",
+        "It does not show hydrogen evolution, which competes with insertion at the low-potential end.",
+        "Titanium phosphates dissolve slowly in acid. A short experiment will not reveal it."
+      ],
+      "relatedIds": [
+        "material.lmo",
+        "material.ntp",
+        "potential.h_acid",
+        "mechanism.intercalation",
+        "concept.faradaic",
+        "formula.specific_capacity"
+      ],
+      "tags": [
+        "anode",
+        "polyanion",
+        "lithium",
+        "aqueous",
+        "nasicon"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Li₂SO₄ or LiNO₃, neutral, deaerated.",
+          "whatChanges": "THE POINT OF THIS MATERIAL. Its insertion potential lies inside the water window over a wide pH range, so lithium can be inserted and removed without reducing the solvent. Almost every other lithium anode fails this test by more than two volts.",
+          "watch": "Hydrogen evolution still competes at the bottom of the window, and dissolved oxygen re-oxidises the charged anode on open circuit — an aqueous cell can lose charge while doing nothing. Deaerate, and report open-circuit self-discharge."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate electrolyte with LiPF₆.",
+          "whatChanges": "Works, but there is no reason to prefer it: it gives up more than a volt of cell voltage against graphite for a stability advantage that only matters in water.",
+          "watch": "Do not read a non-aqueous LTP result as evidence for the aqueous case."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.mno2",
+      "name": "Manganese dioxide (aqueous zinc)",
+      "role": "cathode",
+      "chemistry": [
+        "Zn"
+      ],
+      "family": "oxide",
+      "summary": "The cathode in aqueous zinc cells, and the clearest case in this file of a material whose theoretical capacity is contested rather than merely uncertain.",
+      "reaction": "Mechanism-dependent. One electron per Mn if the stored charge is one H⁺ or ½ Zn²⁺; two if the manganese is reduced fully.",
+      "basisFormula": "MnO₂",
+      "composition": {
+        "Mn": 1,
+        "O": 2
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of MnO₂, counting ONE electron per manganese. The two-electron value is exactly double, and which applies depends on a mechanism that is still argued about.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Zn foil",
+        "whatItMeasures": "Capacity against a zinc electrode that is almost always in large excess — so the cathode is what is being measured, which is appropriate, but the cell is nothing like a device.",
+        "whatItHides": "Whether the charge is stored by H⁺ insertion, by Zn²⁺ insertion, by a dissolution–deposition mechanism, or by more than one at once. The capacity is the same number under every one of those explanations."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.zn_metal"
+        ],
+        "whatChanges": "With a realistic zinc loading rather than a foil, the cell capacity is set by zinc utilisation, and the cathode's per-gram figure stops being the limiting number."
+      },
+      "cannotTell": [
+        "It cannot tell you the mechanism, and the mechanism determines whether the one- or two-electron value is the right bound. Both numbers appear in the literature for the same material.",
+        "It cannot distinguish the polymorphs — α, β, γ, δ, λ — which have the same formula and different behaviour.",
+        "In cells where manganese dissolves and redeposits, 'capacity per gram of MnO₂' is quoting a mass that does not stay constant."
+      ],
+      "relatedIds": [
+        "material.zn_metal",
+        "mechanism.conversion",
+        "formula.specific_capacity",
+        "concept.faradaic"
+      ],
+      "tags": [
+        "cathode",
+        "zinc",
+        "aqueous",
+        "contested-mechanism"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Mildly acidic ZnSO₄ with MnSO₄ added, or strongly alkaline KOH.",
+          "whatChanges": "The mechanism is genuinely disputed and depends on the electrolyte: Zn²⁺ insertion, H⁺ insertion, and dissolution–deposition of manganese have all been reported, sometimes in the same cell. Added MnSO₄ works by suppressing dissolution, which is itself evidence that dissolution matters.",
+          "watch": "DO NOT assume one mechanism. Report the electrolyte, its pH and any Mn²⁺ addition, and treat a capacity from one electrolyte as inapplicable to another."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "conditional",
+          "typical": "Lithium carbonate electrolytes, as a primary-cell cathode.",
+          "whatChanges": "Li/MnO₂ primary cells are a mature non-aqueous use of this material — but a primary cell, and a different reaction from the aqueous zinc case.",
+          "watch": "Primary and secondary performance are not comparable. A number from a primary cell says nothing about rechargeability."
+        }
+      ],
+      "mechanismId": "mechanism.conversion",
+      "mechanismNote": "CONTESTED, and electrolyte-dependent. Conversion via dissolution–deposition is one reported route; Zn²⁺ insertion and H⁺ insertion are others, and more than one may run in the same cell. This label is the most common reading, not a settled fact."
+    },
+    {
+      "id": "material.na_metal",
+      "name": "Sodium metal",
+      "role": "anode",
+      "chemistry": [
+        "Na"
+      ],
+      "family": "metal",
+      "summary": "The counter and reference electrode in nearly every sodium half cell, and the analogue of lithium metal in that role.",
+      "reaction": "Na ⇌ Na⁺ + e⁻",
+      "basisFormula": "Na",
+      "composition": {
+        "Na": 1
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of sodium metal, one electron per atom.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "itself — it is the counter electrode",
+        "whatItMeasures": "As with lithium, it is usually the reference rather than the material under test.",
+        "whatItHides": "Sodium metal is softer and more reactive than lithium, and a sodium half cell's counter electrode contributes more of the observed degradation than a lithium one does. Capacity fade attributed to the working electrode is sometimes the counter electrode's."
+      },
+      "fullCell": {
+        "pairedWith": [],
+        "whatChanges": "Sodium metal anodes face the same plating and electrolyte-consumption problems as lithium, without the decades of electrolyte development."
+      },
+      "cannotTell": [
+        "Potentials measured 'vs Na/Na⁺' are not comparable with potentials measured 'vs Li/Li⁺' without stating the offset between the two reference scales.",
+        "A sodium half cell's stability is not evidence about the working electrode alone."
+      ],
+      "relatedIds": [
+        "material.hard_carbon",
+        "concept.ec_three_electrode",
+        "mechanism.plating",
+        "concept.overpotential",
+        "concept.reversibility",
+        "formula.coulombic_efficiency"
+      ],
+      "tags": [
+        "anode",
+        "metal",
+        "sodium"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "As for lithium: the interphase is what makes the electrode possible. Sodium’s interphase is more soluble in common electrolytes than lithium’s, which is why sodium half cells drift more.",
+          "watch": "Sodium counter electrodes degrade during a long half-cell experiment. A rising overpotential late in a cycle series can be the COUNTER electrode failing, not the material under test."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Reacts with water. Same category as lithium metal.",
+          "watch": "SAFETY. See the lithium entry."
+        }
+      ],
+      "mechanismId": "mechanism.plating"
+    },
+    {
+      "id": "material.nafepo4",
+      "name": "Sodium iron phosphate (maricite / olivine NaFePO₄)",
+      "role": "cathode",
+      "chemistry": [
+        "Na"
+      ],
+      "family": "polyanion",
+      "summary": "The sodium analogue of LFP by composition. The comparison with LFP is instructive precisely because the same arithmetic gives a lower number for a heavier ion.",
+      "reaction": "NaFePO₄ ⇌ FePO₄ + Na⁺ + e⁻",
+      "basisFormula": "NaFePO₄",
+      "composition": {
+        "Na": 1,
+        "Fe": 1,
+        "P": 1,
+        "O": 4
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of NaFePO₄, one sodium per formula unit.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Na metal",
+        "whatItMeasures": "Sodium extraction against a sodium counter electrode.",
+        "whatItHides": "Which polymorph was measured. The olivine form is electrochemically active; the maricite form, which is the thermodynamically stable one, is not — and both have the formula NaFePO₄ and therefore the same theoretical capacity."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.hard_carbon"
+        ],
+        "whatChanges": "The cathode supplies all the sodium, including what hard carbon loses irreversibly on the first cycle — which for hard carbon is substantial."
+      },
+      "cannotTell": [
+        "It cannot distinguish the polymorphs. Two materials with identical composition, identical theoretical capacity and completely different behaviour is the sharpest illustration in this file that a stoichiometric calculation is not a prediction.",
+        "The lower value than LFP is arithmetic — sodium is heavier than lithium — and says nothing about which makes the better cell."
+      ],
+      "relatedIds": [
+        "material.lifepo4",
+        "material.hard_carbon",
+        "technique.xrd",
+        "mechanism.intercalation",
+        "concept.reversibility",
+        "formula.theoretical_capacity"
+      ],
+      "tags": [
+        "cathode",
+        "sodium-ion",
+        "polyanion"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "Only the olivine polymorph cycles sodium usefully; the thermodynamically stable maricite form does not. Two materials with the same formula and completely different behaviour.",
+          "watch": "State which polymorph. \"NaFePO₄\" alone does not identify the material."
+        },
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Na₂SO₄, neutral.",
+          "whatChanges": "Working potential lies inside the water window, and aqueous sodium cells using phosphate cathodes are an active area — abundant elements, non-flammable electrolyte, and a voltage ceiling that rules out high energy density.",
+          "watch": "Sodium phosphates and dissolved oxygen: the same deaeration requirement as any aqueous cell."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.ni_oh2",
+      "name": "Nickel hydroxide / oxyhydroxide",
+      "role": "cathode",
+      "chemistry": [
+        "Ni"
+      ],
+      "family": "hydroxide",
+      "summary": "The positive electrode of NiCd, NiMH and nickel–zinc cells — an alkaline aqueous chemistry that has been in mass production for over a century and is invisible in most lithium-focused teaching.",
+      "reaction": "Ni(OH)₂ + OH⁻ ⇌ NiOOH + H₂O + e⁻",
+      "basisFormula": "Ni(OH)₂",
+      "composition": {
+        "Ni": 1,
+        "O": 2,
+        "H": 2
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of Ni(OH)₂, one electron per nickel on the Ni(II)/Ni(III) couple.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "An oversized counter electrode in KOH, with Hg/HgO as reference",
+        "whatItMeasures": "The proton-transfer capacity of the hydroxide.",
+        "whatItHides": "That the practical electrode contains cobalt additives and a conductive network, and that its capacity depends strongly on how the active mass is made — a different reference electrode entirely from the Ag/AgCl or Li metal used elsewhere in this platform."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.zn_metal"
+        ],
+        "whatChanges": "Against zinc in KOH this is a nickel–zinc cell. Both electrodes are inside the water window AT pH 14 and outside it at low pH — the same pair would not work in acid. The chemistry exists because of where the window sits, not in spite of it."
+      },
+      "cannotTell": [
+        "It does not distinguish the α and β hydroxide phases, or the γ oxyhydroxide, which have different capacities and different swelling behaviour.",
+        "The oxygen-evolution reaction overlaps the charging reaction, so charge acceptance is not the same as capacity.",
+        "Overcharge behaviour is a design feature in these cells, not a fault — it cannot be read from a capacity number."
+      ],
+      "relatedIds": [
+        "material.zn_metal",
+        "potential.ni_oh2",
+        "potential.o2_alkaline",
+        "concept.faradaic",
+        "formula.theoretical_capacity"
+      ],
+      "tags": [
+        "cathode",
+        "hydroxide",
+        "nickel",
+        "aqueous",
+        "alkaline"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Concentrated KOH, around 6 M — pH near 14.",
+          "whatChanges": "The reaction transfers a PROTON and an electron, not a metal ion. It is not an intercalation reaction and the intercalation vocabulary does not apply to it. It works only in strong alkali, where the OH⁻ activity that appears in the reaction is high.",
+          "watch": "Charging sits close to the oxygen line at pH 14 (0.401 V vs SHE), so oxygen evolution competes with charging. That is why these cells gas and why charge efficiency falls at high state of charge — expected behaviour, not a fault."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "The reaction consumes hydroxide and produces water. Without water there is no reaction. This is the clearest case in the module of a chemistry that is not \"an electrode that happens to be in water\" — the solvent is a reactant.",
+          "watch": "Whenever water or OH⁻ appears in the written reaction, the electrolyte is not a background condition and cannot be swapped."
+        }
+      ],
+      "mechanismId": null,
+      "mechanismNote": "NO MECHANISM RECORD COVERS THIS. The reaction transfers a proton and an electron in a layered hydroxide — the guest is H⁺, not a metal ion, and the OH⁻ in the electrolyte is a reactant. Calling it intercalation imports vocabulary that does not apply. This is a gap in electrochemistry.json, recorded rather than papered over."
+    },
+    {
+      "id": "material.nmc111",
+      "name": "NMC111 — LiNi⅓Mn⅓Co⅓O₂",
+      "role": "cathode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "layered oxide",
+      "summary": "The equal-thirds layered oxide. Nickel-rich variants trade stability for capacity, and their theoretical capacities differ only slightly — the real difference is how much can be used.",
+      "reaction": "LiNi⅓Mn⅓Co⅓O₂ ⇌ Li₁₋ₓNi⅓Mn⅓Co⅓O₂ + x Li⁺ + x e⁻",
+      "basisFormula": "LiNi⅓Mn⅓Co⅓O₂",
+      "composition": {
+        "Li": 1,
+        "Ni": 0.3333333333333333,
+        "Mn": 0.3333333333333333,
+        "Co": 0.3333333333333333,
+        "O": 2
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of the stated composition, for full extraction of one lithium.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal",
+        "whatItMeasures": "Extraction to a chosen cut-off, typically well short of x = 1.",
+        "whatItHides": "As with LCO, the number that gets used is set by the cut-off and by how much capacity fade is tolerable, not by the stoichiometry."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.graphite",
+          "material.silicon"
+        ],
+        "whatChanges": "The cathode is the lithium inventory. Pairing it with silicon rather than graphite raises the anode capacity but increases the lithium the anode consumes irreversibly."
+      },
+      "cannotTell": [
+        "The theoretical capacities of NMC111, NMC532, NMC622 and NMC811 are all within a few per cent of each other. Their practical capacities are not, and the difference is entirely in how far each can be delithiated before it degrades — which no stoichiometric calculation reaches.",
+        "Comparing NMC compositions on theoretical capacity would suggest they are nearly equivalent. That conclusion would be wrong, and the arithmetic that produced it would be right."
+      ],
+      "relatedIds": [
+        "material.lco",
+        "material.graphite",
+        "mechanism.intercalation",
+        "concept.reversibility",
+        "formula.capacity_retention"
+      ],
+      "tags": [
+        "cathode",
+        "lithium-ion",
+        "layered"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "The same cut-off trade as LCO, with the additional problem that transition metals dissolved from the cathode migrate to the anode and poison its interphase. A cathode failure therefore appears as anode degradation.",
+          "watch": "This cross-talk means you cannot attribute a full-cell fade to one electrode without post-mortem or a reference electrode in the cell."
+        },
+        {
+          "system": "aqueous",
+          "viable": "conditional",
+          "typical": "Neutral Li₂SO₄, deaerated.",
+          "whatChanges": "As LCO: inside the window at low pH, outside it in alkali.",
+          "watch": "Nickel-rich layered oxides are moisture-sensitive even in storage — surface carbonate and hydroxide form and consume lithium. Aqueous processing is a real research area precisely because it is difficult."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.nnfm",
+      "name": "NaNi⅓Fe⅓Mn⅓O₂",
+      "role": "cathode",
+      "chemistry": [
+        "Na"
+      ],
+      "family": "layered oxide",
+      "summary": "A layered sodium oxide, cobalt-free, and the closest sodium analogue of NMC.",
+      "reaction": "NaNi⅓Fe⅓Mn⅓O₂ ⇌ Na₁₋ₓNi⅓Fe⅓Mn⅓O₂ + x Na⁺ + x e⁻",
+      "basisFormula": "NaNi⅓Fe⅓Mn⅓O₂",
+      "composition": {
+        "Na": 1,
+        "Ni": 0.3333333333333333,
+        "Fe": 0.3333333333333333,
+        "Mn": 0.3333333333333333,
+        "O": 2
+      },
+      "electrons": 1,
+      "capacityBasis": "Per gram of the stated composition, for full extraction of one sodium.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Na metal",
+        "whatItMeasures": "Extraction to a chosen cut-off.",
+        "whatItHides": "Layered sodium oxides undergo phase transitions on desodiation that depend strongly on how far it is taken. The cut-off is not a detail."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.hard_carbon"
+        ],
+        "whatChanges": "This cathode is the sodium inventory for the anode's first-cycle loss, which for hard carbon is the dominant full-cell design constraint."
+      },
+      "cannotTell": [
+        "As with NMC, full extraction is assumed and not achieved. The number is an upper bound on an upper bound.",
+        "Air and moisture sensitivity, which affects handling and therefore reproducibility, appears nowhere in a capacity figure."
+      ],
+      "relatedIds": [
+        "material.hard_carbon",
+        "material.nmc111",
+        "mechanism.intercalation",
+        "concept.potential",
+        "formula.capacity_retention"
+      ],
+      "tags": [
+        "cathode",
+        "sodium-ion",
+        "layered"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "Layered sodium oxides go through several phase transitions across the sodium content range, and the accessible range is set by where you cut off the voltage. Different cut-offs give different materials, in effect.",
+          "watch": "These materials are HYGROSCOPIC. Sodium leaches and hydrates on exposure to air, changing the composition before the experiment starts. Store and weigh in a glovebox, and record the exposure."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Not a window problem — a stability problem. Water intercalates into layered sodium oxides and sodium exchanges out, so the material changes rather than cycles.",
+          "watch": "A material can sit perfectly inside the water window and still be unusable in water. Thermodynamic window and chemical stability are two separate tests, and both have to pass."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.ntp",
+      "name": "Sodium titanium phosphate (NTP)",
+      "role": "anode",
+      "chemistry": [
+        "Na"
+      ],
+      "family": "polyanion",
+      "summary": "The sodium counterpart of LTP, and the standard anode for aqueous sodium-ion cells. Same NASICON framework, same reason for existing: it works inside the stability window of water.",
+      "reaction": "NaTi₂(PO₄)₃ + 2 Na⁺ + 2 e⁻ ⇌ Na₃Ti₂(PO₄)₃",
+      "basisFormula": "NaTi₂(PO₄)₃",
+      "composition": {
+        "Na": 1,
+        "Ti": 2,
+        "P": 3,
+        "O": 12
+      },
+      "electrons": 2,
+      "capacityBasis": "Per gram of NaTi₂(PO₄)₃, inserting two further sodium per formula unit on the Ti⁴⁺/Ti³⁺ couple.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Na metal in a non-aqueous electrolyte, or an oversized counter electrode in aqueous",
+        "whatItMeasures": "Sodium insertion capacity of the framework.",
+        "whatItHides": "In AQUEOUS half cells the counter electrode is often an oversized carbon or a reference-only arrangement, and the cell then has no defined sodium inventory. Read the configuration before comparing two aqueous half-cell numbers — they are frequently not the same experiment."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.nvp",
+          "material.pba_nafe"
+        ],
+        "whatChanges": "NaTi₂(PO₄)₃ ‖ Na₃V₂(PO₄)₃ in Na₂SO₄ is one of the few complete aqueous sodium cells, both electrodes inside the window. Cell voltage around 1.2 V, and the solvent caps it there."
+      },
+      "cannotTell": [
+        "Aqueous half-cell capacities are often measured with no defined counter inventory — that is not a half cell in the sense the rest of this platform uses.",
+        "It does not show the self-discharge from dissolved oxygen, which is the main practical problem with aqueous anodes.",
+        "Carbon coating changes the rate behaviour of this material dramatically; an uncoated and a coated sample are not comparable."
+      ],
+      "relatedIds": [
+        "material.nvp",
+        "material.ltp",
+        "material.pba_nafe",
+        "mechanism.intercalation",
+        "concept.reversibility",
+        "formula.coulombic_efficiency"
+      ],
+      "tags": [
+        "anode",
+        "polyanion",
+        "sodium",
+        "aqueous",
+        "nasicon"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Na₂SO₄, neutral, deaerated.",
+          "whatChanges": "Insertion occurs inside the water window, which is what makes an all-aqueous sodium cell possible at all. Compare with hard carbon, which stores sodium two volts below the window and cannot be used in water.",
+          "watch": "Self-discharge from dissolved O₂, and hydrogen evolution at the low-potential end. Both are electrolyte and pH dependent — report both."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate or ether with NaPF₆ / NaClO₄.",
+          "whatChanges": "Cycles, but concedes a large amount of cell voltage compared with hard carbon.",
+          "watch": "Same caution as LTP: the non-aqueous result does not evidence the aqueous one."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.nvp",
+      "name": "Na₃V₂(PO₄)₃ (NASICON)",
+      "role": "cathode",
+      "chemistry": [
+        "Na"
+      ],
+      "family": "polyanion",
+      "summary": "A NASICON-framework sodium cathode whose theoretical capacity depends on which vanadium couple you count — so the number is a choice before it is a calculation.",
+      "reaction": "Na₃V₂(PO₄)₃ ⇌ NaV₂(PO₄)₃ + 2 Na⁺ + 2 e⁻   (V³⁺/V⁴⁺)",
+      "basisFormula": "Na₃V₂(PO₄)₃",
+      "composition": {
+        "Na": 3,
+        "V": 2,
+        "P": 3,
+        "O": 12
+      },
+      "electrons": 2,
+      "capacityBasis": "Per gram of Na₃V₂(PO₄)₃, counting the two sodium associated with the V³⁺/V⁴⁺ couple.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Na metal",
+        "whatItMeasures": "Extraction of the two accessible sodium at around 3.4 V vs Na/Na⁺.",
+        "whatItHides": "The third sodium is associated with a couple at a much higher potential, outside the window of common electrolytes. A three-electron theoretical capacity is arithmetically valid and practically unreachable in a standard cell."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.hard_carbon"
+        ],
+        "whatChanges": "Nothing about the choice of couple changes, but the consequence does: quoting the three-electron number in a full-cell context overstates the design by half."
+      },
+      "cannotTell": [
+        "It cannot tell you which electron count was assumed. The same material is quoted at two different theoretical capacities in the literature, and both are correct for their stated couple.",
+        "This is why `electrons` is a declared field in every record here rather than something inferred: the assumption has to be visible next to the answer."
+      ],
+      "relatedIds": [
+        "material.nafepo4",
+        "material.hard_carbon",
+        "mechanism.intercalation",
+        "concept.potential",
+        "formula.theoretical_capacity"
+      ],
+      "tags": [
+        "cathode",
+        "sodium-ion",
+        "polyanion",
+        "nasicon"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "The NASICON framework is open enough that it cycles sodium in and out with little volume change, which is where its rate capability and cycle life come from.",
+          "watch": "Vanadium compounds are toxic. Handle powders in a fume hood and follow the group’s written procedure."
+        },
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Na₂SO₄, neutral. Frequently paired with NaTi₂(PO₄)₃ as a full aqueous sodium cell.",
+          "whatChanges": "Both electrodes of that pair sit inside the water window, which is why this is one of the few genuinely complete aqueous cells rather than a half-cell demonstration.",
+          "watch": "The cell voltage is around 1.2 V — set by the electrodes, and hard-capped by the solvent. Do not compare its energy density to a non-aqueous sodium cell without saying so."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation"
+    },
+    {
+      "id": "material.pb",
+      "name": "Lead (lead-acid negative)",
+      "role": "anode",
+      "chemistry": [
+        "Pb"
+      ],
+      "family": "metal",
+      "summary": "The negative electrode of the lead-acid battery — the oldest rechargeable chemistry still in mass production, and the one that best illustrates a cell surviving on kinetics rather than thermodynamics.",
+      "reaction": "Pb + SO₄²⁻ ⇌ PbSO₄ + 2 e⁻",
+      "basisFormula": "Pb",
+      "composition": {
+        "Pb": 1
+      },
+      "electrons": 2,
+      "capacityBasis": "Per gram of lead metal, two electrons per atom. NOTE that the discharge product PbSO₄ is much heavier than the lead, and the sulfuric acid is consumed too — see the full-cell note.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "An oversized counter electrode in H₂SO₄, with Hg/Hg₂SO₄ as reference",
+        "whatItMeasures": "Conversion of lead to lead sulfate and back.",
+        "whatItHides": "That the electrolyte is a REACTANT. Sulfate is consumed on discharge, so the acid concentration falls — which is why a lead-acid cell can be state-of-charge-gauged with a hydrometer, and why a half cell with excess electrolyte behaves unlike the real thing."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.pbo2"
+        ],
+        "whatChanges": "The theoretical capacity of the lead-acid CELL must count the sulfuric acid as well as both electrodes, because both electrodes consume it. Leave the acid out and the calculated energy density is far too high. This is the module’s clearest example of a cell whose limiting inventory is in the electrolyte."
+      },
+      "cannotTell": [
+        "It says nothing about sulfation — the growth of coarse, hard-to-reduce lead sulfate crystals — which is the dominant real-world failure mode.",
+        "It says nothing about the grid alloy, which controls corrosion and gassing and is a large part of the engineering.",
+        "It cannot show acid stratification, which is a cell-geometry effect and does not exist in a beaker cell."
+      ],
+      "relatedIds": [
+        "material.pbo2",
+        "potential.pbso4_pb",
+        "mechanism.conversion",
+        "concept.overpotential",
+        "formula.capacity_retention"
+      ],
+      "tags": [
+        "anode",
+        "metal",
+        "lead",
+        "aqueous",
+        "conversion"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Sulfuric acid, roughly 5 M — strongly acidic by design.",
+          "whatChanges": "PbSO₄/Pb sits at −0.356 V vs SHE, BELOW the hydrogen line at pH 0. Thermodynamically this electrode should evolve hydrogen continuously. It does not, because hydrogen evolution on lead is extremely slow — the electrode is protected by kinetics alone.",
+          "watch": "SAFETY: lead is toxic and sulfuric acid at this concentration is corrosive; lead-acid cells vent hydrogen and oxygen and can produce an explosive mixture in an enclosed space. Follow the group’s written procedure. Never open, drill or short a sealed cell."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Sulfate ions and water both appear in the cell reaction. There is no non-aqueous version of this chemistry.",
+          "watch": "Another case where the electrolyte is a reactant rather than a medium."
+        }
+      ],
+      "mechanismId": "mechanism.conversion"
+    },
+    {
+      "id": "material.pba_nafe",
+      "name": "Prussian blue analogue — Na₂Fe[Fe(CN)₆]",
+      "role": "cathode",
+      "chemistry": [
+        "Na",
+        "K",
+        "Zn"
+      ],
+      "family": "framework",
+      "summary": "An open cyanide framework with channels large enough to pass hydrated ions. One of very few materials that genuinely works in aqueous AND non-aqueous electrolytes, and with sodium, potassium and zinc.",
+      "reaction": "Na₂Fe[Fe(CN)₆] ⇌ Fe[Fe(CN)₆] + 2 Na⁺ + 2 e⁻",
+      "basisFormula": "Na₂Fe[Fe(CN)₆]",
+      "composition": {
+        "Na": 2,
+        "Fe": 2,
+        "C": 6,
+        "N": 6
+      },
+      "electrons": 2,
+      "capacityBasis": "Per gram of the fully sodiated, defect-free, water-free framework, using both iron centres.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Na metal (non-aqueous) or an oversized counter electrode (aqueous)",
+        "whatItMeasures": "How much of the two-electron capacity the actual sample delivers.",
+        "whatItHides": "THE COMPOSITION. Real Prussian blue analogues contain vacancies and coordinated water, so the formula unit in the denominator of the theoretical capacity is usually not the formula unit in the beaker. A measured capacity below theory here may be a composition difference rather than a performance one."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.ntp",
+          "material.hard_carbon"
+        ],
+        "whatChanges": "Against NaTi₂(PO₄)₃ in Na₂SO₄ it forms an aqueous sodium cell; against hard carbon in a carbonate electrolyte, a non-aqueous one. The same cathode, two entirely different cells, two different limiting problems."
+      },
+      "cannotTell": [
+        "It does not reveal the vacancy and water content, which set how much of the theoretical capacity is even present.",
+        "It does not distinguish the high-spin and low-spin iron contributions, which appear at different potentials.",
+        "Cyanide frameworks can release HCN under strongly acidic conditions. Do not treat this as an ordinary oxide."
+      ],
+      "relatedIds": [
+        "material.ntp",
+        "material.zn_metal",
+        "material.hard_carbon",
+        "mechanism.intercalation",
+        "formula.theoretical_capacity",
+        "concept.potential"
+      ],
+      "tags": [
+        "cathode",
+        "framework",
+        "sodium",
+        "potassium",
+        "zinc",
+        "aqueous",
+        "non-aqueous"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Na₂SO₄, ZnSO₄ or K₂SO₄, neutral.",
+          "whatChanges": "The channels admit hydrated ions, so aqueous operation is fast rather than merely possible — one of the few cathodes with genuinely good aqueous rate capability. Working potential lies inside the window in neutral solution.",
+          "watch": "Acidic electrolytes risk cyanide release and framework dissolution. Alkaline electrolytes precipitate iron hydroxides. The usable pH band is narrow, and it must be stated."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate with NaPF₆ or KPF₆.",
+          "whatChanges": "Higher cell voltage than the aqueous case, but coordinated water in the framework then becomes a contaminant that degrades the anode. The material must be dried much harder for non-aqueous use than for aqueous use.",
+          "watch": "A sample good enough for an aqueous cell may be unusable in a non-aqueous one for reasons that have nothing to do with the cathode chemistry."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation",
+      "mechanismNote": "The channels are wide enough to pass a HYDRATED ion, which is unusual — most intercalation hosts require the guest to shed its solvation shell first. That is why this material works well in aqueous electrolyte."
+    },
+    {
+      "id": "material.pbo2",
+      "name": "Lead dioxide (lead-acid positive)",
+      "role": "cathode",
+      "chemistry": [
+        "Pb"
+      ],
+      "family": "oxide",
+      "summary": "The lead-acid positive electrode. It operates about half a volt ABOVE the oxidation limit of water and works anyway — the most widely deployed example of a battery that is thermodynamically committed to destroying its own electrolyte.",
+      "reaction": "PbO₂ + SO₄²⁻ + 4 H⁺ + 2 e⁻ ⇌ PbSO₄ + 2 H₂O",
+      "basisFormula": "PbO₂",
+      "composition": {
+        "Pb": 1,
+        "O": 2
+      },
+      "electrons": 2,
+      "capacityBasis": "Per gram of PbO₂, two electrons per formula unit. As with the negative, this excludes the sulfuric acid the reaction consumes.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "An oversized counter electrode in H₂SO₄, with Hg/Hg₂SO₄ as reference",
+        "whatItMeasures": "Reduction of lead dioxide to lead sulfate.",
+        "whatItHides": "Oxygen evolution, which runs in parallel with charging and is indistinguishable from it in a simple current measurement. Charge acceptance and capacity are different quantities here, and conflating them overstates the electrode."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.pb"
+        ],
+        "whatChanges": "Against lead in sulfuric acid this is the lead-acid cell, near 2 V — a remarkably high voltage for an aqueous system, and it is high precisely BECAUSE both electrodes sit outside the water window in opposite directions."
+      },
+      "cannotTell": [
+        "It cannot separate charging current from oxygen-evolution current without gas analysis or coulometry over a full cycle.",
+        "It says nothing about softening and shedding of the positive active mass, which is the usual end of life.",
+        "It cannot show the effect of grid corrosion, which happens on the current collector rather than the active material."
+      ],
+      "relatedIds": [
+        "material.pb",
+        "potential.pbo2_pbso4",
+        "potential.o2_acid",
+        "mechanism.conversion",
+        "concept.overpotential",
+        "formula.coulombic_efficiency"
+      ],
+      "tags": [
+        "cathode",
+        "oxide",
+        "lead",
+        "aqueous",
+        "conversion",
+        "kinetics"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Sulfuric acid, roughly 5 M.",
+          "whatChanges": "PbO₂/PbSO₄ is at +1.690 V vs SHE; the oxygen line at pH 0 is at +1.229 V. The electrode is 0.46 V ABOVE the limit and should oxidise water continuously. It survives because oxygen evolution on lead dioxide has a very large overpotential. Together with the negative electrode, this cell is outside the water window at BOTH ends and still runs for years.",
+          "watch": "This is the module’s central lesson about the window: the window tells you what is thermodynamically allowed, not what will happen. Kinetics decide the outcome, and kinetics can be destroyed by an impurity or a temperature rise. Never use \"it is outside the window\" as a proof that something cannot work, and never use \"it works\" as a proof that it is inside."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Water and protons appear in the reaction as written.",
+          "watch": "—"
+        }
+      ],
+      "mechanismId": "mechanism.conversion"
+    },
+    {
+      "id": "material.silicon",
+      "name": "Silicon",
+      "role": "anode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "alloy",
+      "summary": "About ten times graphite's capacity, and the reason it is not everywhere is volume change rather than capacity.",
+      "reaction": "Li₁₅Si₄ ⇌ 15 Li⁺ + 15 e⁻ + 4 Si   (3.75 Li per Si)",
+      "basisFormula": "Si",
+      "composition": {
+        "Si": 1
+      },
+      "electrons": 3.75,
+      "capacityBasis": "Per gram of silicon, for the room-temperature limit Li₁₅Si₄ — 3.75 lithium per silicon.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal",
+        "whatItMeasures": "Lithium uptake with lithium in excess, usually over a small number of cycles.",
+        "whatItHides": "Silicon's problem is what happens over hundreds of cycles as the particles fracture and the SEI re-forms on new surface. A ten-cycle half-cell capacity conceals exactly that."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.nmc111",
+          "material.lco"
+        ],
+        "whatChanges": "Every re-formation of SEI on fresh silicon surface consumes lithium from the cathode. In a half cell the lithium foil replaces it silently; in a full cell it is gone."
+      },
+      "cannotTell": [
+        "The often-quoted 4200 mAh/g is for Li₂₂Si₅, a HIGH-TEMPERATURE phase. The room-temperature limit is Li₁₅Si₄, and quoting the higher number for a room-temperature cell overstates it by nearly a fifth.",
+        "It says nothing about the roughly threefold volume expansion, which is the actual engineering problem.",
+        "Composite electrodes are usually a few per cent silicon in graphite. A capacity quoted per gram of silicon and a capacity quoted per gram of the composite differ by more than an order of magnitude."
+      ],
+      "relatedIds": [
+        "material.graphite",
+        "mechanism.alloying",
+        "concept.reversibility",
+        "formula.capacity_retention"
+      ],
+      "tags": [
+        "anode",
+        "lithium-ion",
+        "alloying"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate (EC:DMC/EC:DEC) or ether electrolyte with the alkali salt.",
+          "whatChanges": "Alloying happens near lithium plating, and the particle changes volume by a factor of about three. The interphase is broken and reformed on every cycle, so electrolyte consumption is continuous rather than a first-cycle event.",
+          "watch": "Silicon capacity fade in a half cell is masked by the lithium reservoir. The same electrode in a full cell fades far faster, because there is no reservoir to replace what the interphase consumes."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "Lithium–silicon alloying occurs close to lithium plating. The operating potential sits far below the lower limit of water's stability window — below it at pH 0 and still below it at pH 14, because the whole window slides down together and never widens.",
+          "watch": "Concentrated \"water-in-salt\" electrolytes push the practical limit outward by starving the water of free molecules. That is a KINETIC extension, not a thermodynamic one: the window in the panel above does not move, and a cell built this way is living on slow kinetics."
+        }
+      ],
+      "mechanismId": "mechanism.alloying"
+    },
+    {
+      "id": "material.sulfur",
+      "name": "Sulfur",
+      "role": "cathode",
+      "chemistry": [
+        "Li"
+      ],
+      "family": "conversion",
+      "summary": "A conversion cathode with a very large theoretical capacity and almost none of the properties an intercalation cathode has. Included because it is where the half-cell/full-cell distinction does the most damage.",
+      "reaction": "S + 2 Li⁺ + 2 e⁻ ⇌ Li₂S  (via soluble polysulfide intermediates)",
+      "basisFormula": "S",
+      "composition": {
+        "S": 1
+      },
+      "electrons": 2,
+      "capacityBasis": "Per gram of sulfur, two electrons per sulfur atom for full conversion to Li₂S.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal",
+        "whatItMeasures": "How much of the two-electron conversion is reached in the chosen window.",
+        "whatItHides": "ALMOST EVERYTHING THAT MATTERS. Dissolved polysulfides shuttle to the lithium counter electrode and are reduced there, so charge passes without being stored. With a large lithium foil this appears as high capacity and poor efficiency rather than as failure — and the electrolyte-to-sulfur ratio, usually generous in a coin cell, is a first-order variable that is frequently not reported at all."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.graphite",
+          "material.silicon"
+        ],
+        "whatChanges": "Without excess lithium the shuttle consumes the cell’s only lithium inventory. Sulfur cells that cycle well against lithium foil routinely fail quickly against a real anode, and the difference is not a scale-up problem — it is the half cell having hidden the loss mechanism."
+      },
+      "cannotTell": [
+        "A high sulfur half-cell capacity does not evidence a working cell. Report electrolyte-to-sulfur ratio and sulfur areal loading, or the number cannot be interpreted.",
+        "It does not show the shuttle directly — that needs a rest-step or self-discharge measurement.",
+        "It says nothing about the volume change on conversion to Li₂S, which is large."
+      ],
+      "relatedIds": [
+        "material.li_metal",
+        "material.graphite",
+        "mechanism.conversion",
+        "concept.reversibility",
+        "formula.coulombic_efficiency",
+        "formula.mass_loading"
+      ],
+      "tags": [
+        "cathode",
+        "conversion",
+        "lithium",
+        "non-aqueous",
+        "sulfur"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Ether electrolyte (DOL:DME) with LiTFSI — NOT a carbonate.",
+          "whatChanges": "Carbonate solvents react irreversibly with polysulfides, so the standard lithium-ion electrolyte cannot be used. This is one of the few cases where the electrolyte family is dictated by the cathode.",
+          "watch": "The electrolyte-to-sulfur ratio is as important as the material. A flooded coin cell flatters the result by an order of magnitude relative to a lean cell."
+        },
+        {
+          "system": "aqueous",
+          "viable": "no",
+          "typical": "—",
+          "whatChanges": "The reaction is with lithium, which is not compatible with water; polysulfides are also unstable in aqueous solution.",
+          "watch": "Aqueous sulfur chemistries exist (in flow cells, for example) but they are different reactions and do not belong to this record."
+        }
+      ],
+      "mechanismId": "mechanism.conversion",
+      "mechanismNote": "With soluble intermediates, which is the important part: the polysulfides leave the electrode entirely, so this is a conversion reaction that does not stay where you put it."
+    },
+    {
+      "id": "material.v2o5",
+      "name": "Vanadium pentoxide",
+      "role": "cathode",
+      "chemistry": [
+        "Li",
+        "Zn"
+      ],
+      "family": "oxide",
+      "summary": "A layered oxide used both as a non-aqueous lithium cathode and as an aqueous zinc cathode — and the material in this module whose theoretical capacity depends most heavily on a CHOICE the person calculating it makes.",
+      "reaction": "V₂O₅ + n M^z⁺ + nz e⁻ ⇌ MₙV₂O₅  (n and z depend on the ion and the potential window)",
+      "basisFormula": "V₂O₅",
+      "composition": {
+        "V": 2,
+        "O": 5
+      },
+      "electrons": 2,
+      "capacityBasis": "PER GRAM OF V₂O₅ ASSUMING TWO ELECTRONS — one per vanadium, V⁵⁺→V⁴⁺. That electron count is an ASSUMPTION, not a property of the material: deeper reduction to V³⁺ is reachable in some windows and would give a much larger number. Change `electrons` in the data file and this figure changes with it. Whenever you quote a V₂O₅ theoretical capacity, quote the electron count with it.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Li metal (non-aqueous) or Zn foil (aqueous)",
+        "whatItMeasures": "How much charge the oxide accepts in the chosen window, with a non-limiting counter electrode.",
+        "whatItHides": "The stoichiometry actually reached. Capacity here is set by where the voltage window is cut, so two \"V₂O₅ capacities\" can differ by a factor of two with no disagreement about the material at all."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.zn_metal"
+        ],
+        "whatChanges": "Against zinc in ZnSO₄ the zinc excess disappears and vanadium dissolution into the electrolyte becomes visible as capacity loss rather than being flushed away by a large reservoir."
+      },
+      "cannotTell": [
+        "It does not establish how many electrons per formula unit were actually transferred — that requires the window and, properly, a compositional measurement.",
+        "It does not show vanadium dissolution, which a large counter electrode masks completely.",
+        "In aqueous zinc it does not distinguish Zn²⁺ insertion from H⁺ insertion, which are different reactions often reported as one."
+      ],
+      "relatedIds": [
+        "material.zn_metal",
+        "material.mno2",
+        "mechanism.intercalation",
+        "formula.specific_capacity",
+        "concept.potential"
+      ],
+      "tags": [
+        "cathode",
+        "oxide",
+        "vanadium",
+        "zinc",
+        "lithium",
+        "aqueous",
+        "non-aqueous"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "ZnSO₄ or Zn(CF₃SO₃)₂, mildly acidic.",
+          "whatChanges": "Structural water between the layers helps shield the divalent zinc ion and speeds transport — so a hydrated vanadium oxide can outperform a dried one, which is the reverse of the usual expectation.",
+          "watch": "Vanadium dissolves into aqueous electrolyte. Yellow-tinted electrolyte after cycling is dissolution, and it means capacity has left the electrode rather than been lost by it. Vanadium compounds are toxic — handle powders and spent electrolyte accordingly."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "yes",
+          "typical": "Carbonate with LiPF₆.",
+          "whatChanges": "Lithium insertion over several distinct phases, each with its own plateau. The accessible number of electrons depends on the lower cut-off.",
+          "watch": "Do not carry an electron count between the aqueous and non-aqueous cases. They are different reactions with different limits."
+        }
+      ],
+      "mechanismId": "mechanism.intercalation",
+      "mechanismNote": "For lithium. For aqueous zinc the mechanism is disputed — Zn²⁺ insertion, H⁺ insertion and dissolution–deposition have all been reported — so do not carry this label across to the zinc case."
+    },
+    {
+      "id": "material.zn_metal",
+      "name": "Zinc metal",
+      "role": "anode",
+      "chemistry": [
+        "Zn"
+      ],
+      "family": "metal",
+      "summary": "The anode in aqueous zinc cells, where it is both the current collector and the active material — and, unusually, stable in water.",
+      "reaction": "Zn ⇌ Zn²⁺ + 2 e⁻",
+      "basisFormula": "Zn",
+      "composition": {
+        "Zn": 1
+      },
+      "electrons": 2,
+      "capacityBasis": "Per gram of zinc metal, two electrons per atom.",
+      "reportedCapacity": null,
+      "halfCell": {
+        "against": "Zn foil",
+        "whatItMeasures": "In a symmetric Zn‖Zn cell nothing is being measured about capacity at all — that configuration tests plating and stripping stability, and its voltage response is not a capacity measurement.",
+        "whatItHides": "Zinc half cells routinely use a large excess of zinc foil. A cell with a hundredfold zinc excess can cycle for a very long time without saying anything about a practical zinc utilisation."
+      },
+      "fullCell": {
+        "pairedWith": [
+          "material.mno2"
+        ],
+        "whatChanges": "Zinc utilisation — the fraction of the zinc actually cycled — becomes the number that matters, and it is usually a few per cent in a lab cell and must be near-complete in a device. Reporting anode capacity per gram of zinc while using a foil hundreds of microns thick is the single most common overstatement in this field."
+      },
+      "cannotTell": [
+        "It says nothing about zinc UTILISATION, which is what determines whether the theoretical capacity is even approached.",
+        "It says nothing about the hydrogen evolution and passivation that limit aqueous zinc cells.",
+        "A long cycle life in a symmetric cell with excess zinc is not evidence of a practical anode."
+      ],
+      "relatedIds": [
+        "material.mno2",
+        "mechanism.conversion",
+        "mechanism.plating",
+        "concept.overpotential",
+        "formula.coulombic_efficiency",
+        "formula.mass_loading"
+      ],
+      "tags": [
+        "anode",
+        "metal",
+        "zinc",
+        "aqueous"
+      ],
+      "electrolyteContext": [
+        {
+          "system": "aqueous",
+          "viable": "yes",
+          "typical": "Mildly acidic ZnSO₄ or Zn(CF₃SO₃)₂ around pH 4–6, or strongly alkaline KOH.",
+          "whatChanges": "THIS IS THE MATERIAL THAT MAKES THE WATER WINDOW WORTH UNDERSTANDING. Zn²⁺/Zn is −0.7618 V vs SHE. At pH 0 the hydrogen line is at 0.000 V, so zinc is 0.76 V outside the window and should evolve hydrogen; by pH 14 that line has fallen to −0.828 V and zinc is INSIDE. Alkaline zinc is thermodynamically allowed. Mildly acidic zinc is not — it works on a large hydrogen-evolution overpotential, which is a kinetic reprieve that a catalytic impurity can remove.",
+          "watch": "Hydrogen evolution, dendrites and passivation are all electrolyte-dependent. A zinc result without the electrolyte, its concentration and its pH is not interpretable, and a \"stable\" symmetric cell is not evidence of a practical anode."
+        },
+        {
+          "system": "non-aqueous",
+          "viable": "conditional",
+          "typical": "Acetonitrile- or ether-based Zn salts; a research area rather than a standard.",
+          "whatChanges": "Removes hydrogen evolution and widens the voltage window, at the cost of much slower Zn²⁺ transport and desolvation — the divalent ion is strongly solvated.",
+          "watch": "Do not carry an aqueous zinc result across to a non-aqueous cell. Almost nothing transfers except the theoretical capacity."
+        }
+      ],
+      "mechanismId": "mechanism.plating"
+    }
+  ],
+  "_mechanismId": "The storage mechanism, as an id in electrochemistry.json. Read off the reaction the record declares — a guest entering sites in a surviving host is intercalation, an intermetallic is alloying, a compound pulled apart is conversion, metal made from the electrolyte with no host is plating. NULL IS A LEGITIMATE VALUE and must carry a mechanismNote saying why: forcing a reaction into the nearest label teaches the wrong vocabulary, which is worse than an admitted gap."
+}

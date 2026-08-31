@@ -1,17 +1,25 @@
 {
   "schemaVersion": 1,
   "_README": "Storage chemistry — Roadmap P8. The mechanism layer: what physically happens when an electrode stores charge, how each mechanism shows itself in CV and GCD, and — the field the health check enforces — how to tell it from its neighbours. No mechanism record may claim a signature that proves it. DRAFT — pending review by the research group.",
-
   "preamble": "Mechanisms are not categories with hard edges. They are points on one continuum, and the quantity that orders them is the DIFFERENTIAL CAPACITANCE dQ/dV — how much charge the electrode takes for each additional volt. Flat dQ/dV gives a rectangular voltammogram and a straight discharge line; peaked dQ/dV gives a peaked voltammogram and a plateau. Everything else on this page follows from where a material sits on that continuum, and the interactive model lets you move along it.",
-
   "items": [
     {
       "id": "mechanism.edl",
       "name": "Electrical double layer",
       "short": "EDL / EDLC",
       "family": "capacitive",
-      "aliases": ["EDLC", "double layer", "electrostatic", "supercapacitor", "carbon"],
-      "tags": ["supercapacitor", "carbon", "capacitive"],
+      "aliases": [
+        "EDLC",
+        "double layer",
+        "electrostatic",
+        "supercapacitor",
+        "carbon"
+      ],
+      "tags": [
+        "supercapacitor",
+        "carbon",
+        "capacitive"
+      ],
       "summary": "Charge is stored electrostatically in the layer of ions that assembles at the electrode surface. No electron crosses the interface, and no bond changes.",
       "whatHappens": "Applying a potential attracts counter-ions to the surface and repels co-ions, forming a compact layer of separated charge a few ion diameters thick. The charge is held by electrostatics alone, like a capacitor with a very small plate separation and a very large area.",
       "whereChargeGoes": "The surface, and only the surface. Storage scales with accessible area, not with volume.",
@@ -29,16 +37,29 @@
         "Attributing all of a carbon electrode's capacitance to the double layer when surface functional groups are contributing faradaically",
         "Explaining a capacitance difference by BET area alone — the accessible area, not the measured area, is what stores charge"
       ],
-      "relatedIds": ["mechanism.pseudo_surface", "technique.bet", "formula.specific_capacitance"]
+      "relatedIds": [
+        "mechanism.pseudo_surface",
+        "technique.bet",
+        "formula.specific_capacitance"
+      ]
     },
-
     {
       "id": "mechanism.pseudo_surface",
       "name": "Surface pseudocapacitance",
       "short": "Surface redox",
       "family": "pseudocapacitive",
-      "aliases": ["pseudocapacitance", "surface redox", "underpotential deposition", "RuO2", "MnO2"],
-      "tags": ["supercapacitor", "pseudocapacitance", "faradaic"],
+      "aliases": [
+        "pseudocapacitance",
+        "surface redox",
+        "underpotential deposition",
+        "RuO2",
+        "MnO2"
+      ],
+      "tags": [
+        "supercapacitor",
+        "pseudocapacitance",
+        "faradaic"
+      ],
       "summary": "Charge is stored by fast, reversible redox reactions at or very near the surface — faradaic in mechanism, capacitor-like in behaviour.",
       "whatHappens": "Electrons cross the interface and change an oxidation state, but the reaction is confined to the surface and is fast enough to follow the potential almost without lag. Because surface sites have a spread of energies, the couple is broadened until its differential capacitance is nearly flat.",
       "whereChargeGoes": "Surface and near-surface sites. Storage still scales with accessible area, but each site holds far more charge than a double-layer site.",
@@ -58,16 +79,30 @@
         "Reporting a b-value near 1 as proof of a capacitive mechanism — b is an empirical descriptor of scaling, not an identification",
         "Deconvoluting a CV into 'capacitive' and 'diffusion-controlled' percentages and presenting the split as a measurement rather than as the output of an assumed model"
       ],
-      "relatedIds": ["mechanism.edl", "mechanism.pseudo_intercalation", "formula.b_value", "method.cv"]
+      "relatedIds": [
+        "mechanism.edl",
+        "mechanism.pseudo_intercalation",
+        "formula.b_value",
+        "method.cv"
+      ]
     },
-
     {
       "id": "mechanism.pseudo_intercalation",
       "name": "Intercalation pseudocapacitance",
       "short": "Fast intercalation",
       "family": "pseudocapacitive",
-      "aliases": ["intercalation pseudocapacitance", "Nb2O5", "fast intercalation", "bulk pseudocapacitance"],
-      "tags": ["supercapacitor", "battery", "pseudocapacitance", "intercalation"],
+      "aliases": [
+        "intercalation pseudocapacitance",
+        "Nb2O5",
+        "fast intercalation",
+        "bulk pseudocapacitance"
+      ],
+      "tags": [
+        "supercapacitor",
+        "battery",
+        "pseudocapacitance",
+        "intercalation"
+      ],
       "summary": "Ions enter the bulk of the host, as in a battery, but without a phase change and fast enough that the response still looks capacitive.",
       "whatHappens": "Ions insert into a host structure with open, low-barrier diffusion pathways. Because no phase transformation is required, the potential varies continuously with occupancy instead of pinning to a plateau, and the kinetics stay fast even though the bulk is involved.",
       "whereChargeGoes": "Throughout the particle volume — so capacity does not saturate with thickness in the way surface storage does.",
@@ -86,16 +121,31 @@
         "Treating a fast bulk process as a surface process and normalising to surface area",
         "Reporting capacitance in farads per gram for a material whose discharge curve is visibly sloped"
       ],
-      "relatedIds": ["mechanism.pseudo_surface", "mechanism.intercalation", "formula.b_value"]
+      "relatedIds": [
+        "mechanism.pseudo_surface",
+        "mechanism.intercalation",
+        "formula.b_value"
+      ]
     },
-
     {
       "id": "mechanism.intercalation",
       "name": "Battery-type intercalation",
       "short": "Intercalation",
       "family": "battery",
-      "aliases": ["intercalation", "insertion", "topotactic", "staging", "graphite", "layered oxide"],
-      "tags": ["battery", "lithium-ion", "sodium-ion", "intercalation"],
+      "aliases": [
+        "intercalation",
+        "insertion",
+        "topotactic",
+        "staging",
+        "graphite",
+        "layered oxide"
+      ],
+      "tags": [
+        "battery",
+        "lithium-ion",
+        "sodium-ion",
+        "intercalation"
+      ],
       "summary": "Ions insert into defined sites in a host lattice, often through a sequence of ordered phases, giving the flat plateaus that define battery behaviour.",
       "whatHappens": "Guest ions occupy interstitial sites in a host that keeps its framework. Where two phases coexist, thermodynamics fixes the potential — the extra ions convert one phase into the other rather than raising the energy of the system — and the voltage stays constant until the transformation completes.",
       "whereChargeGoes": "The bulk of the particle, into a limited number of defined sites. That limit is what makes theoretical capacity calculable.",
@@ -115,16 +165,34 @@
         "Reading plateau length as capacity without confirming the step ended on its voltage limit rather than a time limit",
         "Attributing every dQ/dV peak to a phase transition without structural evidence"
       ],
-      "relatedIds": ["mechanism.pseudo_intercalation", "mechanism.conversion", "formula.specific_capacity", "technique.xrd"]
+      "relatedIds": [
+        "mechanism.pseudo_intercalation",
+        "mechanism.conversion",
+        "formula.specific_capacity",
+        "technique.xrd",
+        "material.graphite",
+        "material.lifepo4",
+        "material.hard_carbon",
+        "material.pba_nafe"
+      ],
+      "materialCount": 15
     },
-
     {
       "id": "mechanism.conversion",
       "name": "Conversion",
       "short": "Conversion",
       "family": "battery",
-      "aliases": ["conversion", "displacement", "metal oxide anode", "transition metal fluoride"],
-      "tags": ["battery", "conversion", "high capacity"],
+      "aliases": [
+        "conversion",
+        "displacement",
+        "metal oxide anode",
+        "transition metal fluoride"
+      ],
+      "tags": [
+        "battery",
+        "conversion",
+        "high capacity"
+      ],
       "summary": "The host is chemically taken apart and rebuilt each cycle — very high capacity, at the cost of large hysteresis and difficult reversibility.",
       "whatHappens": "The compound is reduced to a metal dispersed in a matrix of the reaction product, and re-oxidised on charge. Every bond in the starting material is broken and remade, so far more electrons are stored per formula unit than intercalation allows.",
       "whereChargeGoes": "The entire compound participates, not a set of interstitial sites — which is why capacities are several times those of intercalation hosts.",
@@ -144,16 +212,35 @@
         "Presenting first-cycle capacity as the material's capacity",
         "Attributing all first-cycle loss to conversion when SEI formation accounts for part of it"
       ],
-      "relatedIds": ["mechanism.intercalation", "mechanism.alloying", "formula.energy_efficiency"]
+      "relatedIds": [
+        "mechanism.intercalation",
+        "mechanism.alloying",
+        "formula.energy_efficiency",
+        "material.sulfur",
+        "material.mno2",
+        "material.pb",
+        "material.pbo2"
+      ],
+      "materialCount": 4
     },
-
     {
       "id": "mechanism.alloying",
       "name": "Alloying",
       "short": "Alloying",
       "family": "battery",
-      "aliases": ["alloying", "silicon anode", "tin", "germanium", "Li-Si"],
-      "tags": ["battery", "alloying", "silicon", "volume change"],
+      "aliases": [
+        "alloying",
+        "silicon anode",
+        "tin",
+        "germanium",
+        "Li-Si"
+      ],
+      "tags": [
+        "battery",
+        "alloying",
+        "silicon",
+        "volume change"
+      ],
       "summary": "The guest ion forms an alloy with the host element — the highest capacities available, and the largest volume changes.",
       "whatHappens": "Lithium (or sodium) alloys with an element such as silicon or tin, forming successive intermetallic compositions. Many ions are stored per host atom, which is why the capacities are so high.",
       "whereChargeGoes": "The whole particle, transformed into a new compound with a substantially larger volume.",
@@ -173,46 +260,113 @@
         "Presenting good capacity over a few tens of cycles as cycling stability",
         "Comparing capacities measured at very low mass loading with practical electrodes"
       ],
-      "relatedIds": ["mechanism.conversion", "mechanism.intercalation", "formula.capacity_retention"]
+      "relatedIds": [
+        "mechanism.conversion",
+        "mechanism.intercalation",
+        "formula.capacity_retention",
+        "material.silicon"
+      ],
+      "materialCount": 1
+    },
+    {
+      "id": "mechanism.plating",
+      "name": "Metal plating and stripping",
+      "short": "Plating / stripping",
+      "family": "battery",
+      "aliases": [
+        "plating",
+        "stripping",
+        "deposition",
+        "lithium metal anode",
+        "zinc anode",
+        "dendrite"
+      ],
+      "tags": [
+        "battery",
+        "plating",
+        "metal anode",
+        "dendrite",
+        "lithium",
+        "sodium",
+        "zinc"
+      ],
+      "summary": "The guest ion is reduced to bulk metal on the electrode and dissolved back off it. There is no host — which is why the capacity is enormous and the failure modes are mechanical rather than chemical.",
+      "whatHappens": "On charge, M⁺ in the electrolyte gains an electron and joins the metal surface. On discharge it dissolves back. Nothing intercalates, nothing alloys, and no compound is formed or decomposed — the electrode simply gets thicker and thinner.",
+      "whereChargeGoes": "Into new metal at the surface. The electrode has no fixed volume and no defined state of charge: a plated electrode is a different thickness from a stripped one, and there is no lattice keeping the deposit uniform.",
+      "dQdV": "A single sharp feature very close to 0 V versus the metal itself, because the reaction has no host to distinguish sites. dQ/dV is not a useful fingerprint here, which is worth knowing before spending time on it.",
+      "inCV": "A crossover loop near the plating potential — the current on the reverse sweep is larger than on the forward sweep at the same potential, because there is now more surface than there was. That crossover is the signature, and it is the one feature that distinguishes plating from every mechanism above.",
+      "inGCD": "A flat plateau at or near 0 V versus the metal, with an overpotential that grows as the surface degrades. In a symmetric cell the voltage envelope over time IS the measurement — not a capacity.",
+      "rateBehaviour": "Limited by ion transport in the electrolyte rather than in a solid. Above a limiting current the concentration at the surface falls to zero and the deposit becomes dendritic — a threshold, not a gradual decline.",
+      "degradation": "Mechanical and interfacial, not structural. Dendrites can bridge to the counter electrode and short the cell. Deposit that loses electrical contact becomes \"dead\" metal, still present but no longer available. Fresh surface is created on every cycle, so the interphase is re-formed continually and electrolyte is consumed continually. Volume change is effectively infinite, since the electrode is created and destroyed.",
+      "quantityToReport": "COULOMBIC EFFICIENCY PER CYCLE, and the areal capacity plated. A specific capacity per gram of metal is close to meaningless on its own, because a thick foil provides a reservoir that hides everything: cycle life in a symmetric cell with excess metal measures the electrolyte, not the anode.",
+      "distinguishFrom": [
+        "Versus alloying: alloying forms an intermetallic WITH a host element and the host is still there at the end of discharge. Plating has no host — the metal is created from the electrolyte and returned to it. Silicon is alloying; lithium foil is plating.",
+        "Versus conversion: conversion decomposes a compound into a metal and a matrix, and the matrix remains. Plating produces metal and nothing else.",
+        "Versus intercalation: there is no lattice, no defined sites, no staging and no phase sequence. If the plateau sits at 0 V versus the metal and the CV shows a nucleation crossover, it is plating.",
+        "A symmetric cell (M‖M) is NOT a capacity measurement of any kind. It measures how the interface behaves under a fixed current, and reading it as cycle life is a category error."
+      ],
+      "misread": [
+        "Quoting the theoretical capacity of the metal as though the whole foil were cycled — utilisation is usually a few per cent in a lab cell",
+        "Reading a long-lived symmetric cell with a thick foil as a stable anode; the excess metal is what is lasting, not the interface",
+        "Reporting average Coulombic efficiency without the areal capacity it was measured at — the two are not separable",
+        "Treating a rising overpotential as an electrolyte problem when it can equally be accumulated dead metal, or the counter electrode failing"
+      ],
+      "safety": "Alkali metal electrodes are handled in a glovebox and are never brought near water. A shorted, swollen or leaking cell containing plated metal is not to be opened, and the group’s written procedure applies.",
+      "relatedIds": [
+        "mechanism.alloying",
+        "mechanism.conversion",
+        "material.li_metal",
+        "material.na_metal",
+        "material.zn_metal"
+      ],
+      "materialCount": 3
     }
   ],
-
   "devices": {
     "title": "What the device does with those mechanisms",
     "note": "A device is two electrodes. Which mechanism each one uses decides the shape of the cell curve, where the voltage window comes from, and which quantity is valid to report for the whole thing.",
     "rows": [
-      { "device": "Symmetric EDLC",
+      {
+        "device": "Symmetric EDLC",
         "electrodes": "Two identical carbon electrodes, both double-layer.",
         "window": "Set by the electrolyte's stability, not by any redox potential.",
         "curve": "Triangular. Both electrodes are capacitive, so the cell is too.",
         "report": "Cell capacitance for the device; single-electrode-equivalent capacitance for the material, with the factor of four stated.",
-        "watch": "The two electrodes must genuinely be identical for the factor of four to apply." },
-      { "device": "Asymmetric / hybrid supercapacitor",
+        "watch": "The two electrodes must genuinely be identical for the factor of four to apply."
+      },
+      {
+        "device": "Asymmetric / hybrid supercapacitor",
         "electrodes": "One capacitive electrode against one pseudocapacitive or battery-type electrode.",
         "window": "Wider than a symmetric cell, because the two electrodes work over different potential ranges.",
         "curve": "Between triangular and plateaued, depending on how battery-like the second electrode is.",
         "report": "Cell-level quantities. The factor of four does NOT apply — the electrodes are not identical, and each must be characterised separately in a three-electrode arrangement.",
-        "watch": "Mass balancing between the two electrodes is a design choice that changes every reported number." },
-      { "device": "Lithium-ion capacitor",
+        "watch": "Mass balancing between the two electrodes is a design choice that changes every reported number."
+      },
+      {
+        "device": "Lithium-ion capacitor",
         "electrodes": "A capacitive carbon cathode against a battery-type intercalation anode.",
         "window": "Set by the anode's operating potential and the electrolyte limit.",
         "curve": "Sloping, closer to a capacitor than to a battery.",
         "report": "Energy and power at the device level. Capacitance is not the natural quantity here.",
-        "watch": "The anode usually needs pre-lithiation, which is a preparation step with its own reproducibility problems." },
-      { "device": "Lithium-ion / sodium-ion battery",
+        "watch": "The anode usually needs pre-lithiation, which is a preparation step with its own reproducibility problems."
+      },
+      {
+        "device": "Lithium-ion / sodium-ion battery",
         "electrodes": "Two intercalation electrodes at different potentials.",
         "window": "Set by the difference between the two electrodes' redox potentials.",
         "curve": "Plateaued, or sloping-with-steps.",
         "report": "Capacity, energy, coulombic and energy efficiency, retention. Never capacitance.",
-        "watch": "A half cell against lithium metal is not a full cell — the counter electrode is effectively unlimited, so full-cell behaviour cannot be inferred from it." },
-      { "device": "Half cell (research configuration)",
+        "watch": "A half cell against lithium metal is not a full cell — the counter electrode is effectively unlimited, so full-cell behaviour cannot be inferred from it."
+      },
+      {
+        "device": "Half cell (research configuration)",
         "electrodes": "The electrode of interest against a large excess of metal.",
         "window": "Chosen by you, within the electrolyte's stability.",
         "curve": "The electrode of interest, essentially uncontaminated by the counter electrode.",
         "report": "Electrode-level quantities only, always stated as half-cell values.",
-        "watch": "Coulombic efficiency in a half cell flatters the material, because the counter electrode supplies whatever is lost." }
+        "watch": "Coulombic efficiency in a half cell flatters the material, because the counter electrode supplies whatever is lost."
+      }
     ]
   },
-
   "closing": "Which mechanism an electrode uses is not a label you attach after the fact. It decides which quantity is valid to report, which formula applies, which failure modes to expect and which characterisation will answer your next question. It also cannot be established from a single curve — every distinction on this page needs at least a series, and most need a technique from outside electrochemistry."
 }

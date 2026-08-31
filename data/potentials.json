@@ -1,0 +1,493 @@
+{
+  "_README": "STANDARD REDUCTION POTENTIALS, WITH A CITATION ON EVERY ROW. This is the one file in the materials module that holds values EDMGLAB did not compute — a standard potential is a measured thermodynamic quantity, not something derivable from stoichiometry. Every row therefore carries provenance 'literature' and points at sourceId below. Do not add a row you cannot cite. Do not adjust a value to make a diagram look better.",
+  "schemaVersion": 1,
+  "_kind": "content",
+  "_whyThisFileExists": "The whole aqueous / non-aqueous question is a potentials question. Water is only stable over a 1.229 V window; an electrode whose potential falls outside that window reduces or oxidises the solvent instead of storing charge. Without these numbers the distinction is a rule to memorise. With them it is arithmetic a student can do.",
+  "sources": {
+    "libretexts_p1": {
+      "title": "Standard Reduction Potentials by Element (Reference Table P1)",
+      "publisher": "Chemistry LibreTexts",
+      "url": "https://chem.libretexts.org/Bookshelves/Ancillary_Materials/Reference/Reference_Tables/Electrochemistry_Tables/P1%3A_Standard_Reduction_Potentials_by_Element",
+      "citesInTurn": "Bard, A. J.; Parsons, R.; Jordan, J., eds. Standard Potentials in Aqueous Solutions, Dekker: New York, 1985. Milazzo, G.; Caroli, S.; Sharma, V. K. Tables of Standard Electrode Potentials, Wiley: London, 1978. Swift, E. H.; Butler, E. A. Quantitative Measurements and Chemical Equilibria, Freeman: New York, 1972.",
+      "retrieved": "2026-08-30",
+      "_": "A compilation, not a primary measurement. It is cited here because it names its own primary sources, which a reader can chase. If your group prefers to work from Bard directly, replace this block and re-check every value against it — do not assume they agree to the last digit."
+    },
+    "libretexts_t1": {
+      "title": "Standard Thermodynamic Quantities (Reference Table T1)",
+      "publisher": "Chemistry LibreTexts",
+      "url": "https://chem.libretexts.org/Bookshelves/Ancillary_Materials/Reference/Reference_Tables/Thermodynamics_Tables/T1%3A_Standard_Thermodynamic_Quantities",
+      "citesInTurn": "CRC Handbook of Chemistry and Physics, 84th Edition (2004).",
+      "retrieved": "2026-08-30"
+    },
+    "stolaf_eo": {
+      "title": "Standard Reduction Reactions in Basic Aqueous Solution at 25 °C",
+      "publisher": "St. Olaf College, Department of Chemistry (course table)",
+      "url": "https://www.stolaf.edu/depts/chemistry/courses/toolkits/126/hw/table-Eo.pdf",
+      "citesInTurn": "None. The table gives no upstream reference.",
+      "retrieved": "2026-08-31",
+      "unsourced": true,
+      "_": "WEAKER THAN libretexts_p1 AND MARKED SO. A teaching table that cites nothing cannot be chased to a primary measurement, which is the whole point of a citation. Any row using it carries a caution and should be re-checked against Bard before anybody relies on it. Replace this block the moment somebody has the handbook open."
+    }
+  },
+  "_conditions": "EVERY value below is the STANDARD potential: 25 °C, unit activity, 1 bar. A real electrode is never at standard conditions. Concentration shifts it by the Nernst term, pH shifts anything involving H+ or OH-, and a practical electrode also sits at whatever overpotential the current demands. Treat these as the thermodynamic floor plan, not as what a meter will read.",
+  "constants": {
+    "nernstSlope": {
+      "value": 0.05916,
+      "unit": "V per pH unit",
+      "provenance": "theoretical",
+      "derivation": "2.303·R·T/F at T = 298.15 K = 2.303 × 8.3145 × 298.15 / 96485.33",
+      "_": "Computed, not quoted. This is why the water window slides down as a solution gets more alkaline — and why a zinc electrode that is unusable at pH 1 is routine at pH 14."
+    },
+    "waterWindow": {
+      "value": 1.229,
+      "unit": "V",
+      "provenance": "literature",
+      "sourceId": "libretexts_p1",
+      "crossCheck": "ΔfG°(H2O, l) = −237.1 kJ/mol (CRC 84th ed. via libretexts_t1). For 2 H2 + O2 → 2 H2O, ΔG = −474.2 kJ, n = 4, so E = −ΔG/(nF) = 474200 / (4 × 96485.33) = 1.2287 V.",
+      "_": "The width is the same at every pH: in acid 1.229 − 0.000, in base 0.401 − (−0.828). Both differences are 1.229 V, and thermochemistry gives the same number from a completely independent measurement. Three routes, one answer — that is what makes it safe to build the rest of the module on."
+    }
+  },
+  "items": [
+    {
+      "id": "potential.li",
+      "couple": "Li⁺ + e⁻ ⇌ Li(s)",
+      "symbol": "Li⁺/Li",
+      "e0": {
+        "value": -3.04,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−3.040",
+        "_printed": "The source prints each value to its own precision, and that precision is a claim about the measurement. Display THIS string, never a reformatted number — rounding K to three decimals would invent a digit the source does not have."
+      },
+      "chemistry": [
+        "Li"
+      ],
+      "kind": "metal",
+      "note": "The reason lithium cells are high-voltage, and the reason lithium metal cannot touch water. It sits 3.04 V below the hydrogen line — about 2.2 V beyond the reduction limit of water even at pH 14.",
+      "relatedIds": [
+        "material.li_metal",
+        "concept.ec_three_electrode"
+      ],
+      "tags": [
+        "reference",
+        "lithium"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.na",
+      "couple": "Na⁺ + e⁻ ⇌ Na(s)",
+      "symbol": "Na⁺/Na",
+      "e0": {
+        "value": -2.713,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−2.713"
+      },
+      "chemistry": [
+        "Na"
+      ],
+      "kind": "metal",
+      "note": "0.33 V above lithium. That difference — not the mass — is most of why a sodium cell of the same design delivers less energy than a lithium one.",
+      "relatedIds": [
+        "material.na_metal"
+      ],
+      "tags": [
+        "reference",
+        "sodium"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.k",
+      "couple": "K⁺ + e⁻ ⇌ K(s)",
+      "symbol": "K⁺/K",
+      "e0": {
+        "value": -2.93,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−2.93"
+      },
+      "chemistry": [
+        "K"
+      ],
+      "kind": "metal",
+      "note": "Lower than sodium — potassium cells can be higher-voltage than sodium cells despite the heavier ion. Quoted to two decimals in the source; do not print a third.",
+      "relatedIds": [
+        "material.graphite_k"
+      ],
+      "tags": [
+        "reference",
+        "potassium"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.mg",
+      "couple": "Mg²⁺ + 2e⁻ ⇌ Mg(s)",
+      "symbol": "Mg²⁺/Mg",
+      "e0": {
+        "value": -2.356,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−2.356"
+      },
+      "chemistry": [
+        "Mg"
+      ],
+      "kind": "metal",
+      "note": "Two electrons per ion, so a high volumetric capacity — but still far outside the water window, so magnesium batteries are non-aqueous too.",
+      "relatedIds": [],
+      "tags": [
+        "reference",
+        "magnesium",
+        "multivalent"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.al",
+      "couple": "Al³⁺ + 3e⁻ ⇌ Al(s)",
+      "symbol": "Al³⁺/Al",
+      "e0": {
+        "value": -1.676,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−1.676"
+      },
+      "chemistry": [
+        "Al"
+      ],
+      "kind": "metal",
+      "note": "Also outside the window. Aluminium survives in water only because it passivates — a kinetic rescue, not a thermodynamic one, and that distinction is worth understanding before trusting any 'stable in water' claim.",
+      "relatedIds": [],
+      "tags": [
+        "reference",
+        "aluminium",
+        "passivation"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.zn",
+      "couple": "Zn²⁺ + 2e⁻ ⇌ Zn(s)",
+      "symbol": "Zn²⁺/Zn",
+      "e0": {
+        "value": -0.7618,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−0.7618"
+      },
+      "chemistry": [
+        "Zn"
+      ],
+      "kind": "metal",
+      "note": "THE ENTIRE REASON AQUEOUS ZINC BATTERIES EXIST. At pH 0 zinc is 0.76 V below the hydrogen line and should evolve hydrogen; at pH 14 that line has fallen to −0.828 V, BELOW zinc, so plating zinc from alkali is thermodynamically allowed. Move the pH slider in the water-window panel and watch the crossing happen.",
+      "relatedIds": [
+        "material.zn_metal",
+        "material.mno2"
+      ],
+      "tags": [
+        "reference",
+        "zinc",
+        "aqueous"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.pb",
+      "couple": "Pb²⁺ + 2e⁻ ⇌ Pb(s)",
+      "symbol": "Pb²⁺/Pb",
+      "e0": {
+        "value": -0.126,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−0.126"
+      },
+      "chemistry": [
+        "Pb"
+      ],
+      "kind": "metal",
+      "relatedIds": [
+        "material.pb"
+      ],
+      "tags": [
+        "reference",
+        "lead"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.pbso4_pb",
+      "couple": "PbSO₄(s) + 2e⁻ ⇌ Pb(s) + SO₄²⁻",
+      "symbol": "PbSO₄/Pb",
+      "e0": {
+        "value": -0.356,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−0.356"
+      },
+      "chemistry": [
+        "Pb"
+      ],
+      "kind": "conversion",
+      "note": "The lead-acid NEGATIVE. Note it is not the same as Pb²⁺/Pb: sulfate precipitation shifts the potential, which is what a couple written with its actual reaction product tells you and a bare metal couple does not.",
+      "relatedIds": [
+        "material.pb"
+      ],
+      "tags": [
+        "reference",
+        "lead",
+        "aqueous"
+      ],
+      "pHIndependent": false,
+      "definedAtPH": 0
+    },
+    {
+      "id": "potential.pbo2_pbso4",
+      "couple": "PbO₂(s) + SO₄²⁻ + 4H⁺ + 2e⁻ ⇌ PbSO₄(s) + 2H₂O",
+      "symbol": "PbO₂/PbSO₄",
+      "e0": {
+        "value": 1.69,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "+1.690"
+      },
+      "chemistry": [
+        "Pb"
+      ],
+      "kind": "conversion",
+      "note": "The lead-acid POSITIVE, and it is 0.46 V ABOVE the oxygen line. Lead-acid is thermodynamically committed to splitting its own electrolyte and works only because oxygen evolution on lead dioxide is very slow. This is the clearest case in common use of a battery that survives on kinetics rather than on thermodynamics — and it is why lead-acid cells gas, and why they need water topping up.",
+      "relatedIds": [
+        "material.pbo2"
+      ],
+      "tags": [
+        "reference",
+        "lead",
+        "aqueous",
+        "kinetics"
+      ],
+      "pHIndependent": false,
+      "definedAtPH": 0
+    },
+    {
+      "id": "potential.ni_oh2",
+      "couple": "Ni(OH)₂ + 2e⁻ ⇌ Ni(s) + 2OH⁻",
+      "symbol": "Ni(OH)₂/Ni",
+      "e0": {
+        "value": -0.72,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−0.72"
+      },
+      "chemistry": [
+        "Ni"
+      ],
+      "kind": "conversion",
+      "note": "CAUTION — this is the couple that reduces nickel(II) all the way to nickel METAL. It is NOT the Ni(OH)₂/NiOOH couple that a NiMH or NiCd positive electrode actually uses, which is a different, much more oxidising reaction. The oxidising couple is not in this table because it was not verified against the cited source; do not substitute a remembered value for it.",
+      "relatedIds": [
+        "material.ni_oh2"
+      ],
+      "tags": [
+        "reference",
+        "nickel",
+        "alkaline"
+      ],
+      "pHIndependent": false,
+      "definedAtPH": 14
+    },
+    {
+      "id": "potential.cu",
+      "couple": "Cu²⁺ + 2e⁻ ⇌ Cu(s)",
+      "symbol": "Cu²⁺/Cu",
+      "e0": {
+        "value": 0.3419,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "+0.3419"
+      },
+      "chemistry": [
+        "Cu"
+      ],
+      "kind": "metal",
+      "note": "Above hydrogen, which is why copper is stable in acid without oxygen and why it is used as the anode current collector in a lithium cell — it will not dissolve at the low potentials the anode sits at.",
+      "relatedIds": [],
+      "tags": [
+        "reference",
+        "copper",
+        "collector"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.fe",
+      "couple": "Fe²⁺ + 2e⁻ ⇌ Fe(s)",
+      "symbol": "Fe²⁺/Fe",
+      "e0": {
+        "value": -0.44,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−0.44"
+      },
+      "chemistry": [
+        "Fe"
+      ],
+      "kind": "metal",
+      "relatedIds": [],
+      "tags": [
+        "reference",
+        "iron"
+      ],
+      "pHIndependent": true
+    },
+    {
+      "id": "potential.h_acid",
+      "couple": "2H⁺ + 2e⁻ ⇌ H₂(g)",
+      "symbol": "H⁺/H₂",
+      "e0": {
+        "value": 0,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "0.000"
+      },
+      "chemistry": [
+        "H2O"
+      ],
+      "kind": "solventLimit",
+      "limit": "lower",
+      "pHSlope": -0.05916,
+      "note": "Exactly zero by DEFINITION at pH 0 — this couple is the reference, not a measurement. It falls by 59.16 mV per pH unit, so at pH 7 it is −0.414 V and at pH 14 it is −0.828 V. Anything below this line reduces water instead of storing charge.",
+      "relatedIds": [],
+      "tags": [
+        "reference",
+        "water",
+        "limit"
+      ]
+    },
+    {
+      "id": "potential.h_alkaline",
+      "couple": "H₂O + e⁻ ⇌ ½H₂(g) + OH⁻",
+      "symbol": "H₂O/H₂",
+      "e0": {
+        "value": -0.828,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "−0.828"
+      },
+      "chemistry": [
+        "H2O"
+      ],
+      "kind": "solventLimit",
+      "limit": "lower",
+      "note": "The same lower limit written for alkaline conditions. −0.828 V is what the H⁺/H₂ line becomes at pH 14 — the table and the Nernst slope agree, which is a useful check that the slope is being applied correctly.",
+      "relatedIds": [],
+      "tags": [
+        "reference",
+        "water",
+        "limit",
+        "alkaline"
+      ]
+    },
+    {
+      "id": "potential.o2_acid",
+      "couple": "O₂ + 4H⁺ + 4e⁻ ⇌ 2H₂O",
+      "symbol": "O₂/H₂O",
+      "e0": {
+        "value": 1.229,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "+1.229"
+      },
+      "chemistry": [
+        "H2O"
+      ],
+      "kind": "solventLimit",
+      "limit": "upper",
+      "pHSlope": -0.05916,
+      "note": "The upper limit. Anything above this line oxidises water. It falls at the same 59.16 mV per pH unit as the hydrogen line, which is why the WINDOW WIDTH never changes with pH — only its position does.",
+      "relatedIds": [],
+      "tags": [
+        "reference",
+        "water",
+        "limit"
+      ]
+    },
+    {
+      "id": "potential.o2_alkaline",
+      "couple": "O₂ + 2H₂O + 4e⁻ ⇌ 4OH⁻",
+      "symbol": "O₂/OH⁻",
+      "e0": {
+        "value": 0.401,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "libretexts_p1",
+        "printed": "+0.401"
+      },
+      "chemistry": [
+        "H2O"
+      ],
+      "kind": "solventLimit",
+      "limit": "upper",
+      "note": "The upper limit at pH 14. 0.401 − (−0.828) = 1.229 V, the same width as 1.229 − 0.000 in acid. Two independently tabulated pairs, one window.",
+      "relatedIds": [],
+      "tags": [
+        "reference",
+        "water",
+        "limit",
+        "alkaline"
+      ]
+    },
+    {
+      "id": "potential.nio2_ni_oh2",
+      "couple": "NiO₂(s) + 2 H₂O + 2 e⁻ ⇌ Ni(OH)₂(s) + 2 OH⁻",
+      "symbol": "NiO₂/Ni(OH)₂",
+      "e0": {
+        "value": 0.49,
+        "unit": "V vs SHE",
+        "provenance": "literature",
+        "sourceId": "stolaf_eo",
+        "printed": "+0.49",
+        "caution": "The source is a course table with no upstream citation. Treat this as indicative and re-check it against Bard before relying on it."
+      },
+      "chemistry": [
+        "Ni"
+      ],
+      "kind": "conversion",
+      "pHIndependent": false,
+      "definedAtPH": 14,
+      "note": "READ THE OXIDATION STATE BEFORE USING THIS. It is the Ni(IV)/Ni(II) couple — NiO₂ down to Ni(OH)₂, two electrons. The nickel POSITIVE electrode in a NiCd, NiMH or Ni–Zn cell runs Ni(OH)₂ ⇌ NiOOH + H⁺ + e⁻, which is Ni(II)/Ni(III), ONE electron, and a different reaction. The two are conflated constantly, and +0.49 V is quoted for the practical electrode far more often than it is quoted for the couple it actually belongs to. What this row is good for is showing WHERE the nickel positive sits relative to the oxygen line at pH 14 (+0.401 V) — above it, which is why these cells gas on charge and why charge efficiency falls at high state of charge.",
+      "relatedIds": [
+        "material.ni_oh2",
+        "potential.o2_alkaline",
+        "potential.ni_oh2"
+      ],
+      "tags": [
+        "reference",
+        "nickel",
+        "alkaline",
+        "commonly-conflated"
+      ]
+    }
+  ],
+  "_notInThisFile": [
+    "Ni(OH)2/NiOOH — the Ni(II)/Ni(III) couple the nickel POSITIVE electrode actually uses. CHECKED, AND STILL ABSENT: the Bard-derived table this file is built on carries only three nickel entries (Ni2+/Ni, Ni(OH)2/Ni, and the hexammine), and none of them is it. What IS here is potential.nio2_ni_oh2, a DIFFERENT couple at a different oxidation state, from a weaker source. Do not substitute one for the other. Add the real one when somebody has Bard open.",
+    "Any potential vs Li/Li+ or vs Ag/AgCl. Converting between reference scales is a subtraction, but it needs the reference electrode's own potential AND its filling solution, and the wrong filling solution is one of the commonest silent errors in reported three-electrode data. EDMGLAB will not do that conversion for you until the reference electrodes actually on your bench are recorded in instruments.json.",
+    "Anything for a non-aqueous solvent. Standard potentials are defined against SHE in WATER. A potential measured in a carbonate electrolyte against a lithium counter electrode is on a different scale, and the two are not interconvertible without a shared reference — a fact routinely ignored in the literature."
+  ],
+  "_pHNote": "pHIndependent marks a couple whose written reaction contains no H+, OH- or H2O — only those may be drawn as a horizontal line across the whole pH axis. The rest move with pH (PbO2/PbSO4 carries four protons, so it moves about twice as fast as the water lines) and are plotted only at the pH their tabulated value is defined for. Drawing a proton-carrying couple flat across a Pourbaix-style plot is a common and serious error: it puts the electrode on the wrong side of the window."
+}

@@ -2,6 +2,9 @@
   "_README": "Optional PIN gate. SHIPS DISABLED. Generate a replacement for this file from the admin panel at #/admin — never hand-write a PIN here. IMPORTANT: this is a SOFT GATE, not security. EDMGLAB is a static site, so anyone with the URL can open data/formulas.json (or any other file) directly without ever passing this PIN. Everything committed to this repository must still be safe to be public.",
   "schemaVersion": 1,
 
+  "_endpoint": "OPTIONAL. The /exec URL of the AccessControl.gs Web App. Leave it empty and this file IS the access list, changed by editing it and committing. Set it and this file becomes a POINTER: the live list lives at the endpoint, an admin changes it from #/admin with no commit, and everything below is only the fallback used when the endpoint cannot be reached and nothing is cached. docs/apps-script/README.md has the deployment steps. The URL is public and that is fine — reads expose only names, salts and hashes, exactly as this file already does. WRITES need an admin key that lives in Script Properties and never touches this repository.",
+  "endpoint": "",
+
   "enabled": false,
 
   "_mode": "'shared' = one PIN for the group. 'users' = a PIN per person, which also keeps each person's saved progress separate on a shared lab machine.",

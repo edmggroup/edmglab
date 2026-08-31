@@ -1,61 +1,80 @@
 {
-  "_": "An electrode material. NOTHING in data/materials.json exists yet, and this template is written from the schema rather than copied from a real record — because writing one from memory is exactly what the first rule forbids. Every number here must carry a citation.",
-  "id": "material.hard_carbon",
-  "_id": "material.snake_case, unique platform-wide.",
-  "name": "Hard carbon",
-  "aliases": [
-    "non-graphitisable carbon"
-  ],
-  "family": "carbon",
-  "_family": "'carbon', 'metal oxide', 'conducting polymer', 'MXene', 'alloy', 'intercalation host'…",
-  "usedFor": [
-    "sodium-ion anode",
-    "supercapacitor electrode"
-  ],
-  "mechanism": "mechanism.intercalation",
-  "_mechanism": "The id of the storage mechanism record. Cross-checked.",
-  "summary": "One or two sentences. What it is and why anyone uses it.",
-  "properties": {
-    "_": "EVERY numeric property is a value object. provenance must be `literature` or `datasheet` with a source, or `measured` with a date. A number with a unit and no provenance is an ERROR and renders as \"Unverified\".",
-    "theoreticalCapacity": {
-      "value": null,
-      "unit": "mAh/g",
-      "provenance": "theoretical",
-      "note": "State the stoichiometry it was derived from."
+  "_": "TEMPLATE for a record in data/materials.json. Copy it, delete every underscore note, and delete any field you cannot fill honestly. THE ONE RULE THAT CATCHES PEOPLE: there is no capacity field. You declare the formula unit and the electron count; the app computes Q = n·F/(3.6·M) and prints the arithmetic. If you find yourself wanting to type a number in mAh/g, stop — that number belongs in a paper with its conditions, not here.",
+
+  "id": "material.na3v2po43",
+  "_id": "material.<short_name>, lowercase, underscores, unique across the whole platform.",
+
+  "name": "Na₃V₂(PO₄)₃ (NASICON)",
+  "role": "cathode",
+  "_role": "'anode' or 'cathode'. The role in the cell you have in mind — say so in summary if it is used both ways.",
+
+  "chemistry": ["Na"],
+  "_chemistry": "Element SYMBOLS, not names: Li, Na, K, Zn, Mg, Pb, Ni. The view maps them to full names, and a record can carry more than one (a Prussian blue analogue cycles Na, K and Zn).",
+
+  "family": "polyanion",
+  "_family": "carbon · metal · alloy · oxide · layered oxide · spinel · polyanion · framework · hydroxide · conversion. Free text, but reuse an existing value rather than inventing a synonym.",
+
+  "summary": "One or two sentences. What it is and why anyone uses it — not a list of its virtues.",
+
+  "reaction": "Na₃V₂(PO₄)₃ ⇌ NaV₂(PO₄)₃ + 2 Na⁺ + 2 e⁻",
+  "_reaction": "The electrode reaction as written, with the SAME formula unit and electron count as the fields below. If the reaction and the arithmetic disagree, the page shows a derivation that contradicts the equation above it.",
+
+  "basisFormula": "Na₃V₂(PO₄)₃",
+  "_basisFormula": "DISPLAY string only — subscripts, brackets, whatever reads correctly. Never parsed.",
+
+  "composition": { "Na": 3, "V": 2, "P": 3, "O": 12 },
+  "_composition": "The machine-readable version of basisFormula: element symbol → count. This is what the molar mass is summed from, so it must expand every bracket. Set to null when the material HAS no formula unit (hard carbon), and set electrons to null too — the page then says so instead of computing.",
+
+  "electrons": 2,
+  "_electrons": "Electrons transferred per formula unit above. THIS IS OFTEN A CHOICE, NOT A FACT — V₂O₅ and MnO₂ are the obvious cases. When it is a choice, say so in capacityBasis in capitals, because the number on the page is only as good as this.",
+
+  "capacityBasis": "Per gram of the fully sodiated phase, using two of the three sodium — the third is not extracted in the usual window.",
+  "_capacityBasis": "What the computed number is PER, and any assumption inside it. This is the sentence that stops the figure being quoted out of context.",
+
+  "reportedCapacity": null,
+  "_reportedCapacity": "STAYS NULL. It is here so the absence is visible rather than looking like an oversight. A measured capacity needs its electrolyte, voltage window, rate, mass loading and cell configuration, and none of those live in this file.",
+
+  "halfCell": {
+    "against": "Na metal",
+    "whatItMeasures": "What the half cell genuinely tells you.",
+    "whatItHides": "What the counter electrode's excess conceals. This is the field the module exists for — if you cannot fill it, you do not yet understand the measurement well enough to write the record."
+  },
+
+  "fullCell": {
+    "pairedWith": ["material.hard_carbon"],
+    "_pairedWith": "Ids in this same file. Checked by tools/materials-test.mjs — a typo here fails the test rather than rendering a dead link.",
+    "whatChanges": "What becomes the limiting factor once there is no reservoir."
+  },
+
+  "electrolyteContext": [
+    {
+      "system": "non-aqueous",
+      "_system": "'aqueous' or 'non-aqueous'. Give BOTH entries even when one of them is a flat no — 'this cannot work in water, and here is why' is the more useful half for a student.",
+      "viable": "yes",
+      "_viable": "'yes' · 'no' · 'conditional'. Exactly these three; the test checks it.",
+      "typical": "Carbonate or ether with NaPF₆ / NaClO₄.",
+      "_typical": "The electrolyte this is normally run in. Use '—' when viable is 'no'.",
+      "whatChanges": "What the solvent changes about the chemistry — interphase formation, accessible window, transport, dissolution.",
+      "watch": "The thing that goes wrong, or the safety point. Use '—' if there genuinely isn't one; it is then not rendered."
     },
-    "reportedCapacity": {
-      "value": null,
-      "unit": "mAh/g",
-      "provenance": "literature",
-      "source": "",
-      "_source": "DOI or full citation. Required — an error without it.",
-      "_note": "A single literature number is rarely meaningful on its own. Prefer a RANGE with the conditions, and say which: rate, electrolyte, voltage window, mass loading."
-    },
-    "specificSurfaceArea": {
-      "value": null,
-      "unit": "m²/g",
-      "provenance": "literature",
-      "source": "",
-      "_note": "Say which technique. BET area is not electrochemically accessible area — see technique.bet."
+    {
+      "system": "aqueous",
+      "viable": "no",
+      "typical": "—",
+      "whatChanges": "Say WHY, in terms of the water window where that is the reason. 'The operating potential sits below the lower limit at every pH' is a checkable statement; 'it is not stable in water' is not.",
+      "watch": "Note where the reason is chemical stability rather than the window — a material can sit perfectly inside the window and still be destroyed by water."
     }
-  },
-  "conditions": {
-    "_": "The conditions any reported value was measured under. A capacity with no rate, electrolyte and window is not a comparable number.",
-    "electrolyte": "",
-    "voltageWindow": "",
-    "rate": "",
-    "cellType": "",
-    "massLoading": ""
-  },
-  "preparation": "Reference to the preparation route, or a short description.",
-  "characterisedBy": [
-    "technique.xrd",
-    "technique.bet"
   ],
-  "_characterisedBy": "Technique ids normally used on this material. Cross-checked.",
-  "limitations": [
-    "What it does badly, and under what conditions."
+  "_electrolyteContext": "Prose, not numbers, ON PURPOSE. Operating potentials in a given electrolyte are measured quantities and belong in a citation. What goes here is the reasoning, which a student can then apply to a material that is not in this file.",
+
+  "cannotTell": [
+    "Three or four things a measurement on this material does NOT establish.",
+    "Write them as flat statements, not hedges.",
+    "This array is why somebody reads the record twice."
   ],
-  "relatedIds": [],
-  "tags": []
+
+  "relatedIds": ["material.hard_carbon", "potential.na", "mechanism.intercalation"],
+  "_relatedIds": "Ids anywhere in the platform. material.* and potential.* are checked by tools/materials-test.mjs; the rest by the in-app health page, which loads every file.",
+
+  "tags": ["cathode", "polyanion", "sodium", "non-aqueous"]
 }

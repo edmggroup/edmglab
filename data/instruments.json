@@ -1,36 +1,114 @@
 {
   "_README": "YOUR ACTUAL MACHINES. This file ships EMPTY and stays empty until your group fills it from your own manuals and calibration records. Nothing in EDMGLAB will ever write a specification here, and neither should anyone working from memory or from what a similar model does — a wrong number here is worse than a missing one, because it looks authoritative. Copy the block in _template into items[] and fill what you know. Leave out what you do not: an absent field renders as 'not recorded', which is honest.",
   "schemaVersion": 1,
-
   "_why": "The specifications matter, but the QUIRKS are the reason this file exists. 'Channel 7 reads about 2 mV low, verified March 2026' is institutional knowledge that currently lives in one senior student's head and leaves when they graduate. It is also useless to anyone outside the lab, so it is safe in a public repository — unlike anything about unpublished results.",
-
-  "items": [],
-
+  "items": [
+    {
+      "id": "instrument.origalys_workstation",
+      "_": "SKELETON, not a record. The group confirmed the workstation is an OrigaLys, driven by OrigaMaster — those two lines are the only things filled in. Every number below is null and must stay null until somebody copies it out of the manual, with the manual version recorded. Rename the id once the model is known, e.g. instrument.origalys_ogf500.",
+      "kind": "workstation",
+      "vendor": "OrigaLys",
+      "model": "",
+      "_model": "REQUIRED before this record is useful. OrigaFlex (OGF01A / OGF05A / OGF500 …), OrigaStat (OGS100 / OGS200), or whichever is on the bench. Read it off the front panel or the About box in OrigaMaster.",
+      "software": "OrigaMaster",
+      "softwareVersion": "",
+      "_softwareVersion": "Help → About in OrigaMaster. Technique names and defaults change between versions.",
+      "serial": "",
+      "location": "",
+      "commissioned": "",
+      "manual": {
+        "title": "",
+        "version": "",
+        "url": "",
+        "_": "Every specification below has to be traceable to this. Record the version — a value from the wrong edition is a wrong value with a citation attached."
+      },
+      "channels": [],
+      "_channels": "OrigaFlex is modular: one entry per module, with its own range and serial. OrigaStat is a single unit. Record which is which, because a student needs to know which box they are plugged into.",
+      "specs": {
+        "_": "ALL NULL BY DESIGN. Copy each from the manual and set provenance to \"datasheet\" with the source. Copy the accuracy wording EXACTLY, including whether it is % of reading or % of range.",
+        "currentMax": {
+          "value": null,
+          "unit": "A",
+          "provenance": "datasheet",
+          "source": ""
+        },
+        "currentRanges": {
+          "value": null,
+          "unit": "",
+          "provenance": "datasheet",
+          "source": "",
+          "_": "Number of ranges and their limits. This is what decides whether a low-current experiment is resolvable at all."
+        },
+        "currentResolution": {
+          "value": null,
+          "unit": "nA",
+          "provenance": "datasheet",
+          "source": ""
+        },
+        "voltageMax": {
+          "value": null,
+          "unit": "V",
+          "provenance": "datasheet",
+          "source": ""
+        },
+        "voltageResolution": {
+          "value": null,
+          "unit": "µV",
+          "provenance": "datasheet",
+          "source": ""
+        },
+        "compliance": {
+          "value": null,
+          "unit": "V",
+          "provenance": "datasheet",
+          "source": "",
+          "_": "The counter-electrode voltage the potentiostat can drive to. A cell that needs more than this simply will not hold its setpoint, and the symptom looks like a bad cell."
+        },
+        "eisFrequencyMax": {
+          "value": null,
+          "unit": "kHz",
+          "provenance": "datasheet",
+          "source": ""
+        },
+        "eisFrequencyMin": {
+          "value": null,
+          "unit": "mHz",
+          "provenance": "datasheet",
+          "source": ""
+        }
+      },
+      "calibration": [],
+      "sop": [],
+      "_sop": "Your own procedures: how the three-electrode cell is assembled, which lead goes where, how the reference is stored between runs.",
+      "quirks": [],
+      "_quirks": "The reason this file exists. Anything a new student is told verbally in their first week belongs here, with a date and a name.",
+      "relatedIds": [
+        "method.cv",
+        "method.eis",
+        "method.gcd_ec",
+        "method.ir_compensation"
+      ]
+    }
+  ],
   "_template": {
     "_": "Copy this object into items[] and delete every field you cannot fill from a document in front of you. Delete these underscore notes too.",
-
     "id": "instrument.neware_bts_4000",
     "_id": "instrument.<vendor>_<model>, lowercase, underscores. Unique across the whole platform — every cross-reference points at this string.",
-
     "kind": "cycler",
     "_kind": "'cycler' for a battery tester, 'workstation' for a potentiostat/galvanostat, 'furnace', 'balance', 'other'.",
-
     "vendor": "",
     "model": "",
     "serial": "",
     "location": "",
     "_location": "Which room, bench or chamber. Useful when there are two of the same model.",
-
     "commissioned": "",
     "_commissioned": "YYYY-MM. When the lab got it. Helps date the quirks below.",
-
     "manual": {
       "title": "",
       "version": "",
       "url": "",
       "_": "EVERY datasheet value below must be traceable to this. Record the manual's version — vendors revise specifications between editions, and a value from the wrong edition is a wrong value with a citation attached."
     },
-
     "channels": [
       {
         "id": "1",
@@ -42,7 +120,6 @@
       }
     ],
     "_channels": "One entry per channel, or one per group if they are identical. This is what lets somebody find out which channels share a temperature chamber without asking.",
-
     "specs": {
       "_": "Every entry is a value OBJECT, never a bare number. provenance must be 'datasheet' with a source, or 'measured' with a date — nothing else belongs in this file. The health check errors on a value with a unit and no provenance.",
       "currentMax": {
@@ -52,7 +129,12 @@
         "source": "",
         "_source": "Manual title and version, and the page or table number."
       },
-      "currentResolution": { "value": null, "unit": "mA", "provenance": "datasheet", "source": "" },
+      "currentResolution": {
+        "value": null,
+        "unit": "mA",
+        "provenance": "datasheet",
+        "source": ""
+      },
       "currentAccuracy": {
         "value": null,
         "unit": "% of range",
@@ -60,9 +142,24 @@
         "source": "",
         "_note": "Copy the vendor's wording exactly, including whether it is % of reading or % of range. The two differ by a lot at low current, and it is the commonest place a specification is quoted wrongly."
       },
-      "voltageMax": { "value": null, "unit": "V", "provenance": "datasheet", "source": "" },
-      "voltageResolution": { "value": null, "unit": "mV", "provenance": "datasheet", "source": "" },
-      "voltageAccuracy": { "value": null, "unit": "% of range", "provenance": "datasheet", "source": "" },
+      "voltageMax": {
+        "value": null,
+        "unit": "V",
+        "provenance": "datasheet",
+        "source": ""
+      },
+      "voltageResolution": {
+        "value": null,
+        "unit": "mV",
+        "provenance": "datasheet",
+        "source": ""
+      },
+      "voltageAccuracy": {
+        "value": null,
+        "unit": "% of range",
+        "provenance": "datasheet",
+        "source": ""
+      },
       "minStepTime": {
         "value": null,
         "unit": "s",
@@ -71,7 +168,6 @@
         "_note": "The shortest step or logging interval. This is what sets whether a fast rate test is even recordable on this machine."
       }
     },
-
     "calibration": [
       {
         "date": "",
@@ -83,16 +179,16 @@
         "certificate": ""
       }
     ],
-
     "sop": [
       {
         "title": "",
         "_title": "e.g. 'Mounting a CR2032 in the four-position fixture'",
-        "steps": [""],
+        "steps": [
+          ""
+        ],
         "_steps": "The lab's own procedure, in order. This exists nowhere else — not in the manual, and not in any paper."
       }
     ],
-
     "quirks": [
       {
         "what": "",
@@ -106,7 +202,6 @@
       }
     ],
     "_quirks": "The most valuable part of this file. Write down what you would otherwise tell a new student verbally in their first week.",
-
     "relatedIds": [],
     "_relatedIds": "Ids of methods this machine runs, or troubleshooting entries where its quirks matter. e.g. ['method.cc_charge_discharge']"
   }

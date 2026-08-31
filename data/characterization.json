@@ -1,26 +1,51 @@
 {
   "schemaVersion": 1,
   "_README": "Characterisation technique library — Roadmap P9. Every record must state what the technique CANNOT tell you; the health check refuses a record without it. That field is the reason this library exists: almost every characterisation mistake in this field is a technique applied outside what it can answer, and the answer still looks like a result. DRAFT — pending review by the research group.",
-
   "_note_on_numbers": "This library deliberately contains almost no numeric specifications. Resolution, detection limit and spot size are properties of a particular instrument and configuration, not of a technique, and quoting them here would invite someone to cite a number that does not describe the machine they used. Where a number is definitional it is given as such. Fill in your own instruments' figures from their manuals.",
-
   "families": [
-    { "id": "structural",   "label": "Structure and phase" },
-    { "id": "morphology",   "label": "Morphology and imaging" },
-    { "id": "surface",      "label": "Surface area and porosity" },
-    { "id": "composition",  "label": "Composition" },
-    { "id": "thermal",      "label": "Thermal" },
-    { "id": "vibrational",  "label": "Vibrational and bonding" }
+    {
+      "id": "structural",
+      "label": "Structure and phase"
+    },
+    {
+      "id": "morphology",
+      "label": "Morphology and imaging"
+    },
+    {
+      "id": "surface",
+      "label": "Surface area and porosity"
+    },
+    {
+      "id": "composition",
+      "label": "Composition"
+    },
+    {
+      "id": "thermal",
+      "label": "Thermal"
+    },
+    {
+      "id": "vibrational",
+      "label": "Vibrational and bonding"
+    }
   ],
-
   "items": [
     {
       "id": "technique.xrd",
       "name": "Powder X-ray diffraction",
       "abbrev": "XRD",
       "family": "structural",
-      "aliases": ["XRD", "powder XRD", "PXRD", "X-ray diffraction", "diffraction"],
-      "tags": ["structure", "phase", "crystallinity"],
+      "aliases": [
+        "XRD",
+        "powder XRD",
+        "PXRD",
+        "X-ray diffraction",
+        "diffraction"
+      ],
+      "tags": [
+        "structure",
+        "phase",
+        "crystallinity"
+      ],
       "summary": "Identifies crystalline phases and measures lattice parameters from the angles at which X-rays diffract off periodic planes.",
       "probes": "monochromatic X-rays over a range of incident angles",
       "detects": "diffracted intensity against 2θ",
@@ -58,16 +83,46 @@
         "Fitting an amorphous hump as background and then not mentioning it",
         "Assigning a phase on peak positions alone when relative intensities do not match"
       ],
-      "relatedIds": ["technique.sem", "technique.tem", "technique.raman"]
+      "relatedIds": [
+        "technique.sem",
+        "technique.tem",
+        "technique.raman",
+        "material.nafepo4",
+        "material.silicon",
+        "material.nnfm",
+        "material.graphite_k",
+        "material.mno2",
+        "material.ni_oh2",
+        "material.nvp",
+        "material.pb"
+      ],
+      "materialNotes": {
+        "material.nafepo4": "The record states that only the olivine polymorph cycles and maricite does not — same formula, different structure. XRD is what tells the two apart, and \"NaFePO₄\" alone does not identify the material.",
+        "material.silicon": "The record notes the crystalline starting material does not come back after the first cycle. Post-cycling XRD is how that is established rather than assumed.",
+        "material.nnfm": "The record notes several phase transitions across the sodium content range; which phases are present is an XRD question.",
+        "material.graphite_k": "This record quotes its capacity per the stage-1 compound KC₈, and notes the larger ion expands the lattice far more than lithium does. Staging and lattice expansion are both read from peak positions.",
+        "material.mno2": "This record states it cannot distinguish the α, β, γ, δ and λ polymorphs — same formula, different behaviour. Distinguishing them is the XRD question.",
+        "material.ni_oh2": "This record names the α and β hydroxide phases and the γ oxyhydroxide as having different capacities and different swelling. Which phase you have is an XRD answer.",
+        "material.nvp": "This record attributes the rate capability and cycle life to a framework that changes volume very little. That is a lattice-parameter claim, and only in-situ or post-cycling XRD tests it.",
+        "material.pb": "This record names sulfation — coarse lead sulfate that will not reduce — as the dominant failure. XRD identifies the PbSO₄ phase; SEM shows how coarse it has become."
+      }
     },
-
     {
       "id": "technique.sem",
       "name": "Scanning electron microscopy",
       "abbrev": "SEM",
       "family": "morphology",
-      "aliases": ["SEM", "scanning electron microscopy", "FESEM", "electron microscope"],
-      "tags": ["morphology", "imaging", "surface"],
+      "aliases": [
+        "SEM",
+        "scanning electron microscopy",
+        "FESEM",
+        "electron microscope"
+      ],
+      "tags": [
+        "morphology",
+        "imaging",
+        "surface"
+      ],
       "summary": "Images surface topography by scanning a focused electron beam and collecting the electrons that come back.",
       "probes": "a focused electron beam raster-scanned across the surface",
       "detects": "secondary electrons (topography) or backscattered electrons (composition contrast)",
@@ -104,16 +159,44 @@
         "Attributing a feature to the material when it was introduced by the coating or the beam",
         "Quoting magnification instead of a scale bar — magnification depends on the display size and means nothing on its own"
       ],
-      "relatedIds": ["technique.tem", "technique.eds", "technique.particle_size"]
+      "relatedIds": [
+        "technique.tem",
+        "technique.eds",
+        "technique.particle_size",
+        "material.silicon",
+        "material.zn_metal",
+        "material.li_metal",
+        "material.pb",
+        "material.pbo2",
+        "material.sulfur"
+      ],
+      "materialNotes": {
+        "material.silicon": "The record puts particle fracture from a threefold volume change at the centre of the failure mode. SEM is where cracking is seen.",
+        "material.zn_metal": "The record names dendrites and passivation as the limits on aqueous zinc.",
+        "material.li_metal": "Dendrite and dead-metal morphology after cycling.",
+        "material.pb": "The record describes sulfation as the GROWTH OF COARSE crystals. Coarseness is a morphology observation, not a phase one.",
+        "material.pbo2": "This record names softening and shedding of the positive active mass as the usual end of life — a structural change in the electrode, visible where a capacity number is not.",
+        "material.sulfur": "This record notes the volume change on conversion to Li₂S is large. What that does to the electrode is a morphology question."
+      }
     },
-
     {
       "id": "technique.tem",
       "name": "Transmission electron microscopy",
       "abbrev": "TEM",
       "family": "morphology",
-      "aliases": ["TEM", "HRTEM", "transmission electron microscopy", "SAED", "electron diffraction"],
-      "tags": ["morphology", "imaging", "structure", "nanoscale"],
+      "aliases": [
+        "TEM",
+        "HRTEM",
+        "transmission electron microscopy",
+        "SAED",
+        "electron diffraction"
+      ],
+      "tags": [
+        "morphology",
+        "imaging",
+        "structure",
+        "nanoscale"
+      ],
       "summary": "Images the internal structure of very thin specimens with electrons transmitted through them, and can diffract from the same region to identify what it is.",
       "probes": "a high-energy electron beam transmitted through an electron-transparent specimen",
       "detects": "transmitted and diffracted electrons — bright-field images, lattice fringes, and diffraction patterns from a selected area",
@@ -149,16 +232,29 @@
         "Not reporting beam-sensitivity when the material is known to be beam-sensitive",
         "Measuring a coating thickness at one point and quoting it without a distribution"
       ],
-      "relatedIds": ["technique.sem", "technique.xrd", "technique.eds"]
+      "relatedIds": [
+        "technique.sem",
+        "technique.xrd",
+        "technique.eds"
+      ]
     },
-
     {
       "id": "technique.eds",
       "name": "Energy-dispersive X-ray spectroscopy",
       "abbrev": "EDS / EDX",
       "family": "composition",
-      "aliases": ["EDS", "EDX", "EDAX", "energy dispersive X-ray", "elemental mapping"],
-      "tags": ["composition", "elemental", "mapping"],
+      "aliases": [
+        "EDS",
+        "EDX",
+        "EDAX",
+        "energy dispersive X-ray",
+        "elemental mapping"
+      ],
+      "tags": [
+        "composition",
+        "elemental",
+        "mapping"
+      ],
       "summary": "Identifies which elements are present, and roughly in what proportion, from the characteristic X-rays an electron beam excites. Almost always an attachment to an SEM or TEM.",
       "probes": "the same electron beam as the microscope it is attached to",
       "detects": "characteristic X-ray energies, and their counts",
@@ -174,11 +270,13 @@
         "Oxidation state, bonding, or which compound the elements are in. That needs XPS, XRD or spectroscopy.",
         "Whether a light-element map means anything at all. Carbon and oxygen maps in particular are more often contamination and topography than composition."
       ],
-      "sample": { "form": "Same as the microscope it is in",
+      "sample": {
+        "form": "Same as the microscope it is in",
         "amount": "Same as the microscope it is in",
         "prep": "A flat, polished surface is required for anything approaching quantitative analysis. On loose powder the result is qualitative.",
         "destructive": "No, beyond the microscope's own beam effects",
-        "notes": "Standardless quantification is a calculation with assumptions, not a measurement. Treat the numbers as semi-quantitative unless standards were run." },
+        "notes": "Standardless quantification is a calculation with assumptions, not a measurement. Treat the numbers as semi-quantitative unless standards were run."
+      },
       "reportWith": [
         "That it is EDS and whether the quantification was standardless",
         "Accelerating voltage — it sets the interaction volume and which lines are excited",
@@ -191,16 +289,32 @@
         "Reading a carbon map on a carbon-coated sample as the material's carbon",
         "Using a point spectrum on a particle smaller than the interaction volume"
       ],
-      "relatedIds": ["technique.sem", "technique.tem", "technique.xps", "technique.icp"]
+      "relatedIds": [
+        "technique.sem",
+        "technique.tem",
+        "technique.xps",
+        "technique.icp"
+      ]
     },
-
     {
       "id": "technique.bet",
       "name": "Nitrogen physisorption — BET surface area and pore analysis",
       "abbrev": "BET",
       "family": "surface",
-      "aliases": ["BET", "surface area", "N2 adsorption", "physisorption", "BJH", "porosimetry", "isotherm"],
-      "tags": ["surface area", "porosity", "supercapacitor"],
+      "aliases": [
+        "BET",
+        "surface area",
+        "N2 adsorption",
+        "physisorption",
+        "BJH",
+        "porosimetry",
+        "isotherm"
+      ],
+      "tags": [
+        "surface area",
+        "porosity",
+        "supercapacitor"
+      ],
       "summary": "Measures how much gas a surface adsorbs at a series of pressures, and converts that isotherm into a specific surface area and a pore-size distribution.",
       "probes": "nitrogen gas at successive relative pressures, at its boiling point of 77 K",
       "detects": "the quantity of gas adsorbed and desorbed — the isotherm",
@@ -237,16 +351,33 @@
         "Quoting a pore size without naming the model that produced it",
         "Explaining a capacitance difference by a BET-area difference alone"
       ],
-      "relatedIds": ["technique.particle_size", "technique.sem"]
+      "relatedIds": [
+        "technique.particle_size",
+        "technique.sem",
+        "material.hard_carbon"
+      ],
+      "materialNotes": {
+        "material.hard_carbon": "The record attributes part of the capacity to filling of CLOSED pores — which is precisely the porosity BET cannot see, since nitrogen cannot enter them. A useful case of a technique whose limitation is the point."
+      }
     },
-
     {
       "id": "technique.raman",
       "name": "Raman spectroscopy",
       "abbrev": "Raman",
       "family": "vibrational",
-      "aliases": ["Raman", "Raman spectroscopy", "D band", "G band", "ID/IG"],
-      "tags": ["bonding", "carbon", "structure", "defects"],
+      "aliases": [
+        "Raman",
+        "Raman spectroscopy",
+        "D band",
+        "G band",
+        "ID/IG"
+      ],
+      "tags": [
+        "bonding",
+        "carbon",
+        "structure",
+        "defects"
+      ],
       "summary": "Probes vibrational modes through inelastic scattering of laser light — the standard tool for carbon materials and for distinguishing polymorphs.",
       "probes": "a monochromatic laser focused to a small spot",
       "detects": "inelastically scattered light, as a shift in wavenumber",
@@ -263,11 +394,13 @@
         "What the material was before the laser hit it. Focused laser power heats, oxidises and transforms — carbons and oxides especially — so a power series is a control, not an optional extra.",
         "Bulk composition. The spot samples a very small volume; several spots are needed before any statement about the sample."
       ],
-      "sample": { "form": "Powder, film or electrode, measured directly",
+      "sample": {
+        "form": "Powder, film or electrode, measured directly",
         "amount": "Very little — a single particle suffices",
         "prep": "Usually none, which is much of its appeal",
         "destructive": "Non-destructive at low power; destructive at high power, sometimes without an obvious sign",
-        "notes": "Always run a laser-power series and show that the spectrum does not change with power." },
+        "notes": "Always run a laser-power series and show that the spectrum does not change with power."
+      },
       "reportWith": [
         "Excitation wavelength and laser power at the sample",
         "Acquisition time and number of accumulations",
@@ -280,16 +413,35 @@
         "Attributing a change to the material when it was caused by laser heating",
         "Treating band intensity as concentration without calibration"
       ],
-      "relatedIds": ["technique.xrd", "technique.ftir", "technique.xps"]
+      "relatedIds": [
+        "technique.xrd",
+        "technique.ftir",
+        "technique.xps",
+        "material.hard_carbon",
+        "material.graphite"
+      ],
+      "materialNotes": {
+        "material.hard_carbon": "The record states that behaviour varies strongly with precursor and pyrolysis temperature. The D and G band ratio is the standard probe of that disorder — though it is a fingerprint, not a measure of capacity.",
+        "material.graphite": "Distinguishes graphitic ordering from disorder, which is what separates graphite from the hard carbons above it."
+      }
     },
-
     {
       "id": "technique.xps",
       "name": "X-ray photoelectron spectroscopy",
       "abbrev": "XPS",
       "family": "composition",
-      "aliases": ["XPS", "ESCA", "photoelectron spectroscopy", "binding energy"],
-      "tags": ["surface", "oxidation state", "composition", "SEI"],
+      "aliases": [
+        "XPS",
+        "ESCA",
+        "photoelectron spectroscopy",
+        "binding energy"
+      ],
+      "tags": [
+        "surface",
+        "oxidation state",
+        "composition",
+        "SEI"
+      ],
       "summary": "Measures the binding energies of electrons ejected from the outermost few nanometres, giving elemental composition and chemical state of the surface.",
       "probes": "soft X-rays under ultra-high vacuum",
       "detects": "the kinetic energy of emitted photoelectrons, converted to binding energy",
@@ -306,11 +458,13 @@
         "The surface you care about, if it was exposed to air. Air-sensitive surfaces change on transfer, so a sample not moved under inert conditions gives you the composition of a surface that formed on the way to the instrument.",
         "What sputtering did to the sample. Ion sputtering for depth profiling preferentially removes some species and can reduce others, so a depth profile is a profile of the sputtered sample."
       ],
-      "sample": { "form": "Solid, vacuum-compatible, flat where possible",
+      "sample": {
+        "form": "Solid, vacuum-compatible, flat where possible",
         "amount": "A small piece or a pressed powder",
         "prep": "Air-sensitive samples must be transferred without air exposure. Everything else is about avoiding contamination — handling, adhesive and solvent residues all end up in the spectrum.",
         "destructive": "Non-destructive without sputtering; destructive with it",
-        "notes": "Cycled electrodes should be rinsed by a stated procedure — the rinse removes electrolyte salt that would otherwise dominate, and also removes some of what you wanted to measure." },
+        "notes": "Cycled electrodes should be rinsed by a stated procedure — the rinse removes electrolyte salt that would otherwise dominate, and also removes some of what you wanted to measure."
+      },
       "reportWith": [
         "X-ray source and pass energy",
         "The charge-referencing method and the value used",
@@ -324,16 +478,38 @@
         "Fitting many components until the residual is small and presenting that as identification",
         "Comparing surface compositions of samples transferred under different conditions"
       ],
-      "relatedIds": ["technique.eds", "technique.raman", "technique.ftir"]
+      "relatedIds": [
+        "technique.eds",
+        "technique.raman",
+        "technique.ftir",
+        "material.li_metal",
+        "material.na_metal",
+        "material.lto",
+        "material.nmc111"
+      ],
+      "materialNotes": {
+        "material.li_metal": "The record makes the interphase the whole story. XPS is the standard surface probe of what that layer is made of — on a sample that must never meet air between the glovebox and the instrument.",
+        "material.na_metal": "The record notes sodium’s interphase is more soluble in common electrolytes than lithium’s.",
+        "material.lto": "This record attributes LTO’s cycle life to forming little or no interphase, because it operates above the potential where carbonates reduce. \"Little or no interphase\" is a surface claim, and XPS is how it is tested rather than assumed.",
+        "material.nmc111": "This record notes nickel-rich layered oxides form surface carbonate and hydroxide in storage, consuming lithium before the experiment starts."
+      }
     },
-
     {
       "id": "technique.tga",
       "name": "Thermogravimetric analysis",
       "abbrev": "TGA",
       "family": "thermal",
-      "aliases": ["TGA", "thermogravimetric", "mass loss", "TG-DSC"],
-      "tags": ["thermal", "composition", "stability"],
+      "aliases": [
+        "TGA",
+        "thermogravimetric",
+        "mass loss",
+        "TG-DSC"
+      ],
+      "tags": [
+        "thermal",
+        "composition",
+        "stability"
+      ],
       "summary": "Records mass against temperature in a controlled atmosphere — used for composition splits, thermal stability, and carbon or water content.",
       "probes": "a programmed temperature ramp in a chosen atmosphere",
       "detects": "sample mass, continuously",
@@ -350,11 +526,13 @@
         "A trustworthy small mass change without a blank. Buoyancy changes as gas density falls with temperature, producing apparent mass changes of the same order as small real ones.",
         "Anything about a sample that reacted with its crucible, which happens more often than it is reported."
       ],
-      "sample": { "form": "Powder or small solid piece",
+      "sample": {
+        "form": "Powder or small solid piece",
         "amount": "A few milligrams — small enough for uniform heating, large enough for a good signal",
         "prep": "Minimal, but the packing and the crucible material both matter",
         "destructive": "Yes, entirely",
-        "notes": "Run a blank with an empty crucible under identical conditions and subtract it." },
+        "notes": "Run a blank with an empty crucible under identical conditions and subtract it."
+      },
       "reportWith": [
         "Atmosphere and flow rate",
         "Heating rate and temperature range",
@@ -368,16 +546,38 @@
         "Reading a small mass change that is within the buoyancy artefact",
         "Reporting a composition split from overlapping loss steps as if the split were resolved"
       ],
-      "relatedIds": ["technique.ftir", "technique.eds"]
+      "relatedIds": [
+        "technique.ftir",
+        "technique.eds",
+        "material.pba_nafe",
+        "material.lifepo4",
+        "material.ntp",
+        "material.sulfur"
+      ],
+      "materialNotes": {
+        "material.pba_nafe": "The record states that real frameworks contain vacancies and coordinated water, so the formula unit in the denominator of the theoretical capacity is usually not the one in the beaker. TGA is how the water content is measured.",
+        "material.lifepo4": "This record notes that carbon coating and particle-size reduction exist to solve an electronic-conductivity problem, and that those additions reduce the capacity per gram of ELECTRODE while leaving the theoretical figure unchanged. How much carbon is present is a TGA measurement.",
+        "material.ntp": "This record states carbon coating changes the rate behaviour dramatically and that coated and uncoated samples are not comparable — so the coating fraction has to be measured, not assumed.",
+        "material.sulfur": "This record demands the sulfur areal loading be reported before a number can be interpreted. In a sulfur–carbon composite that starts with knowing the sulfur fraction."
+      }
     },
-
     {
       "id": "technique.ftir",
       "name": "Fourier-transform infrared spectroscopy",
       "abbrev": "FTIR",
       "family": "vibrational",
-      "aliases": ["FTIR", "IR", "infrared", "ATR", "ATR-FTIR"],
-      "tags": ["bonding", "functional groups", "binder"],
+      "aliases": [
+        "FTIR",
+        "IR",
+        "infrared",
+        "ATR",
+        "ATR-FTIR"
+      ],
+      "tags": [
+        "bonding",
+        "functional groups",
+        "binder"
+      ],
       "summary": "Identifies functional groups from infrared absorption by molecular vibrations.",
       "probes": "infrared light across a range of wavenumbers",
       "detects": "absorbance or transmittance against wavenumber",
@@ -394,11 +594,13 @@
         "A band position that means the same in every environment. Hydrogen bonding, crystallinity and neighbouring groups all shift bands, so a shift is not automatically a chemical change.",
         "A useful spectrum through strong water absorption, which overlaps regions of interest and is very hard to remove convincingly."
       ],
-      "sample": { "form": "Powder, film, liquid, or a pressed pellet",
+      "sample": {
+        "form": "Powder, film, liquid, or a pressed pellet",
         "amount": "Small",
         "prep": "Transmission usually needs a KBr pellet; ATR needs firm contact and little else. The mode should be reported, because the two do not give identical spectra.",
         "destructive": "Non-destructive in ATR; the pellet is consumed in transmission",
-        "notes": "Dry the sample and the KBr — adsorbed water shows up strongly and is easily read as sample chemistry." },
+        "notes": "Dry the sample and the KBr — adsorbed water shows up strongly and is easily read as sample chemistry."
+      },
       "reportWith": [
         "Mode (ATR or transmission) and, for ATR, the crystal material",
         "Resolution and number of scans",
@@ -411,16 +613,30 @@
         "Reading adsorbed water as a sample feature",
         "Quantifying from band height without a calibration"
       ],
-      "relatedIds": ["technique.raman", "technique.tga", "technique.xps"]
+      "relatedIds": [
+        "technique.raman",
+        "technique.tga",
+        "technique.xps"
+      ]
     },
-
     {
       "id": "technique.particle_size",
       "name": "Particle-size analysis",
       "abbrev": "PSD",
       "family": "morphology",
-      "aliases": ["particle size", "laser diffraction", "DLS", "PSD", "D50", "dynamic light scattering"],
-      "tags": ["morphology", "powder", "processing"],
+      "aliases": [
+        "particle size",
+        "laser diffraction",
+        "DLS",
+        "PSD",
+        "D50",
+        "dynamic light scattering"
+      ],
+      "tags": [
+        "morphology",
+        "powder",
+        "processing"
+      ],
       "summary": "Measures a distribution of particle sizes in suspension, by laser diffraction for larger particles or dynamic light scattering for finer ones.",
       "probes": "laser light through a dispersed suspension",
       "detects": "the scattering pattern (diffraction) or the fluctuation rate of scattered intensity (DLS)",
@@ -436,11 +652,13 @@
         "A reliable distribution for a broad or multimodal powder by DLS, which is strongly biased towards larger scatterers and can miss a fine population entirely.",
         "Anything about shape, which for electrode processing often matters more than size."
       ],
-      "sample": { "form": "Powder dispersed in a compatible liquid",
+      "sample": {
+        "form": "Powder dispersed in a compatible liquid",
         "amount": "Small, but enough to reach the instrument's obscuration window",
         "prep": "Dispersion is the measurement. Sonication power and time, the dispersant, and the settling time all change the answer and all have to be recorded.",
         "destructive": "Non-destructive to the material, though sonication can break friable agglomerates",
-        "notes": "For laser diffraction the optical model needs the material's refractive index; an assumed value propagates into the distribution." },
+        "notes": "For laser diffraction the optical model needs the material's refractive index; an assumed value propagates into the distribution."
+      },
       "reportWith": [
         "Technique, and for laser diffraction the optical model and refractive indices used",
         "Dispersant, sonication conditions and settling time",
@@ -453,16 +671,32 @@
         "Reporting a volume distribution and a number distribution interchangeably",
         "Not reporting sonication, then being unable to reproduce the result"
       ],
-      "relatedIds": ["technique.sem", "technique.bet"]
+      "relatedIds": [
+        "technique.sem",
+        "technique.bet",
+        "material.lifepo4"
+      ],
+      "materialNotes": {
+        "material.lifepo4": "This record names particle-size reduction as one of the two things done to work around the conductivity limit — so the distribution is a variable of the sample, not a fixed property of the material."
+      }
     },
-
     {
       "id": "technique.icp",
       "name": "Inductively coupled plasma spectroscopy",
       "abbrev": "ICP-OES / ICP-MS",
       "family": "composition",
-      "aliases": ["ICP", "ICP-OES", "ICP-MS", "elemental analysis", "digestion"],
-      "tags": ["composition", "elemental", "quantitative"],
+      "aliases": [
+        "ICP",
+        "ICP-OES",
+        "ICP-MS",
+        "elemental analysis",
+        "digestion"
+      ],
+      "tags": [
+        "composition",
+        "elemental",
+        "quantitative"
+      ],
       "summary": "Quantifies elemental content in a digested sample, by emission or by mass spectrometry — the reference method when composition must actually be quantitative.",
       "probes": "a high-temperature plasma that atomises and excites a nebulised solution",
       "detects": "emitted light at element-characteristic wavelengths, or ions by mass",
@@ -479,11 +713,13 @@
         "A concentration outside the calibrated range, where the response is not linear.",
         "An accurate result where the matrix interferes — high salt loads and isobaric overlaps in ICP-MS both need a stated strategy, not a hope."
       ],
-      "sample": { "form": "A solution — the sample must be digested first",
+      "sample": {
+        "form": "A solution — the sample must be digested first",
         "amount": "Milligrams, weighed accurately, since the result is normalised to that mass",
         "prep": "Acid digestion, usually with heat or microwave assistance. This is the step that determines whether the answer is right.",
         "destructive": "Completely",
-        "notes": "Run digestion blanks and a certified reference material where one exists for the matrix." },
+        "notes": "Run digestion blanks and a certified reference material where one exists for the matrix."
+      },
       "reportWith": [
         "Digestion procedure — acids, temperature, duration, vessel",
         "Whether any residue remained after digestion",
@@ -497,9 +733,30 @@
         "Treating total metal content as active-material content",
         "Omitting blanks when reporting trace levels"
       ],
-      "relatedIds": ["technique.eds", "technique.xps"]
+      "relatedIds": [
+        "technique.eds",
+        "technique.xps",
+        "material.lco",
+        "material.lmo",
+        "material.v2o5",
+        "material.ltp",
+        "material.mno2",
+        "material.nmc111",
+        "material.ni_oh2",
+        "material.lifepo4"
+      ],
+      "materialNotes": {
+        "material.lco": "The record names cobalt dissolution into the electrolyte as an irreversible loss that does not show in early cycles. ICP on the recovered electrolyte is how dissolution is quantified.",
+        "material.lmo": "The record names manganese dissolution, worse with temperature and pH.",
+        "material.v2o5": "The record notes vanadium leaving the electrode into aqueous electrolyte — visible as colour, quantified by ICP.",
+        "material.ltp": "This record warns that titanium phosphates dissolve slowly in acid and that a short experiment will not reveal it. ICP on the recovered electrolyte is how a slow loss is caught.",
+        "material.mno2": "This record notes that where manganese dissolves and redeposits, \"capacity per gram of MnO₂\" quotes a mass that does not stay constant. ICP is how you find out whether it did.",
+        "material.nmc111": "This record names transition metals dissolving from the cathode and poisoning the anode interphase — so the cathode fault appears as anode degradation.",
+        "material.ni_oh2": "This record notes the practical electrode contains cobalt additives, so the composition of the active mass is not the formula on the label.",
+        "material.lifepo4": "This record names iron dissolution as something an aqueous cell suffers that a non-aqueous one never sees."
+      }
     }
   ],
-
-  "closing": "No technique here answers a question on its own. Each measures one thing about one part of a sample under one set of conditions, and the sentence you write in a paper is usually a claim about the material as a whole. Bridging that gap is what the 'cannot tell you' list on each page is for — read it before choosing the technique, not after the reviewer asks."
+  "closing": "No technique here answers a question on its own. Each measures one thing about one part of a sample under one set of conditions, and the sentence you write in a paper is usually a claim about the material as a whole. Bridging that gap is what the 'cannot tell you' list on each page is for — read it before choosing the technique, not after the reviewer asks.",
+  "_materialNotes": "Why THIS technique is relevant to THAT material — and the rule that keeps it honest: a link exists only where the material's own record names the thing the technique measures. Nothing here says what a measurement showed. These are reasons to run an experiment, never results of one."
 }

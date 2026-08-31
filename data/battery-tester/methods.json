@@ -10,8 +10,7 @@
       "aliases": [
         "OCV",
         "open circuit voltage",
-        "rest step",
-        "Open Circuit Potential (OCP)"
+        "rest step"
       ],
       "summary": "No current is applied; the cell voltage is recorded as it relaxes. Almost always the first and last step of a schedule.",
       "instrument": {
@@ -94,8 +93,7 @@
         "CC",
         "constant current",
         "GCD",
-        "galvanostatic cycling",
-        "Gal. Charge and Discharge Cycle"
+        "galvanostatic cycling"
       ],
       "summary": "A fixed current is forced through the cell and the voltage is recorded. The foundation of nearly every battery measurement.",
       "instrument": {

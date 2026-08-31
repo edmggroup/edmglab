@@ -9,9 +9,11 @@
       "name": "Open-circuit potential (OCP)",
       "aliases": [
         "OCP",
-        "Open Circuit Potential (OCP)",
         "open circuit potential",
         "rest potential"
+      ],
+      "origalys": [
+        "Open Circuit Potential (OCP)"
       ],
       "summary": "No current is imposed; the working electrode's potential against the reference is recorded over time. Normally the first measurement of any session.",
       "instrument": {
@@ -92,10 +94,12 @@
       "name": "Cyclic voltammetry (CV)",
       "aliases": [
         "CV",
+        "cyclic voltammogram"
+      ],
+      "origalys": [
         "Pot. Cyclic Voltammetry (CV)",
         "Pot. Advanced Cyclic Voltammetry",
-        "Gal. Cyclic Voltammetry",
-        "cyclic voltammogram"
+        "Gal. Cyclic Voltammetry"
       ],
       "summary": "The potential is swept back and forth between limits while the current is recorded. The most widely used and most widely over-interpreted electrochemical technique.",
       "instrument": {
@@ -202,8 +206,10 @@
       "name": "Linear sweep voltammetry (LSV)",
       "aliases": [
         "LSV",
-        "Pot. Linear Voltammetry",
         "linear sweep"
+      ],
+      "origalys": [
+        "Pot. Linear Voltammetry"
       ],
       "summary": "The potential is swept once in a single direction. Useful where the return sweep would complicate rather than clarify.",
       "instrument": {
@@ -286,8 +292,10 @@
       "name": "Chronoamperometry (CA)",
       "aliases": [
         "CA",
-        "Chrono Amperometry (CA)",
         "potential step"
+      ],
+      "origalys": [
+        "Chrono Amperometry (CA)"
       ],
       "summary": "The potential is stepped and the resulting current decay is recorded against time.",
       "instrument": {
@@ -375,8 +383,10 @@
       "name": "Chronopotentiometry (CP)",
       "aliases": [
         "CP",
-        "Chrono Potentiometry (CP)",
         "current step"
+      ],
+      "origalys": [
+        "Chrono Potentiometry (CP)"
       ],
       "summary": "The current is stepped and the potential response is recorded. The mirror image of chronoamperometry.",
       "instrument": {
@@ -460,9 +470,11 @@
       "name": "Galvanostatic charge–discharge on a workstation",
       "aliases": [
         "GCD",
-        "Single Charge or Discharge",
-        "Gal. Charge and Discharge Cycle",
         "galvanostatic cycling"
+      ],
+      "origalys": [
+        "Single Charge or Discharge",
+        "Gal. Charge and Discharge Cycle"
       ],
       "summary": "Constant-current cycling run on the workstation rather than a cycler — appropriate for small currents, few cycles, or when a reference electrode is needed.",
       "instrument": {
@@ -561,10 +573,12 @@
       "name": "Electrochemical impedance spectroscopy (EIS)",
       "aliases": [
         "EIS",
+        "impedance spectroscopy"
+      ],
+      "origalys": [
         "Pot. Dynamic EIS",
         "Gal. Dynamic EIS",
-        "Fixed Frequency EIS",
-        "impedance spectroscopy"
+        "Fixed Frequency EIS"
       ],
       "summary": "A small alternating signal is applied across a range of frequencies and the complex impedance measured, separating processes by their characteristic timescales.",
       "instrument": {
@@ -668,8 +682,10 @@
       "aliases": [
         "polarization",
         "polarisation curve",
-        "Polarization for corrosion (Tafel)",
         "General corrosion (Rp)"
+      ],
+      "origalys": [
+        "Polarization for corrosion (Tafel)"
       ],
       "summary": "Current measured as the potential is moved away from equilibrium, mapping how the system responds to an imposed driving force.",
       "instrument": {
@@ -754,7 +770,9 @@
       "name": "Tafel analysis",
       "aliases": [
         "Tafel",
-        "Tafel slope",
+        "Tafel slope"
+      ],
+      "origalys": [
         "Polarization for corrosion (Tafel)"
       ],
       "summary": "A conceptual treatment of the linear region of overpotential against log current, used to extract kinetic descriptors — and very easy to misapply.",

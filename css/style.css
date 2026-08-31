@@ -447,6 +447,19 @@ a.card:hover, button.card:hover {
   font-size: var(--fs-xs); font-weight: 500;
 }
 .chip-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+/* Verdict variants. They live HERE and not inside a view's inline <style>,
+   because a shared class defined inside one module's style block has now been
+   the cause of five separate defects in this codebase (.tabbar, .lim-list,
+   .mv-*, .wf-cm, .seg). Anything named generically enough that a second view
+   might reasonably use it belongs in this file from the first use. */
+.chip-ok {
+  color: var(--chip-ok-fg); background: color-mix(in srgb, var(--ok) 10%, transparent);
+  border-color: color-mix(in srgb, var(--ok) 40%, transparent);
+}
+.chip-warn {
+  color: var(--chip-warn-fg); background: color-mix(in srgb, var(--warn) 10%, transparent);
+  border-color: color-mix(in srgb, var(--warn) 40%, transparent);
+}
 
 .callout {
   padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md);

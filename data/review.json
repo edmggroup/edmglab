@@ -1,0 +1,16 @@
+{
+  "_README": "Content review. This file switches the review page at #/review on and points it at somewhere to store verdicts. It ships with an empty endpoint, which means the page still works — verdicts are then kept in the reviewer's own browser and exported as a file at the end. Deploy docs/apps-script/Review.gs and paste the /exec URL below to have several people review at once and see each other's progress. docs/apps-script/REVIEW.md has the steps.",
+  "schemaVersion": 1,
+
+  "_endpoint": "The /exec URL of the Review.gs Web App. Empty = verdicts stay on each reviewer's device. The URL is public, and writes need the REVIEW_KEY that lives in Script Properties — see the header of Review.gs for why a key is needed even though the worst case is only junk verdicts.",
+  "endpoint": "",
+
+  "_note": "Shown at the top of the review page. Use it to say what this round of review is for, and when you need it back.",
+  "note": "",
+
+  "_finalise": "IDs the group has signed off. A record listed here stops being labelled draft in the app — see js/router.js. This is the ONE part of review that is deliberately a git commit rather than an endpoint write: 'the group has checked this' is a claim the platform makes to every future student, and it should go through the same reviewable history as the content it is about. Add ids here only once the verdicts justify it.",
+  "finalised": [],
+
+  "_finalisedNote": "Optional. Who signed off and when, shown in the page footer of a finalised record. Example: { \"by\": \"EDMG group meeting\", \"on\": \"2026-09-15\" }",
+  "finalisedBy": null
+}

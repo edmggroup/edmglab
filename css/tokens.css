@@ -43,6 +43,13 @@
   --ok-wash:       rgba(108, 191, 132, 0.12);
   --warn:          #e0a458;
   --warn-wash:     rgba(224, 164, 88, 0.12);
+  /* Text on a tinted chip of the SAME hue. In dark theme the semantic colour
+     is already light enough to sit on its own 10% wash (5.8:1 and 6.0:1), so
+     these are just aliases; the light theme overrides them, because there the
+     token is a mid-tone that only reaches 4.1:1 on its own wash. Chips are
+     13px, so 4.5:1 is required, not 3:1. */
+  --chip-ok-fg:    var(--ok);
+  --chip-warn-fg:  var(--warn);
   --danger:        #e0705f;
   --danger-wash:   rgba(224, 112, 95, 0.12);
   --info:          #8b9fe8;
@@ -156,6 +163,14 @@
      4.39:1 in both directions — a near miss in two places at once. */
   --warn:          #9c5d11;
   --warn-wash:     rgba(156, 93, 17, 0.10);
+  /* One step darker than the semantic token, used ONLY as text on that
+     token's own 10% wash. On #eef1f5 that composite ground is 230,226,222 for
+     warn and 219,229,227 for ok; the plain tokens give 4.09 and 4.41, just
+     under the 4.5 a 13px chip needs, and these give 4.95 and 5.41. Darkening
+     --ok and --warn themselves instead would have changed every callout,
+     badge and border that uses them. */
+  --chip-ok-fg:    #26653c;
+  --chip-warn-fg:  #8a5210;
   --danger:        #b3402f;
   --danger-wash:   rgba(179, 64, 47, 0.10);
   --info:          #41539c;

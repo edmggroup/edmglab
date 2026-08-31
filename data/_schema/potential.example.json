@@ -1,0 +1,41 @@
+{
+  "_": "TEMPLATE for a record in data/potentials.json. THE ONE RULE THAT CATCHES PEOPLE: this is the only file in the materials module holding a number the app did not compute, so it is the only one where a citation is mandatory rather than good practice. A row you cannot trace to a document does not go in — not even a value everybody knows.",
+
+  "id": "potential.ag_agcl",
+  "_id": "potential.<short_name>, lowercase, underscores.",
+
+  "couple": "AgCl(s) + e⁻ ⇌ Ag(s) + Cl⁻",
+  "_couple": "The half-reaction AS WRITTEN IN THE SOURCE, in the direction the source writes it (reduction). The written form is what decides pHIndependent below, so do not tidy it.",
+
+  "symbol": "AgCl/Ag",
+  "_symbol": "Short label for the plot. Keep it under about twelve characters or it collides with its neighbours.",
+
+  "e0": {
+    "value": 0.2223,
+    "_value": "The number, as a number. Used for arithmetic only.",
+    "unit": "V vs SHE",
+    "provenance": "literature",
+    "_provenance": "Always 'literature' here. A potential is a measurement, never theoretical, and this platform does not measure any.",
+    "sourceId": "libretexts_p1",
+    "_sourceId": "A key in this file's top-level `sources` map. An id that names nothing is an ERROR in the health check and in tools/materials-test.mjs — it is worse than no citation, because it looks like one. Use `source` with the citation written out instead if the source is used only once.",
+    "printed": "+0.2223",
+    "_printed": "The value EXACTLY as the source prints it, minus sign U+2212. The view displays this string and never a reformatted number: the source's precision is a claim about the measurement, and rounding K⁺/K to three decimals would invent a digit nobody measured. The test checks that this string and `value` agree."
+  },
+
+  "chemistry": ["Ag"],
+  "_chemistry": "Element symbols, as in materials.json. Use 'H2O' for the solvent limits.",
+
+  "kind": "conversion",
+  "_kind": "'metal' (M^n+ / M) · 'conversion' (a solid product, e.g. a sulfate or hydroxide) · 'solventLimit' (the water lines themselves — those are drawn differently and take `limit` and `pHSlope` instead of the pH fields below).",
+
+  "pHIndependent": true,
+  "_pHIndependent": "TRUE ONLY IF THE WRITTEN REACTION CONTAINS NO H⁺, NO OH⁻ AND NO H₂O. Those are drawn as a horizontal line across the whole pH axis. Everything else moves with pH — PbO₂/PbSO₄ carries four protons and moves about twice as fast as the water lines — and drawing one of those flat is the standard way a plot like this goes wrong: it puts the electrode on the wrong side of the window. When false, give definedAtPH instead.",
+
+  "definedAtPH": 0,
+  "_definedAtPH": "For a pH-dependent couple: the pH its tabulated value is defined at. It is then plotted as a single point there rather than as a line, and the table beside the plot says 'only at pH N' instead of a verdict.",
+
+  "note": "Optional. What this potential explains — the reason it is worth having in the file at all. Keep it to the thing a student would not work out alone.",
+
+  "relatedIds": ["material.zn_metal"],
+  "tags": ["reference", "silver"]
+}

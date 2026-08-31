@@ -6,7 +6,12 @@
       "id": "troubleshooting.high_ir_drop",
       "module": "battery-tester",
       "symptom": "Large IR drop at the start of discharge",
-      "aliases": ["IR drop", "voltage drop", "large IR", "ohmic drop"],
+      "aliases": [
+        "IR drop",
+        "voltage drop",
+        "large IR",
+        "ohmic drop"
+      ],
       "summary": "The voltage steps down sharply the instant the current reverses, and the step is bigger than expected.",
       "causes": [
         "Two-wire sensing, so lead and contact resistance are included in the measured voltage",
@@ -33,14 +38,31 @@
       "safetyNotes": [
         "A rising IR drop combined with heating can indicate a developing internal fault. Stop the test and let the cell cool before handling it."
       ],
-      "relatedIds": ["glossary.ir_drop", "concept.bt_four_wire", "method.cc_charge_discharge", "method.pulse"],
-      "tags": ["battery tester", "resistance", "IR drop"]
+      "relatedIds": [
+        "glossary.ir_drop",
+        "concept.bt_four_wire",
+        "method.cc_charge_discharge",
+        "method.pulse",
+        "material.na_metal"
+      ],
+      "tags": [
+        "battery tester",
+        "resistance",
+        "IR drop"
+      ],
+      "materialNotes": {
+        "material.na_metal": "This record notes sodium counter electrodes degrade over a long half-cell experiment, so a rising overpotential can be the COUNTER electrode failing rather than the material under test."
+      }
     },
     {
       "id": "troubleshooting.low_capacity",
       "module": "battery-tester",
       "symptom": "Capacity much lower than expected",
-      "aliases": ["low capacity", "capacity too low", "poor capacity"],
+      "aliases": [
+        "low capacity",
+        "capacity too low",
+        "poor capacity"
+      ],
       "summary": "The measured capacity is well below what the material should deliver.",
       "causes": [
         "Active material mass entered incorrectly on the instrument — the most common cause and the hardest to spot, because it scales everything consistently",
@@ -69,14 +91,46 @@
       "safetyNotes": [
         "Do not widen the voltage window beyond the electrolyte's stability range to chase capacity. Decomposition recorded as capacity is both a wrong result and a safety hazard."
       ],
-      "relatedIds": ["concept.bt_active_mass", "formula.c_rate", "method.cc_charge_discharge", "method.rate_capability"],
-      "tags": ["battery tester", "capacity", "diagnostics"]
+      "relatedIds": [
+        "concept.bt_active_mass",
+        "formula.c_rate",
+        "method.cc_charge_discharge",
+        "method.rate_capability",
+        "material.hard_carbon",
+        "material.v2o5",
+        "material.pba_nafe",
+        "material.zn_metal",
+        "material.graphite",
+        "material.lco",
+        "material.lto",
+        "material.nvp"
+      ],
+      "tags": [
+        "battery tester",
+        "capacity",
+        "diagnostics"
+      ],
+      "materialNotes": {
+        "material.hard_carbon": "This record names a large first-cycle irreversible capacity that varies with precursor and pyrolysis temperature — a capacity below expectation may be the material as made, not the cell as built.",
+        "material.v2o5": "This record states the accessible capacity depends on where the voltage window is cut and on how many electrons are actually reached. Check the window before suspecting the cell.",
+        "material.pba_nafe": "This record states real frameworks carry vacancies and coordinated water, so the theoretical denominator is usually wrong — a low capacity here can be a composition difference rather than a performance one.",
+        "material.zn_metal": "This record makes zinc UTILISATION the number that matters. A capacity computed per gram of a thick foil will always look poor.",
+        "material.graphite": "This record states LiC₆ is the fully lithiated LIMIT, and whether the last staging step happens at all depends on the potential window, the rate and the electrolyte. A capacity short of 372 may be the window, not the electrode.",
+        "material.lco": "This record calls roughly half the theoretical capacity accessible in practice, and says the gap is structural stability rather than kinetics — so a number near half of theory is the expected result, not a fault.",
+        "material.lto": "This record says the low capacity is by construction, not a defect. Before investigating, check the figure is not simply LTO behaving as LTO.",
+        "material.nvp": "This record notes the same material is quoted at two different theoretical capacities depending on which vanadium couple is counted. A \"low\" capacity may be a comparison against the three-electron number, which is practically unreachable in a standard electrolyte."
+      }
     },
     {
       "id": "troubleshooting.poor_cycling",
       "module": "battery-tester",
       "symptom": "Poor cycling stability",
-      "aliases": ["capacity fade", "poor cycling", "cycling stability", "degradation"],
+      "aliases": [
+        "capacity fade",
+        "poor cycling",
+        "cycling stability",
+        "degradation"
+      ],
       "summary": "Capacity falls faster than expected over cycling, or the cell fails early.",
       "causes": [
         "Structural degradation of the active material over repeated cycling",
@@ -105,14 +159,42 @@
       "safetyNotes": [
         "Rapid capacity loss accompanied by swelling, heating or gas evolution means the cell should be taken off test immediately and isolated. Do not continue cycling to 'see what happens'."
       ],
-      "relatedIds": ["method.long_term_cycling", "method.coulombic_efficiency", "formula.coulombic_efficiency", "method.capacity_retention"],
-      "tags": ["battery tester", "cycling", "degradation"]
+      "relatedIds": [
+        "method.long_term_cycling",
+        "method.coulombic_efficiency",
+        "formula.coulombic_efficiency",
+        "method.capacity_retention",
+        "material.silicon",
+        "material.lmo",
+        "material.nmc111",
+        "material.li_metal",
+        "material.pb",
+        "material.graphite_k"
+      ],
+      "tags": [
+        "battery tester",
+        "cycling",
+        "degradation"
+      ],
+      "materialNotes": {
+        "material.silicon": "This record puts a threefold volume change, particle fracture and an interphase that re-forms every cycle at the centre of the failure mode.",
+        "material.lmo": "This record names manganese dissolution, accelerating with temperature and with acidic electrolyte decomposition products.",
+        "material.nmc111": "This record names transition metals dissolving from the cathode and poisoning the anode interphase — so a cathode fault appears as anode degradation.",
+        "material.li_metal": "This record notes every plating and stripping cycle breaks and re-forms part of the interphase.",
+        "material.pb": "This record names sulfation — coarse lead sulfate that will not reduce — as the dominant real-world failure.",
+        "material.graphite_k": "This record warns the electrode may not survive the lattice expansion the larger ion causes, and that potassium metal counter electrodes degrade in ways attributed to the working electrode more often than they should be."
+      }
     },
     {
       "id": "troubleshooting.abnormal_voltage_curve",
       "module": "battery-tester",
       "symptom": "Abnormal or distorted voltage curve",
-      "aliases": ["weird curve", "abnormal voltage", "distorted curve", "strange shape"],
+      "aliases": [
+        "weird curve",
+        "abnormal voltage",
+        "distorted curve",
+        "strange shape"
+      ],
       "summary": "The charge or discharge curve does not look like it should — unexpected steps, noise, plateaus in the wrong place, or no plateau at all.",
       "causes": [
         "Contact resistance varying during the test, producing steps or noise",
@@ -141,14 +223,39 @@
       "safetyNotes": [
         "Reversed polarity can damage a cell and in some chemistries is hazardous. Verify connections before starting rather than diagnosing afterwards."
       ],
-      "relatedIds": ["concept.bt_sampling", "concept.bt_controlled_vs_measured", "method.cc_charge_discharge", "concept.bt_safety_limits"],
-      "tags": ["battery tester", "curve shape", "diagnostics"]
+      "relatedIds": [
+        "concept.bt_sampling",
+        "concept.bt_controlled_vs_measured",
+        "method.cc_charge_discharge",
+        "concept.bt_safety_limits",
+        "material.nafepo4",
+        "material.nnfm",
+        "material.lifepo4",
+        "material.mno2",
+        "material.graphite_k"
+      ],
+      "tags": [
+        "battery tester",
+        "curve shape",
+        "diagnostics"
+      ],
+      "materialNotes": {
+        "material.nafepo4": "This record notes two polymorphs with the same formula and completely different behaviour — an unexpected curve shape may mean maricite rather than olivine.",
+        "material.nnfm": "This record notes several phase transitions across the sodium range, and that these materials hydrate on air exposure before the experiment starts.",
+        "material.lifepo4": "This record notes the plateau is so flat that state of charge is nearly unreadable from voltage — a real operational problem, not a fault to chase.",
+        "material.mno2": "This record states the polymorphs — α, β, γ, δ, λ — share a formula and behave differently, and that the storage mechanism itself is disputed and electrolyte-dependent. An unexpected curve shape may be a different polymorph or a different mechanism, not a fault.",
+        "material.graphite_k": "This record notes the larger potassium ion expands the lattice far more than lithium does. Staging features that do not match a lithium graphite curve are expected here."
+      }
     },
     {
       "id": "troubleshooting.ce_above_100",
       "module": "battery-tester",
       "symptom": "Coulombic efficiency above 100%",
-      "aliases": ["CE over 100", "efficiency above 100", "coulombic efficiency high"],
+      "aliases": [
+        "CE over 100",
+        "efficiency above 100",
+        "coulombic efficiency high"
+      ],
       "summary": "More charge comes out than went in — not physically meaningful for an ideal cell, and always worth investigating.",
       "causes": [
         "Soft internal short, allowing charge to leak during the charge step so the measured charge capacity is understated",
@@ -174,8 +281,21 @@
       "safetyNotes": [
         "A developing internal short can escalate. A cell showing persistent efficiency above 100% together with heating should be taken off test and isolated."
       ],
-      "relatedIds": ["formula.coulombic_efficiency", "method.coulombic_efficiency", "method.ocv"],
-      "tags": ["battery tester", "efficiency", "fault"]
+      "relatedIds": [
+        "formula.coulombic_efficiency",
+        "method.coulombic_efficiency",
+        "method.ocv",
+        "material.sulfur"
+      ],
+      "tags": [
+        "battery tester",
+        "efficiency",
+        "fault"
+      ],
+      "materialNotes": {
+        "material.sulfur": "This record describes the polysulfide shuttle: charge passes without being stored, which is exactly the mechanism that puts an efficiency above 100% on the wrong side of a cycle."
+      }
     }
-  ]
+  ],
+  "_materialNotes": "Why this symptom is worth checking against THAT material — linked only where the material's own record names the cause. These are candidate causes to rule in or out, never a diagnosis: one symptom never proves one cause."
 }

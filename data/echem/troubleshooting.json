@@ -6,7 +6,12 @@
       "id": "troubleshooting.noisy_cv",
       "module": "echem",
       "symptom": "Noisy cyclic voltammogram",
-      "aliases": ["noisy CV", "noise", "spiky CV", "scatter"],
+      "aliases": [
+        "noisy CV",
+        "noise",
+        "spiky CV",
+        "scatter"
+      ],
       "summary": "The voltammogram is buried in noise or shows regular oscillation superimposed on the response.",
       "causes": [
         "Electrical interference picked up on long or poorly routed leads — mains pickup is the usual suspect",
@@ -35,14 +40,27 @@
         "Adjust the bandwidth or stability setting if your instrument exposes one"
       ],
       "safetyNotes": [],
-      "relatedIds": ["method.cv", "concept.ec_ir_compensation", "concept.ec_three_electrode"],
-      "tags": ["workstation", "CV", "noise"]
+      "relatedIds": [
+        "method.cv",
+        "concept.ec_ir_compensation",
+        "concept.ec_three_electrode"
+      ],
+      "tags": [
+        "workstation",
+        "CV",
+        "noise"
+      ]
     },
     {
       "id": "troubleshooting.large_semicircle",
       "module": "echem",
       "symptom": "Unexpectedly large semicircle in the Nyquist plot",
-      "aliases": ["large semicircle", "high Rct", "big arc", "large impedance"],
+      "aliases": [
+        "large semicircle",
+        "high Rct",
+        "big arc",
+        "large impedance"
+      ],
       "summary": "The impedance arc is much larger than expected, implying a high charge-transfer resistance.",
       "causes": [
         "Genuinely slow interfacial kinetics",
@@ -69,14 +87,26 @@
         "Justify the circuit on physical grounds before fitting, not after"
       ],
       "safetyNotes": [],
-      "relatedIds": ["method.eis", "method.eis_fitting", "concept.ec_eis_validity"],
-      "tags": ["workstation", "EIS", "impedance"]
+      "relatedIds": [
+        "method.eis",
+        "method.eis_fitting",
+        "concept.ec_eis_validity"
+      ],
+      "tags": [
+        "workstation",
+        "EIS",
+        "impedance"
+      ]
     },
     {
       "id": "troubleshooting.unstable_ocp",
       "module": "echem",
       "symptom": "Unstable or drifting open-circuit potential",
-      "aliases": ["unstable OCP", "drifting potential", "OCP not settling"],
+      "aliases": [
+        "unstable OCP",
+        "drifting potential",
+        "OCP not settling"
+      ],
       "summary": "The potential will not settle, or keeps sliding in one direction.",
       "causes": [
         "Insufficient equilibration time — the cell simply has not finished settling",
@@ -103,14 +133,33 @@
         "Control the laboratory temperature, or at least record it"
       ],
       "safetyNotes": [],
-      "relatedIds": ["method.ocp", "concept.ec_three_electrode", "concept.ec_eis_validity"],
-      "tags": ["workstation", "OCP", "reference electrode"]
+      "relatedIds": [
+        "method.ocp",
+        "concept.ec_three_electrode",
+        "concept.ec_eis_validity",
+        "material.ntp",
+        "material.ltp"
+      ],
+      "tags": [
+        "workstation",
+        "OCP",
+        "reference electrode"
+      ],
+      "materialNotes": {
+        "material.ntp": "This record names self-discharge from dissolved oxygen: an aqueous cell can lose charge while doing nothing.",
+        "material.ltp": "This record names the same dissolved-oxygen self-discharge, and asks for it to be reported."
+      }
     },
     {
       "id": "troubleshooting.unexpected_current",
       "module": "echem",
       "symptom": "Unexpected or excessive current",
-      "aliases": ["unexpected current", "high current", "leakage current", "background current"],
+      "aliases": [
+        "unexpected current",
+        "high current",
+        "leakage current",
+        "background current"
+      ],
       "summary": "Current appears where none was expected, or is much larger than the process being studied should produce.",
       "causes": [
         "Potential window outside the electrolyte's stability range, so decomposition current is being recorded",
@@ -139,14 +188,36 @@
       "safetyNotes": [
         "Large unexpected currents can cause gas evolution and heating. Stop the measurement and inspect the cell rather than letting it continue."
       ],
-      "relatedIds": ["method.cv", "method.lsv", "concept.ec_compliance", "method.polarization"],
-      "tags": ["workstation", "current", "background"]
+      "relatedIds": [
+        "method.cv",
+        "method.lsv",
+        "concept.ec_compliance",
+        "method.polarization",
+        "material.zn_metal",
+        "material.pbo2",
+        "material.ni_oh2"
+      ],
+      "tags": [
+        "workstation",
+        "current",
+        "background"
+      ],
+      "materialNotes": {
+        "material.zn_metal": "This record notes hydrogen evolution competes with plating below about pH 12.9 — current that is not storing charge.",
+        "material.pbo2": "This record states the electrode sits 0.46 V above the oxygen line, so oxygen evolution runs in parallel with charging and is indistinguishable from it in a simple current measurement.",
+        "material.ni_oh2": "This record notes charging sits close to the oxygen line at pH 14, so charge efficiency falls at high state of charge — expected behaviour, not a fault."
+      }
     },
     {
       "id": "troubleshooting.loop_oscillation",
       "module": "echem",
       "symptom": "Control loop oscillation or ringing",
-      "aliases": ["oscillation", "ringing", "unstable loop", "instrument oscillating"],
+      "aliases": [
+        "oscillation",
+        "ringing",
+        "unstable loop",
+        "instrument oscillating"
+      ],
       "summary": "The response shows regular high-frequency oscillation that is not a property of the cell.",
       "causes": [
         "High-impedance reference electrode — a blocked frit or a dried-out reference",
@@ -171,8 +242,17 @@
       "safetyNotes": [
         "A loop oscillating at large amplitude can drive the cell well outside its intended potential window. Stop the measurement rather than letting it run."
       ],
-      "relatedIds": ["concept.ec_ir_compensation", "method.ir_compensation", "method.cv"],
-      "tags": ["workstation", "instrument", "artefact"]
+      "relatedIds": [
+        "concept.ec_ir_compensation",
+        "method.ir_compensation",
+        "method.cv"
+      ],
+      "tags": [
+        "workstation",
+        "instrument",
+        "artefact"
+      ]
     }
-  ]
+  ],
+  "_materialNotes": "Why this symptom is worth checking against THAT material — linked only where the material's own record names the cause. These are candidate causes to rule in or out, never a diagnosis: one symptom never proves one cause."
 }
