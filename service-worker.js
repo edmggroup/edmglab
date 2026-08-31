@@ -24,7 +24,7 @@
  * after a fix has shipped.
  */
 
-const CACHE_VERSION = 'edmglab-v23';
+const CACHE_VERSION = 'edmglab-v28';
 const DATA_CACHE = 'edmglab-data-v1';
 
 /* Paths are RELATIVE so the app works both at a domain root and at a
@@ -48,6 +48,8 @@ const SHELL = [
   './js/lib/offline.js',
   './js/lib/access.js',
   './js/lib/access-gate.js',
+  './js/lib/access-live.js',
+  './js/lib/access-remote.js',
   './js/lib/anim-engine.js',
   './js/lib/anim-fullscreen.js',
   './js/lib/anim-components.js',
@@ -68,6 +70,12 @@ const SHELL = [
   './js/views/suggest.js',
   './js/views/analysis.js',
   './js/views/instruments.js',
+  './js/views/materials.js',
+  './js/views/pathway.js',
+  './js/views/review.js',
+  './js/lib/review-units.js',
+  './js/lib/review-live.js',
+  './js/lib/finalised.js',
   './js/echem/analysis.js',
   './js/echem/sim/scanrate.js',
   './js/lib/feedback.js',

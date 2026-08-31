@@ -7,8 +7,13 @@
  * not, the bug is here and not in the electrochemistry.
  */
 
-import * as A from '../EDMGLAB/js/echem/analysis.js';
-import * as S from '../EDMGLAB/js/echem/sim/scanrate.js';
+/* Relative to THIS file, not to the working directory. The path used to be
+   ../EDMGLAB/js/… , which only resolved when the script was run from the
+   directory above the repo — so the one audit that needs no browser was the
+   one that failed the moment somebody ran it from inside the repo, which is
+   where everybody runs it from. */
+import * as A from '../js/echem/analysis.js';
+import * as S from '../js/echem/sim/scanrate.js';
 
 let pass = 0, fail = 0;
 const ok = (name, cond, detail = '') => {
