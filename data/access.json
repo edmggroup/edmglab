@@ -5,7 +5,7 @@
   "mode": "users",
   "message": "Enter the lab access PIN to continue.",
   "hint": "",
-  "rememberDays": 14,
+  "rememberDays": 1,
   "users": [
     {
       "name": "Krishna Kumar M",
