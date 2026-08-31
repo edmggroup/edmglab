@@ -85,6 +85,15 @@
         <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
         <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
       </button>
+
+      <!-- Locks the app and brings the PIN screen back. Hidden until app.js
+           confirms the gate is actually on: a lock button on an ungated site
+           would do nothing but reload the page, which is worse than absent.
+           It ships hidden so it can never flash on during boot. -->
+      <button class="icon-btn" id="lock-btn" hidden
+              aria-label="Lock EDMGLAB" title="Lock — you will need your PIN again">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2"/></svg>
+      </button>
     </div>
   </header>
 
