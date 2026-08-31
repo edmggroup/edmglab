@@ -942,7 +942,7 @@ them as assertions:
 
 | | |
 |---|---|
-| Performance budget (§I.1) | 7/7 targets met · shell 146.9 KB against 150 |
+| Performance budget (§I.1) | 7/7 targets met · shell 146.2 KB against 150 |
 | Accessibility, 207 routes × 2 themes | 0 findings across six checks |
 | Offline, from a cold install that opened only the home page | 207/207 routes render with no network |
 | PWA install criteria | 14/14 · plus 6/6 of the things that decide whether Android shows the rich dialog |

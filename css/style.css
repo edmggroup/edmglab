@@ -789,12 +789,12 @@ body.gate-open { overflow: hidden; }
 
 .gate-submit { width: 100%; }
 
-.gate-note {
-  margin: var(--sp-5) 0 0; padding-top: var(--sp-4);
-  border-top: 1px solid var(--border);
-  font-size: var(--fs-xs); line-height: 1.55; color: var(--text-muted); text-align: left;
-}
-.gate-note strong { color: var(--warn); }
+/* .gate-note is gone: the "soft gate, not security" paragraph was removed from
+   the PIN screen at the group's request, so the rule that styled it had no
+   element left to style. Deleted rather than left behind — an orphaned rule is
+   how a stylesheet starts growing things nobody dares remove. The warning
+   itself still stands on #/admin, in js/lib/access.js and in the architecture;
+   it was only ever in the wrong place on the login screen. */
 
 @media (max-width: 380px) {
   .gate-pin { gap: var(--sp-2); }

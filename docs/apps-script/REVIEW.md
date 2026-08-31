@@ -24,7 +24,7 @@ Re-run the command any time — it always reflects what is currently in `data/`.
 
 ## 2. Record the verdict — `#/review`
 
-Menu → **Content Review**. Same 285 entries, grouped by module, with a running count of what is still unchecked. Three buttons per entry:
+Menu → **Content Review**, open to everyone in the group. Same 285 entries, grouped by module, with a running count of what is still unchecked. Three buttons per entry:
 
 | Verdict | What it means |
 |---|---|
@@ -38,7 +38,7 @@ The page works with no setup — verdicts are kept in that browser and exported 
 
 ## 3. Optional: several people at once
 
-Deploy the script and everyone sees the same progress, and each other's disagreements.
+Without this, verdicts live in one browser and vanish if it is cleared. Deploy the script and they are kept in a Sheet, everyone sees the same progress, and disagreements between reviewers become visible instead of being lost.
 
 **1. Make a new Google Sheet.** Call it *EDMGLAB review*. Do not reuse the corrections or access sheets.
 
@@ -50,7 +50,9 @@ Deploy the script and everyone sees the same progress, and each other's disagree
 |---|---|
 | `REVIEW_KEY` | 16 or more random characters |
 
-> **This key is meant to be shared with the whole group.** Every reviewer needs it, so it will end up in a group chat — choose it on that assumption, and **never set it to the same string as `ADMIN_KEY`**. `selfTest` errors if you do. They protect very different things: the worst a leaked review key allows is junk verdicts, which are appended rather than overwritten and can be voted over. The admin key can lock the group out.
+> **Give this key to everyone who will review.** It will end up in a group chat — choose it on that assumption. **Never set it to the same string as `ADMIN_KEY`** (`selfTest` errors if you do): two deployments should not share one secret, or losing the key that costs only junk verdicts would also cost access control.
+>
+> **The key is the line between "everyone here" and "everyone".** Reviewing is open to your group, not to the internet. Without a key, anyone who finds the URL could mark all 285 entries as checked — which is not a junk row somebody deletes, but a false claim that your group has read its own safety section.
 
 **4. Run `selfTest`** from the editor. Grant permissions. Check the log.
 

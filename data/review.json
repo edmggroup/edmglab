@@ -1,8 +1,8 @@
 {
-  "_README": "Content review. This file switches the review page at #/review on and points it at somewhere to store verdicts. It ships with an empty endpoint, which means the page still works — verdicts are then kept in the reviewer's own browser and exported as a file at the end. Deploy docs/apps-script/Review.gs and paste the /exec URL below to have several people review at once and see each other's progress. docs/apps-script/REVIEW.md has the steps.",
+  "_README": "Content review. This file switches the review page at #/review on and points it at somewhere to store verdicts. REVIEWING IS OPEN TO THE WHOLE GROUP — the person best placed to check a diffraction entry is whoever runs the diffractometer, not whoever administers the website. What keeps it to the group rather than the internet is the REVIEW_KEY checked inside the Apps Script, which no browser ever holds. Ships with an empty endpoint, which means the page still works and verdicts are kept in that browser and exported as a file. docs/apps-script/REVIEW.md has the steps.",
   "schemaVersion": 1,
 
-  "_endpoint": "The /exec URL of the Review.gs Web App. Empty = verdicts stay on each reviewer's device. The URL is public, and writes need the REVIEW_KEY that lives in Script Properties — see the header of Review.gs for why a key is needed even though the worst case is only junk verdicts.",
+  "_endpoint": "The /exec URL of the Review.gs Web App. Empty = verdicts stay in each reviewer's own browser. The URL is public, and writes need the REVIEW_KEY that lives in Script Properties — share it with everyone who will review, and never set it to the same string as ADMIN_KEY. See the header of Review.gs for why a key is needed even though the worst case is only junk verdicts.",
   "endpoint": "",
 
   "_note": "Shown at the top of the review page. Use it to say what this round of review is for, and when you need it back.",

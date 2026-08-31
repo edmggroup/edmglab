@@ -1981,3 +1981,90 @@ Cache version `edmglab-v28`. Steps: `docs/apps-script/REVIEW.md`.
 **285 entries are now addressable, exportable and recordable. None of them is reviewed.** That is the one
 thing in this project no amount of code can do, and it is now the only thing standing between the platform
 and being finished.
+
+---
+
+## 26. Admin-only review, a lock button, and one note removed
+
+Three changes from the group, and one of them needed a line drawn rather than a feature built.
+
+### 26.1 Reviewing is an admin job
+
+`#/review` is now hidden from anyone signed in as a member, and refuses them with a page that says who they
+are signed in as and what to do instead — rather than a blank "not found", which a student who followed a
+link would reasonably read as the app being broken.
+
+**Role comes from the config, never from the session.** The session lives in `localStorage`, which the
+person at the keyboard can edit; `data/access.json` (or the live endpoint) is fetched fresh every boot. So
+`requireAccess()` looks the role up by slug after the gate resolves. Neither is a real boundary on a static
+site, but the app should at least not be consulting a value its own user can type.
+
+**With the gate off, nobody is identified, and the console stays visible.** Hiding it from everyone would
+lock the only person who can use it out of their own tool. `role` is `null` in that case rather than
+`'admin'`, and the difference is stated rather than papered over.
+
+**What is actually enforced, and what is not.** Hiding a nav entry does not make a route unreachable —
+anyone can type the hash, and the check runs in code their browser already downloaded. The only thing here
+that can genuinely refuse a stranger is `Review.gs` checking a key held in Script Properties that no browser
+ever sees. So the guidance changed with the feature: the review key is no longer "shared with the whole
+group", it is held by the admins. It stays a *separate* key from `ADMIN_KEY` — two deployments should not
+share one secret, or losing the one that costs only junk verdicts would also cost access control.
+
+The review page says this on itself. A group that believed this page was protected would draw exactly the
+wrong conclusion about what else is.
+
+### 26.2 A lock button, where somebody leaving a room would look
+
+Sign-out was a text link on the access page. It is now a lock icon in the top bar beside Learn / Research,
+and the access page points at it. Locking a shared lab machine is something you do on the way out, not
+something you go hunting for in a settings screen.
+
+It is **hidden unless the gate is on**, and ships hidden so it cannot flash during boot: on an ungated site
+the button would reload the page and change nothing, which is a worse answer than not offering it. Its
+tooltip names the person signed in.
+
+### 26.3 The note removed from the login screen
+
+The group asked for the "soft gate, not security" paragraph to come off the PIN screen. It has, and a
+comment in its place says so and says where the warning still lives.
+
+It was in the wrong place. A student typing a PIN cannot act on it. The person who *can* — whoever decides
+what gets committed to a public repository — reads it in full on `#/admin`, and it is also at the top of
+`js/lib/access.js`, in `data/access.json` and in this architecture. **Removing it from the one screen where
+nobody could use it is a UI fix; removing it from those would be a different thing entirely, and the comment
+in the gate says not to.**
+
+### 26.4 The budget failed a fourth time, and the fix was overdue
+
+Roles, the lock and the guard added about 2 KB to the boot path: **151 KB against 150**.
+
+`search.js` came off it. Five kilobytes on every visit for a panel that opens on a click or a `/`, imported
+statically since Phase 0 — while `charts.js` and `anim-engine.js` had been treated exactly this way for
+months, with the reasoning written out in `app.js` directly above the import that ignored it. It is fetched
+on first open now; a worst-case query already runs in 1.8 ms against a 50 ms budget, and the service worker
+has the file after the first visit anyway.
+
+Shell is **146.2 KB**. Four failures, four genuine regressions found, no budget raised.
+
+*One correction to §25.7, which claimed the same audit had failed three times "and taught something".* It
+had. But the lesson was incomplete: the pattern is not that new code is heavy, it is that **`app.js` keeps
+acquiring static imports for things that happen later**, and the comment warning against precisely that has
+been sitting in the file the whole time.
+
+### 26.5 Verification
+
+| Check | Result |
+|---|---|
+| Roles, end to end | admin sees the console and the nav entry · member is turned away and the entry is hidden · lock relocks to the PIN screen · gate off, lock hidden |
+| Live access endpoint | 27/27 |
+| Materials, potentials, pathway inputs | 80/80 |
+| Analysis engine | 41/41 |
+| Routes | 207 · 0 console errors |
+| Accessibility, 207 routes × 2 themes | 0 findings |
+| Standing requirements, 3 widths | clean |
+| Offline, cold start | 207/207 routes · 0 failures |
+| Performance budget | **7/7 · shell 146.2 KB against 150** |
+| PWA install criteria | 14/14 · 6/6 |
+| Data health check | 20 files · 223 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v29`.
