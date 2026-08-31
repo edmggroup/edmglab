@@ -1,16 +1,29 @@
 /**
  * EDMGLAB — Access control admin panel
  *
- * Generates the contents of `data/access.json`. It cannot write the file:
- * EDMGLAB is a static site with no server, so the admin copies the generated
- * JSON and commits it. That is a feature rather than a limitation — the access
- * configuration goes through the same reviewable commit history as everything
- * else, and no secret is ever typed into the repository directly (only a
- * PBKDF2 derivation of it).
+ * TWO WAYS TO CHANGE WHO GETS IN, and the page offers whichever is available.
  *
- * The panel is deliberately NOT gated. It has no power over what the deployed
- * site does — only a commit does — so hiding it would add friction without
- * adding protection. Anyone opening it sees settings they cannot apply.
+ * 1. GENERATE AND COMMIT (always present, works offline).
+ *    Produces the contents of `data/access.json` for the admin to paste and
+ *    commit. A static site has no server to write the file, and routing the
+ *    access list through the same reviewable commit history as everything else
+ *    is a genuine benefit, not only a workaround.
+ *
+ * 2. LIVE MANAGEMENT (only when `endpoint` is set in data/access.json).
+ *    Adds, suspends and removes people through the AccessControl.gs Web App,
+ *    live for everyone on their next visit. This exists because path 1 asks a
+ *    supervisor to make a git commit in order to give a new student a PIN,
+ *    which is fine for a developer and a real obstacle for everyone else.
+ *
+ * The endpoint is the ONE part of this project where a server can actually
+ * refuse a request: it holds an admin key in Script Properties, which a static
+ * page cannot do because anything it holds is readable. So writes are properly
+ * controlled — while READS stay public, because the config contains only names,
+ * salts and PBKDF2 hashes, exactly what already sits in a public repository.
+ *
+ * The panel itself is deliberately NOT gated. Without the admin key it can
+ * change nothing that matters, so hiding it would add friction without adding
+ * protection.
  */
 
 import { esc, pageHead, section, callout } from '../ui.js';
@@ -63,10 +76,19 @@ export async function render(outlet) {
           <span class="badge ${live.enabled ? 'badge-measured' : 'badge-literature'}">
             ${live.enabled ? 'Enabled' : 'Disabled'}</span>
         </div>
+        ${live._source ? `<div class="xsmall muted" style="margin-top:.5rem">
+          Read from ${esc({ endpoint: 'the live endpoint', cache: 'the last known list (endpoint unreachable)',
+                            file: 'data/access.json' }[live._source] || live._source)}.</div>` : ''}
         ${store.getUser() ? `<div class="xsmall muted" style="margin-top:.7rem">
           Signed in on this device as <code>${esc(store.getUser())}</code> —
           <a href="#" id="admin-signout">sign out</a></div>` : ''}
       </div></div>`)}
+
+    <section class="section" id="live-section" hidden>
+      <div class="section-head"><h2>Manage people</h2>
+        <span class="section-note">changes apply immediately — no commit</span></div>
+      <div class="panel"><div class="panel-body stack" id="live-body"></div></div>
+    </section>
 
     ${section('Configure', `
       <div class="panel"><div class="panel-body stack">
@@ -197,6 +219,11 @@ export async function render(outlet) {
 
   $('#admin-signout')?.addEventListener('click', (e) => { e.preventDefault(); access.signOut(); });
 
+  /* Live management appears only when data/access.json names an endpoint, and
+     the module behind it is only downloaded then — a group that has not
+     deployed the script pays nothing for a feature it does not have. */
+  wireLive(outlet, $).catch((e) => console.warn('[admin] live management unavailable:', e.message));
+
   $('#f-enabled').addEventListener('change', (e) => {
     draft.enabled = e.target.checked;
     $('#pin-settings').hidden = !draft.enabled;
@@ -310,4 +337,183 @@ export async function render(outlet) {
   });
 
   return { destroy() {} };
+}
+
+/* ══════════════════════════════════════════════════════════
+   Live management
+   ══════════════════════════════════════════════════════════
+   Everything below runs only when an endpoint is configured. The rest of this
+   page keeps working exactly as it did — the generate-and-commit flow is not
+   replaced, because it is still the right answer for a group that has not
+   deployed the script, and it is the only thing that works with no network.
+
+   THE ADMIN KEY IS TYPED FOR EVERY ACTION AND IS NEVER STORED. Not in
+   localStorage, not in a variable that outlives the call. A static page cannot
+   keep a secret, so it does not pretend to. See js/lib/access-live.js.       */
+
+async function wireLive(outlet, $) {
+  const endpoint = await access.endpointUrl();
+  if (!endpoint) return;
+
+  const live = await import('../lib/access-live.js');
+  const sec = $('#live-section');
+  const body = $('#live-body');
+  sec.hidden = false;
+
+  let state = null;        // last fetched config
+  let updated = null;
+
+  body.innerHTML = '<div class="loading-row"><span class="spinner"></span> Reading the live list…</div>';
+
+  try {
+    const got = await live.fetchConfig(endpoint);
+    state = got.config; updated = got.updated;
+  } catch (e) {
+    body.innerHTML = callout(`<strong>The endpoint is configured but did not answer.</strong>
+      ${esc(e.message)}<br><br>The gate still works from <code>data/access.json</code>, and the
+      generate-and-commit flow below is unaffected. Check the deployment steps in
+      <code>docs/apps-script/README.md</code>.`, 'warn');
+    return;
+  }
+
+  draw();
+
+  function draw() {
+    const users = state.users || [];
+    body.innerHTML = `
+      ${callout(`<strong>This is the list the site is actually using.</strong> A change here is live for
+        everyone on their next visit — no commit, no deploy. The endpoint refuses any write without the
+        admin key, which lives in Script Properties on Google's servers and is not in this repository.
+        <br><br>
+        <strong>One consequence to know about.</strong> A device that is offline keeps the last list it
+        saw, so somebody you suspend keeps access on that device until it reconnects. That is a soft gate
+        behaving like a soft gate; if you need someone out immediately, the answer is not a PIN.`, 'info')}
+
+      <label class="field">
+        <span class="field-label">Admin key <span class="muted">(not stored — typed for each change)</span></span>
+        <input type="password" id="lv-key" autocomplete="off" placeholder="from Script Properties">
+      </label>
+
+      <label class="field">
+        <span class="field-label">Your name <span class="muted">(optional — recorded in the audit log)</span></span>
+        <input type="text" id="lv-by" maxlength="40" autocomplete="off" placeholder="who is making this change">
+      </label>
+
+      <div class="row" style="justify-content:space-between;align-items:center;
+                              border-top:1px solid var(--border);padding-top:.8rem">
+        <div>
+          <strong>Gate is ${state.enabled ? 'ON' : 'OFF'}</strong>
+          <div class="xsmall muted">Mode: ${esc(state.mode === 'users' ? 'per-user PINs' : 'one shared PIN')}${
+            updated ? ` · last changed ${esc(new Date(updated).toLocaleString('en-GB'))}` : ''}</div>
+        </div>
+        <button type="button" class="btn btn-sm" id="lv-toggle">Turn ${state.enabled ? 'off' : 'on'}</button>
+      </div>
+
+      <div id="lv-people">
+        <div class="field-label" style="margin-bottom:.4rem">People (${users.length})</div>
+        ${users.length ? `<div class="stack-sm">${users.map((u) => `
+          <div class="row lv-row" style="justify-content:space-between;align-items:center">
+            <div>
+              <strong>${esc(u.name)}</strong>
+              <span class="chip ${u.enabled === false ? 'chip-warn' : 'chip-ok'}">${
+                u.enabled === false ? 'suspended' : 'active'}</span>
+              ${u.role === 'admin' ? '<span class="chip">admin</span>' : ''}
+              <div class="xsmall muted"><code>${esc(u.slug)}</code>${
+                u.added ? ` · added ${esc(new Date(u.added).toLocaleDateString('en-GB'))}` : ''}</div>
+            </div>
+            <div class="row" style="gap:.4rem">
+              <button type="button" class="btn btn-sm" data-toggle="${esc(u.slug)}"
+                      data-to="${u.enabled === false}">${u.enabled === false ? 'Restore' : 'Suspend'}</button>
+              <button type="button" class="btn btn-sm" data-remove="${esc(u.slug)}">Remove</button>
+            </div>
+          </div>`).join('')}</div>`
+        : '<p class="small muted">Nobody is on the list yet.</p>'}
+      </div>
+
+      <div class="row" style="align-items:flex-end;gap:.6rem;border-top:1px solid var(--border);padding-top:.8rem">
+        <label class="field" style="flex:1 1 180px">
+          <span class="field-label">Name</span>
+          <input type="text" id="lv-name" maxlength="40" placeholder="e.g. Priya">
+        </label>
+        <label class="field" style="flex:0 0 110px">
+          <span class="field-label">Their PIN</span>
+          <input type="text" inputmode="numeric" maxlength="4" id="lv-pin" class="pin-field" placeholder="••••">
+        </label>
+        <button type="button" class="btn btn-primary" id="lv-add">Add person</button>
+      </div>
+
+      <p class="xsmall muted" id="lv-status" role="status" aria-live="polite"></p>
+
+      <p class="xsmall muted" style="border-top:1px solid var(--border);padding-top:.7rem;margin-bottom:0">
+        The PIN is turned into a PBKDF2 hash <strong>in this browser</strong> and only the hash is sent, so a
+        PIN never reaches Google and never appears in a log. Tell the person their PIN yourself — nothing
+        here can show it to you again.</p>`;
+
+    const status = body.querySelector('#lv-status');
+    const key = () => body.querySelector('#lv-key').value.trim();
+    const by = () => body.querySelector('#lv-by').value.trim();
+
+    /** Every action funnels through here: check the key is present, disable
+     *  the buttons so a double-click cannot fire twice, run, refetch, redraw. */
+    async function act(what, fn) {
+      if (!key()) { say('Enter the admin key first.', true); return; }
+      const buttons = [...body.querySelectorAll('button')];
+      buttons.forEach((b) => { b.disabled = true; });
+      say(what + '…');
+      try {
+        const res = await fn();
+        state = res.config; updated = res.updated || updated;
+        const k = key(), n = by();
+        draw();
+        // Redraw wipes the inputs; put the key and name back so an admin can
+        // make three changes without typing the key three times.
+        body.querySelector('#lv-key').value = k;
+        body.querySelector('#lv-by').value = n;
+        say('Done. Live for everyone on their next visit.');
+      } catch (e) {
+        buttons.forEach((b) => { b.disabled = false; });
+        say(e.message, true);
+      }
+    }
+
+    function say(msg, bad = false) {
+      const s = body.querySelector('#lv-status');
+      if (!s) return;
+      s.textContent = msg;
+      s.style.color = bad ? 'var(--chip-warn-fg)' : '';
+    }
+    void status;
+
+    body.querySelector('#lv-toggle').addEventListener('click', () =>
+      act(state.enabled ? 'Turning the gate off' : 'Turning the gate on',
+        () => live.setGate(endpoint, key(), { enabled: !state.enabled, mode: state.mode }, by())));
+
+    body.querySelectorAll('[data-toggle]').forEach((b) => {
+      b.addEventListener('click', () => act(b.dataset.to === 'true' ? 'Restoring' : 'Suspending',
+        () => live.setPersonEnabled(endpoint, key(), b.dataset.toggle, b.dataset.to === 'true', by())));
+    });
+
+    body.querySelectorAll('[data-remove]').forEach((b) => {
+      b.addEventListener('click', () => {
+        /* Two clicks, no dialog. A confirm() would block the extension and is
+           banned in this codebase; making the button ask for itself is both
+           safer and faster than a modal. */
+        if (b.dataset.armed !== 'yes') {
+          b.dataset.armed = 'yes';
+          b.textContent = 'Really remove?';
+          setTimeout(() => { if (b.isConnected) { b.dataset.armed = ''; b.textContent = 'Remove'; } }, 4000);
+          return;
+        }
+        act('Removing', () => live.removePerson(endpoint, key(), b.dataset.remove, by()));
+      });
+    });
+
+    body.querySelector('#lv-add').addEventListener('click', () => {
+      const name = body.querySelector('#lv-name').value.trim();
+      const pin = body.querySelector('#lv-pin').value.trim();
+      if (!name) { say('Give the person a name.', true); return; }
+      if (!/^\d{4}$/.test(pin)) { say('A PIN must be exactly four digits.', true); return; }
+      act('Adding ' + name, () => live.addPerson(endpoint, key(), { name, pin, by: by() }));
+    });
+  }
 }

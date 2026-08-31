@@ -102,8 +102,16 @@ export async function verify(pin, cfg) {
   if (cfg.mode === 'users' && Array.isArray(cfg.users)) {
     for (const u of cfg.users) {
       if (!u.salt || !u.hash) continue;
+      /* A suspended person is skipped rather than filtered out earlier, so the
+         derivation still runs for them and a suspended PIN takes exactly as
+         long to reject as a wrong one. Filtering the list first would make
+         "suspended" measurably faster than "wrong", which tells the person at
+         the keyboard that their PIN was right — the one thing suspending them
+         was meant to stop. */
       const got = await derive(pin, u.salt, u.iterations || ITERATIONS);
-      if (got === u.hash) return { ok: true, user: u.slug || slugify(u.name), label: u.name };
+      if (got === u.hash && u.enabled !== false) {
+        return { ok: true, user: u.slug || slugify(u.name), label: u.name };
+      }
     }
     return { ok: false, user: null, label: null };
   }

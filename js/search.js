@@ -28,7 +28,11 @@ const TYPE_LABEL = {
 };
 
 /** Fields worth searching, in priority order. */
-const FIELDS = ['title', 'name', 'term', 'label', 'symptom', 'plainText', 'aliases', 'tags', 'shortDef'];
+/* `origalys` is here so that typing the technique name printed on the lab's
+   own instrument screen — "Gal. Charge and Discharge Cycle" — finds the method
+   page. The names live in that field alone rather than being duplicated into
+   aliases, so there is one place to correct them. */
+const FIELDS = ['title', 'name', 'term', 'label', 'symptom', 'plainText', 'aliases', 'origalys', 'tags', 'shortDef'];
 
 function haystack(rec) {
   const bits = [];

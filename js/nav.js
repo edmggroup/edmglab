@@ -72,12 +72,13 @@ export const TABS = [
 export const MODULES = [
   { id: 'dashboard',       label: 'Dashboard',           route: '#/',                    icon: 'home',      tab: 'home',  group: null,    phase: 0,  view: 'dashboard' },
 
+  { id: 'pathway',         label: 'The Pathway',         route: '#/pathway',             icon: 'compass',   tab: 'learn', group: 'learn', view: 'pathway' },
   { id: 'fundamentals',    label: 'Fundamentals',        route: '#/fundamentals',        icon: 'book',      tab: 'learn', group: 'learn', view: 'fundamentals' },
   { id: 'chemistry',       label: 'Storage Chemistry',   route: '#/chemistry',           icon: 'atom',      tab: 'learn', group: 'learn', view: 'chemistry/index' },
   { id: 'glossary',        label: 'Glossary',            route: '#/glossary',            icon: 'book',      tab: 'learn', group: 'learn', view: 'glossary' },
   { id: 'learning',        label: 'Learning & Quiz',     route: '#/learning',            icon: 'heart',     tab: 'learn', group: 'learn', view: 'quiz' },
 
-  { id: 'materials',       label: 'Electrode Materials', route: '#/materials',           icon: 'layers',    tab: 'lab',   group: 'lab',   phase: 7 },
+  { id: 'materials',       label: 'Electrode Materials', route: '#/materials',           icon: 'layers',    tab: 'lab',   group: 'lab',   view: 'materials' },
   { id: 'preparation',     label: 'Electrode Prep',      route: '#/preparation',         icon: 'flask',     tab: 'lab',   group: 'lab',   view: 'preparation' },
   { id: 'characterization',label: 'Characterisation',    route: '#/characterization',    icon: 'scope',     tab: 'lab',   group: 'lab',   view: 'characterization' },
   { id: 'battery-tester',  label: 'Battery Tester',      route: '#/battery-tester',      icon: 'battery',   tab: 'lab',   group: 'lab',   phase: 3,  view: 'battery-tester/index' },
@@ -97,6 +98,7 @@ export const MODULES = [
   // used everywhere else, so cards and page titles stay unambiguous.
   { id: 'demo',   label: 'Engine Demo',       shortLabel: 'Demo',   route: '#/demo',   icon: 'grid',  tab: 'menu', group: null, util: true, phase: 0, view: 'demo' },
   { id: 'health', label: 'Data Health Check', shortLabel: 'Health', route: '#/health', icon: 'scope', tab: 'menu', group: null, util: true, phase: 0, view: 'health' },
+  { id: 'review', label: 'Content Review',    shortLabel: 'Review', route: '#/review', icon: 'flag',  tab: 'menu', group: null, util: true, phase: 0, view: 'review' },
   { id: 'admin',  label: 'Access Control',    shortLabel: 'Access', route: '#/admin',  icon: 'lock',  tab: 'menu', group: null, util: true, phase: 0, view: 'admin' },
   /* The main way in is the footer link under every page, which carries the
      route it was clicked from. This entry is for someone who has already

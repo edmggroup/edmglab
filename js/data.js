@@ -30,14 +30,19 @@ export const CORE = ['concepts', 'formulas', 'glossary'];
  * from formulas.json, troubleshooting lives per-module, and the protocol
  * builder and instrument chooser are code, not content.
  *
- * `materials` is different and stays: it is a real file that has not been
- * written yet, because it needs literature values with citations.
+ * `materials` was such a key for a long time — registered, awaiting content.
+ * It is now written, so it left PENDING below. That pair (REGISTRY entry and
+ * PENDING entry) is the kind of hand-maintained list that rots silently, so
+ * the health check now reports a PENDING key whose file actually loads.
  */
 const REGISTRY = {
   concepts:              'concepts.json',
   formulas:              'formulas.json',
   glossary:              'glossary.json',
-  materials:             'materials.json',   // Roadmap P7 — awaiting references
+  materials:             'materials.json',
+  /* The one materials file holding values EDMGLAB did not compute. Every row
+     carries a citation, because a standard potential is measured, not derived. */
+  potentials:            'potentials.json',
   /* Ships EMPTY on purpose and is never filled by this platform — the specs
      come from the group's own manuals, the quirks from their own benches. */
   instruments:           'instruments.json',
@@ -197,7 +202,7 @@ export function allKeys() {
  * warm-up skips these so it does not report a permanent "1 file missing";
  * the health check still lists them, which is where that belongs.
  */
-export const PENDING = new Set(['materials']);
+export const PENDING = new Set([]);
 
 /** Absolute URL of one registered file. The only place outside this module
  *  that needs it is the offline warm-up, which caches by URL. */

@@ -80,7 +80,13 @@ export function renderMethodList(host, methods, opts = {}) {
 
 function methodCard(m) {
   const ctrl = m.instrument?.controls, meas = m.instrument?.measures;
-  const vendor = (m.aliases || []).find((a) => /^(Pot\.|Gal\.|Chrono|Open Circuit|Single|Fixed)/.test(a));
+  /* The OrigaMaster name is DECLARED on the record now, not guessed from the
+     shape of an alias. The old regex had two failure modes: an OrigaMaster
+     name that did not start with one of its prefixes was invisible, and an
+     ordinary alias that happened to start with "Pot." would have been shown as
+     one. It also put the workstation software's technique name on two BATTERY
+     TESTER methods, which are not driven by OrigaMaster at all. */
+  const vendor = (m.origalys || [])[0] || null;
   return `<a class="ml-card" href="#/method/${esc(idTail(m.id))}">
     <span class="ml-name">${esc(m.name)}</span>
     <span class="ml-sum">${esc(m.summary || m.cell?.whatHappens || '')}</span>
@@ -102,7 +108,7 @@ export function renderMethodDetail(host, m, opts = {}) {
     return { destroy() {} };
   }
 
-  const vendorAliases = (m.aliases || []).filter((a) => /^(Pot\.|Gal\.|Chrono|Open Circuit|Single|Fixed|Polarization)/.test(a));
+  const vendorAliases = m.origalys || [];
 
   host.innerHTML = `
     ${opts.backHref ? `<a class="btn btn-sm" href="${esc(opts.backHref)}" style="margin-bottom:1rem">← All methods</a>` : ''}

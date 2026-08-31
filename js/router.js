@@ -169,7 +169,7 @@ function escapeHtml(s) {
 
    Not shown on the correction page itself, and not on the admin panel —
    neither is content anyone would be correcting. */
-const NO_FOOTER = ['/suggest', '/admin', '/menu'];
+const NO_FOOTER = ['/suggest', '/admin', '/menu', '/review'];
 
 function updateFooter(path) {
   const main = document.getElementById('main');
@@ -186,8 +186,29 @@ function updateFooter(path) {
   }
   foot.hidden = false;
   const q = new URLSearchParams({ about: '#' + path });
+  const correct = `<a class="page-foot-link" href="#/suggest?${q}">Something wrong on this page?</a>`;
+
+  // Draft first, then upgrade if this record turns out to be signed off. The
+  // fetch is one request and cached, but the footer must never flash "checked"
+  // for a record that is not.
   foot.innerHTML = `<span>All content here is <strong>draft</strong>, pending review by the group.</span>
-    <a class="page-foot-link" href="#/suggest?${q}">Something wrong on this page?</a>`;
+    ${correct}`;
+
+  /* Only a record DETAIL page can be individually signed off, and the module
+     that knows about that is imported only when one is on screen — router.js
+     is on the boot path and has already broken the shell-payload budget once
+     by growing. js/lib/finalised.js has the reasoning. */
+  if (!/^\/(materials|formula|characterization|troubleshooting|method)\/./.test(path)) return;
+  import('./lib/finalised.js').then(async (m) => {
+    const id = m.recordIdFor(path);
+    if (!id) return;
+    const f = await m.load();
+    if (!f.ids.has(id) || currentPath() !== path) return;
+    const who = f.by?.by ? ` by ${f.by.by}` : '';
+    const when = f.by?.on ? ` on ${f.by.on}` : '';
+    foot.innerHTML = `<span>This entry was <strong>checked${who}</strong>${when}.
+      Other pages remain draft.</span> ${correct}`;
+  }).catch(() => { /* stays draft, which is the safe direction */ });
 }
 
 export function start(outletEl) {

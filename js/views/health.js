@@ -41,6 +41,22 @@ export async function render(outlet) {
   const allIds = new Map();     // id -> file key
   let recordCount = 0;
 
+  /* ── PENDING is a hand-maintained list, so something has to check it ──
+     data.js keeps a set of keys that are registered but deliberately unwritten;
+     the offline warm-up skips them so it does not report a permanent "1 file
+     missing". The failure mode is silent and one-directional: somebody writes
+     the file, forgets the set, and that file is then never cached offline —
+     the app works perfectly on a desk and has a hole in it in the lab.
+     Nothing catches that except this. (Same defect class as the shell list
+     and the cross-reference field list: a list nothing verifies.) */
+  for (const k of data.PENDING) {
+    if (!missing.includes(k)) {
+      issues.push(mk('error', k, '(registry)',
+        'Listed in data.js PENDING but the file loads. Remove it from PENDING — while it is there, ' +
+        'this file is excluded from the offline warm-up and will be unavailable without a network.'));
+    }
+  }
+
   /* ── Pass 1: per-record structural and scientific checks ── */
   for (const { key, payload } of files) {
     if (payload.schemaVersion === undefined) {
@@ -75,7 +91,13 @@ export async function render(outlet) {
         allIds.set(rec.id, key);
       }
 
-      checkProvenance(rec, key, rec.id, issues);
+      /* A file may declare a `sources` map and have its records cite into it by
+         `sourceId` instead of repeating the citation on every row. That is the
+         better arrangement when one source backs many values — sixteen copies
+         of a citation are sixteen chances for one of them to drift — but it
+         only works if an unresolvable sourceId is an error, so the set of legal
+         keys goes down with the check. */
+      checkProvenance(rec, key, rec.id, issues, '', 0, new Set(Object.keys(payload.sources || {})));
 
       // Formulas must state where they are valid (§40, Architecture §D.4).
       if (rec.id.startsWith('formula.')) {
@@ -524,21 +546,31 @@ async function renderOffline(el) {
 }
 
 /** Recursively find numeric value objects and check their provenance. */
-function checkProvenance(node, key, id, issues, path = '', depth = 0) {
+function checkProvenance(node, key, id, issues, path = '', depth = 0, sourceIds = EMPTY_SET) {
   if (depth > 6 || node === null || typeof node !== 'object') return;
 
   if (Array.isArray(node)) {
-    node.forEach((v, i) => checkProvenance(v, key, id, issues, `${path}[${i}]`, depth + 1));
+    node.forEach((v, i) => checkProvenance(v, key, id, issues, `${path}[${i}]`, depth + 1, sourceIds));
     return;
   }
 
   // A value object is anything with a numeric `value` and a `unit`.
   const looksLikeValue = 'value' in node && typeof node.value === 'number' && 'unit' in node;
   if (looksLikeValue) {
+    /* Two ways to cite: `source` written out on the value, or `sourceId`
+       naming an entry in the file's `sources` map. A sourceId that names
+       nothing is WORSE than no citation, because it looks like one. */
+    const named = node.sourceId ? sourceIds.has(node.sourceId) : false;
+    const cited = Boolean(node.source) || named;
+
+    if (node.sourceId && !named) {
+      issues.push(mk('error', key, id,
+        `${path} cites sourceId "${node.sourceId}", which is not in this file's "sources" map.`));
+    }
     if (!node.provenance) {
       issues.push(mk('error', key, id,
         `${path || 'value'} has a number and a unit but no provenance — it would render as "Unverified".`));
-    } else if ((node.provenance === 'literature' || node.provenance === 'datasheet') && !node.source) {
+    } else if ((node.provenance === 'literature' || node.provenance === 'datasheet') && !cited) {
       issues.push(mk('error', key, id,
         `${path} is marked "${node.provenance}" but cites no source. Spec §40 requires a citation.`));
     } else if (node.provenance === 'measured' && !node.date) {
@@ -549,9 +581,11 @@ function checkProvenance(node, key, id, issues, path = '', depth = 0) {
 
   for (const [k, v] of Object.entries(node)) {
     if (k.startsWith('_')) continue;
-    checkProvenance(v, key, id, issues, path ? `${path}.${k}` : k, depth + 1);
+    checkProvenance(v, key, id, issues, path ? `${path}.${k}` : k, depth + 1, sourceIds);
   }
 }
+
+const EMPTY_SET = new Set();
 
 function mk(sev, file, id, message) { return { sev, file, id, message }; }
 

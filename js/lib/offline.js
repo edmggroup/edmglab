@@ -38,7 +38,7 @@ const VENDOR = ['chart.umd.min.js', 'chartjs-plugin-zoom.min.js', 'hammer.min.js
    but both fail soft rather than loudly, which means that offline without
    them the PIN gate silently disables itself and corrections silently lose
    the repository they were going to. Warm them so neither happens quietly. */
-const CONFIG = ['access.json', 'feedback.json']
+const CONFIG = ['access.json', 'feedback.json', 'review.json']
   .map((f) => new URL(`../../data/${f}`, import.meta.url).href);
 
 function urls() { return [...cacheableUrls(), ...CONFIG, ...VENDOR]; }

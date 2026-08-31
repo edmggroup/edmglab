@@ -30,7 +30,6 @@ import { requireAccess } from './lib/access.js';
    loadedModule() below returns the module only when a view has already
    imported it, and null otherwise. */
 import { trap } from './lib/focus-trap.js';
-import { warmOnIdle } from './lib/offline.js';
 
 const root = document.documentElement;
 const app = document.querySelector('.app');
@@ -230,6 +229,32 @@ router.route('/analysis', () => import('./views/analysis.js'), { title: 'Scan-ra
    The one view whose content this platform will never write. */
 router.route('/instruments', () => import('./views/instruments.js'), { title: 'Our Instruments' });
 
+/* ── Electrode materials (Roadmap P7) ──
+   Both routes load the SAME module: the index and the detail are one render()
+   branching on ctx.params.id, because the derivation shown on a card and the
+   derivation shown on a detail page must come from one code path. Two modules
+   would be two arithmetics to keep in agreement. */
+router.route('/materials',     () => import('./views/materials.js'), { title: 'Electrode Materials' });
+router.route('/materials/:id', () => import('./views/materials.js'), { title: 'Electrode Material' });
+
+/* ── The pathway ──
+   The route the platform was originally described as: concept → chemistry →
+   material → preparation → characterisation → fabrication → testing →
+   calculation → analysis → interpretation → troubleshooting. Every module was
+   built and none of them was that, because the sidebar sorts by what a thing
+   IS and this sorts by when you need it. */
+router.route('/pathway',     () => import('./views/pathway.js'), { title: 'The Pathway' });
+router.route('/pathway/:id', () => import('./views/pathway.js'), { title: 'Pathway' });
+
+/* ── Content review ──
+   The 60,000 words are draft until somebody who knows the field says
+   otherwise, and the platform says so on every page. This is where that gets
+   recorded. It is NOT an editor: a verdict is recorded here, the change is
+   made in the JSON and committed, so scientific claims stay inside the
+   reviewable history that is the reason the content lives in git. */
+router.route('/review',      () => import('./views/review.js'), { title: 'Content Review' });
+router.route('/review/:key', () => import('./views/review.js'), { title: 'Content Review' });
+
 router.start(document.getElementById('view-outlet'));
 
 /* ══════════════════════════════════════════════════════════
@@ -298,8 +323,20 @@ data.loadCore().catch((e) => console.warn('[app] core data warm-up failed', e));
 /* Once the page is quiet, pull the REST of the content and the plot libraries
    into the cache so the platform is usable offline in full — not just on the
    pages this visit happened to open. Skipped on a metered connection; see
-   js/lib/offline.js. */
-warmOnIdle();
+   js/lib/offline.js.
+
+   FETCHED THREE SECONDS AFTER LOAD, on the same schedule as the work it does.
+   Three attempts were needed to get this right and the first two are worth
+   recording: a static import put 5 KB on the critical path for code whose
+   every line runs three seconds later, and a top-level dynamic import barely
+   improved on it because that still fires during boot. Even
+   requestIdleCallback fired inside the measurement window on a fast machine —
+   "when idle" is almost immediately on a page that has finished painting. The
+   fetch has to be scheduled on the same clock as the work, and only the
+   budget made the difference between the three visible. */
+const warmLater = () => import('./lib/offline.js').then((m) => m.warmOnIdle());
+if (document.readyState === 'complete') setTimeout(warmLater, 3000);
+else window.addEventListener('load', () => setTimeout(warmLater, 3000), { once: true });
 
 /* ══════════════════════════════════════════════════════════
    6 · Housekeeping

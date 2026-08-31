@@ -374,7 +374,8 @@ offline warm-up caches and the search index reads. **A file not in that registry
 | `preparation.json` | The electrode-preparation chain | `_kind: preparation` |
 | `import-profiles.json` | Instrument column vocabularies and plot definitions | `_kind: profiles` |
 | **`instruments.json`** | **Your actual hardware.** Ships empty; specs from your manuals, quirks from your benches | `instrument.…` |
-| **`materials.json`** | **Not yet written** — it needs literature values with citations | `material.…` |
+| **`materials.json`** | 24 electrode materials. **Holds no capacity value at all** — each record declares a formula unit and an electron count, and the app computes Q from them | `material.…` |
+| **`potentials.json`** | Standard reduction potentials, the one file here holding a number the app did not compute. Citation mandatory on every row | `potential.…` |
 | `battery-tester/*.json` | Concepts, instrument diagram, cell formats, workflow, methods, troubleshooting, safety | mixed |
 | `echem/*.json` | Concepts, potentiostat and electrode diagrams, methods, circuit elements, Tafel, troubleshooting | mixed |
 | `shared/*.json` | The two decision trees | `_kind: tree` |
@@ -768,7 +769,7 @@ Reordered from v0.1 to put the highest-value bench tools early. Instruments and 
 | **4** | **Data import + charting** — Web Worker parser, column mapping, GCD/cycle-life/Ragone plots, auto-calculation | A student drags in a cycler CSV and gets specific capacity, CE and retention |
 | **5** | **Electrochemical Workstation module** — concepts, technique library, cell configuration teaching | Wiring decisions and their consequences are documented and linked to the calculators |
 | **6** | **Electrochemical analysis depth** — CV/EIS import, b-value, Dunn deconvolution, Nyquist/Bode, dQ/dV | ✅ **Done.** `#/analysis` runs b-value and Dunn on a simulated series whose decomposition is planted in advance (41 assertions, k₁/k₂ recovered to 1e-9) and on your own multi-file CV exports. Eight diagnostics, including the sub-range check that fires where R² = 0.997. See INSTRUMENTATION-INTEGRATION §20. |
-| **7** | **Materials database** — provenance-tagged schema, browse/filter/detail | Several real materials fully populated with cited values |
+| **7** | **Materials database** — provenance-tagged schema, browse/filter/detail | ✅ **Done.** `#/materials` holds 24 materials across Li / Na / K / Zn / Mg / Pb, aqueous and non-aqueous. No capacity is stored: every figure is computed from declared stoichiometry with the arithmetic printed. Adds the water-stability-window panel, built on 16 cited standard potentials. 51 assertions in `tools/materials-test.mjs`. See INSTRUMENTATION-INTEGRATION §21. |
 | **8** | **Energy Storage Chemistry** — supercapacitor / LIB / SIB / ion-capacitor structures | At least one storage class complete end to end |
 | **9** | **Preparation + Characterization** — SOP guides; XRD/Raman/FTIR/BET/SEM-TEM/XPS with Bragg and Scherrer linked | One full prep-to-characterization pathway for a real material |
 | **10** | **Troubleshooting engine** — symptom search; smart links from calculator and import results | Instrument, IR drop, cycling stability and distorted-CV entries all live |
@@ -871,11 +872,17 @@ Every link in that sequence is derived from `relatedIds`, `measuredBy`, `feedsFo
 
 The four questions v0.2 left open, and what happened to them.
 
-**1. Which electrochemical workstation do you have?** — *still open.* The module was built vendor-neutral,
-which remains the right default: the concepts and functions are common to Autolab, Gamry, BioLogic, CH
-Instruments, Ivium and PalmSens, and technique names are cross-referenced across those vocabularies. Naming
-your model would add its own technique aliases to search and let its specifications go into
-`instruments.json` from your manual. Nothing is blocked on it.
+**1. Which electrochemical workstation do you have?** — *answered: **OrigaLys**, driven by **OrigaMaster**.*
+The module stays vendor-neutral, which remains right — the concepts are common to Autolab, Gamry, BioLogic,
+CH Instruments, Ivium and PalmSens — with an OrigaLys layer on top. Nine workstation methods now declare an
+`origalys` field carrying the technique names as OrigaMaster prints them, so a student searching
+"Gal. Charge and Discharge Cycle" lands on the right page; the method-selection tree carries the same names
+at each leaf. `data/instruments.json` holds an OrigaLys skeleton with vendor and software filled in and
+**every specification null**, because the model is not yet known and no number may be written from anything
+but your manual.
+
+Still needed from the group: **the model** (OrigaFlex OGF01A/OGF05A/OGF500, OrigaStat OGS100/OGS200, or
+whichever is on the bench), the **OrigaMaster version**, and access to the manual.
 
 **2. The single-page change** — *adopted, and it earned its place.* A view switch is 18 ms against a budget
 of 100; a repeat visit is interactive in 0.12 s with no network at all. Neither number is reachable with
@@ -884,8 +891,10 @@ fifteen HTML files, and the offline behaviour the lab actually needs would have 
 **3. Colours and typography** — *settled, then corrected by measurement.* The palette in `css/tokens.css` is
 the one that shipped. Four tokens were later re-derived from contrast measured on the rendered page rather
 than on the colour in isolation: an inline link inside a callout sits on that callout's wash, and read
-4.34:1 there while reading 5.9:1 on the page. All 132 routes now pass AA in both themes, checked by
-`tools/a11y-audit.mjs`.
+4.34:1 there while reading 5.9:1 on the page. Two more followed in P7: a 13 px verdict chip on a 10% wash
+of its own semantic colour reached 4.09:1 and 4.41:1, so `--chip-ok-fg` and `--chip-warn-fg` were added
+rather than darkening `--ok` and `--warn` — which would have moved every callout, badge and border that
+uses them. All 157 routes pass AA in both themes, checked by `tools/a11y-audit.mjs`.
 
 **4. Where should protocols come from?** — *answered by deleting the question.* `protocols.json` was never
 written and has been removed from the registry. The protocol builder at `#/battery-tester/protocol`
@@ -897,16 +906,26 @@ file to maintain.
 
 Three things, none of which is a design question.
 
-**Electrode Materials (P7)** is the one module still carrying a phase badge. It needs literature values with
-citations. Building it from remembered numbers would break the first rule this platform was given, so it
-stays unbuilt until the group supplies a reference list. `data/_schema/material.example.json` is the shape it
-will take.
+**Standard potentials are a short list, and operating potentials are absent.** `potentials.json` holds the
+sixteen couples that could be verified against a cited source. The Ni(OH)₂/NiOOH couple that a nickel
+POSITIVE electrode actually uses is not among them, and neither is any material's operating potential in a
+named electrolyte — those are measurements, and the module states the reasoning instead of asserting numbers
+it has not checked. The water-window panel therefore converts YOUR measurement rather than supplying one.
+Adding a row means reading a source, not remembering a value; `data/_schema/potential.example.json` is the
+shape, and `tools/materials-test.mjs` fails on a citation that does not resolve.
+
+**The pathway measures its own gaps.** `#/pathway` walks the eleven-stage route for a chosen material and
+counts how many stages hold something specific to it. It reported a median of 4 of 11 when it was built;
+those gaps have since been worked through and every stage that can be material-specific now is, for all 24
+materials. The page is explicit that a full bar is a floor and not a ceiling — it means each material has
+somewhere specific to go from each stage, not that the content is deep or reviewed. See
+INSTRUMENTATION-INTEGRATION §22 and §23.
 
 **`instruments.json` is empty**, by design. The specifications have to come from your manuals and the quirks
 from your benches; §E.5 explains why the quirks are the part that matters. The file, its annotated template
 and the view that renders it are all in place — only the content is missing, and only you can write it.
 
-**The content itself is draft.** Roughly 64,000 words across 181 records, every page marked as such. The
+**The content itself is draft — and there is now a way to change that.** Roughly 76,000 words, which js/lib/review-units.js resolves into 285 reviewable entries (more than the 223 records, because the document-shaped files hold prose too). `tools/export-review.mjs` writes them to Word for circulation; `#/review` records verdicts; `finalised` in data/review.json turns a page's footer from draft to checked. See INSTRUMENTATION-INTEGRATION §25. What remains is people reading it. Across 223 records, every page marked as such. The
 health check validates structure, not truth: nothing in it can tell you a definition is wrong, only that it
 is shaped correctly. The safety section needs your safety officer specifically. A correction flow now exists
 at `#/suggest`, reachable from a line under every page, so what a reader notices can be recorded rather than
@@ -915,18 +934,22 @@ remembered.
 ## Where the project stands
 
 Every numbered phase, 0 through 15, is built — the two marked optional as far as they go without credentials
-only the group holds. 132 routes, 22 charts, a data health check reporting zero errors across 17 files and
-180 records, and six audit scripts in `tools/` that re-check the claims in this document rather than leaving
+only the group holds, plus **the pathway** — the route the platform was originally described as, which none
+of the fifteen modules turned out to be. 206 routes, 22 charts, a data health check reporting zero errors
+across 20 files and 223 records, and eight audit scripts in `tools/` that re-check the claims in this
+document rather than leaving
 them as assertions:
 
 | | |
 |---|---|
-| Performance budget (§I.1) | 7/7 targets met · shell 141 KB against 150 |
-| Accessibility, 132 routes × 2 themes | 0 findings across six checks |
-| Offline, from a cold install that opened only the home page | 132/132 routes render with no network |
+| Performance budget (§I.1) | 7/7 targets met · shell 146.9 KB against 150 |
+| Accessibility, 207 routes × 2 themes | 0 findings across six checks |
+| Offline, from a cold install that opened only the home page | 207/207 routes render with no network |
 | PWA install criteria | 14/14 · plus 6/6 of the things that decide whether Android shows the rich dialog |
-| Standing layout requirements, 3 widths | no sideways scrolling, nothing outside its box |
+| Standing layout requirements, 3 widths | no sideways scrolling, nothing outside its box, no diagram without an escape from the column |
 | Scan-rate analysis engine | 41 numerical assertions |
+| Live access endpoint, end to end | 27 assertions · no PIN crosses the network, no admin key reaches browser storage |
+| Materials, potentials and the pathway's inputs | 80 assertions · no stored capacity, every citation resolves (and a weak one says so), 1.229 V three ways, every mechanism id resolves |
 
 The work left is not architectural. It is content, review, and a deployment.
 

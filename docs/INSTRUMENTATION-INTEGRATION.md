@@ -1364,3 +1364,620 @@ And `.seg` / `.seg-b`, the segmented control, was defined inside `js/echem/tafel
 Cache version `edmglab-v22`.
 
 **One deliberate departure from the content-as-data rule.** `LIMITS` — what a b-value and a capacitive fraction do not license — lives in `js/echem/analysis.js` rather than in a JSON file, because it is the module's contract with the reader rather than authored content. If the group wants to edit those sentences without touching code, moving them to `data/echem/analysis.json` is a small change and the right one.
+
+---
+
+## 21. Electrode materials, aqueous and non-aqueous (Roadmap P7)
+
+The group asked for electrode materials covering half cell and full cell, for sodium, lithium and zinc,
+**in aqueous and non-aqueous systems in a wide range**, and authorised the references to be taken from
+standards rather than supplied.
+
+P7 had been deferred for one reason: a materials database is normally a column of capacities from the
+literature, and that column is the one thing this platform was told never to contain without citations
+somebody had actually read. The module is built the other way round.
+
+### 21.1 There is no capacity in `materials.json`
+
+Not one. Each of the 24 records declares two things — the formula unit the capacity is quoted per, and how
+many electrons that unit transfers — and the app computes
+
+```
+Q = n·F / (3.6·M)          M summed from IUPAC standard atomic weights
+```
+
+live, printing the arithmetic next to the answer. There is no stored number that can be wrong, the
+derivation is checkable in your head, and changing an electron count in the data changes the figure on the
+page. `tools/materials-test.mjs` walks every record looking for a value object and fails if it finds one, so
+the claim in this paragraph is enforced rather than asserted.
+
+Every figure was also checked against what the field quotes: graphite 371.9, Li metal 3861.9, Si 3578.6,
+LTO 175.1, LFP 169.9, LCO 273.8, Na metal 1165.8, Zn metal 819.9, MnO₂ 308.3, NTP 132.8, LTP 138.3,
+Ni(OH)₂ 289.1, Pb 258.7, PbO₂ 224.1, S 1672.0. All agree — but they came out of arithmetic, not recall,
+which is the point. The expected values live in the test, not in the app.
+
+**What is still deliberately absent:** reported capacity, first-cycle efficiency, rate performance, cycle
+life, and cell voltage. The first four vary by more than an order of magnitude with synthesis and testing
+conditions; the fifth is a user input in the demonstration, labelled as such.
+
+**Three records exist mainly to show where the arithmetic stops.** Hard carbon has `composition: null` and
+`electrons: null` — there is no formula unit, so the page says so instead of computing. MnO₂ has a contested
+electron count. V₂O₅'s `capacityBasis` says in capitals that two electrons is an assumption, not a property.
+
+### 21.2 The water stability window
+
+The aqueous/non-aqueous question is a potentials question, so it needed numbers the app cannot derive.
+`data/potentials.json` holds sixteen standard reduction potentials, every row citing
+[LibreTexts Reference Table P1](https://chem.libretexts.org/Bookshelves/Ancillary_Materials/Reference/Reference_Tables/Electrochemistry_Tables/P1%3A_Standard_Reduction_Potentials_by_Element),
+which in turn names Bard/Parsons/Jordan (1985), Milazzo (1978) and Swift/Butler (1972). It is the only file
+in the module holding a number EDMGLAB did not compute, and a `sourceId` that resolves to nothing is an
+error in both the health check and the test.
+
+The window itself comes out at 1.229 V three independent ways:
+
+| Route | Result |
+|---|---|
+| Acid pair, O₂/H₂O − H⁺/H₂ | 1.229 − 0.000 = **1.2290 V** |
+| Alkaline pair, O₂/OH⁻ − H₂O/H₂ | 0.401 − (−0.828) = **1.2290 V** |
+| Thermochemistry, −ΔG/nF from ΔfG°(H₂O, l) = −237.1 kJ/mol | 474200 / (4 × 96485.33) = **1.2287 V** |
+
+Two tabulated pairs and one thermochemical measurement, agreeing to under a millivolt. That is what makes it
+safe to build the rest of the module on, and all three are re-derived by the test on every run.
+
+The panel plots both water lines against pH, sliding at 2.303·R·T/F = 0.05916 V per pH unit — **derived, not
+quoted** — so the band moves down without ever getting wider. The demonstration is zinc: Zn²⁺/Zn is
+−0.7618 V vs SHE, which is 0.76 V outside the window at pH 0 and **inside** it by pH 14. The crossing is at
+**pH 12.88**, computed from the two cited potentials rather than written into the prose, and the test fails
+if it ever leaves the 0–14 axis.
+
+That single crossing is the whole answer to why alkaline zinc cells have been manufactured for a century
+while mildly acidic ones are a research problem — the acidic cell is living on a hydrogen-evolution
+overpotential, which an impurity can take away.
+
+**The panel refuses to be a general Pourbaix diagram.** Only couples whose written reaction contains no H⁺,
+OH⁻ or H₂O are drawn flat across the pH axis. PbO₂/PbSO₄ carries four protons and moves about twice as fast
+as the water lines, so it appears as a single point at the pH its tabulated value is defined for. Drawing a
+proton-carrying couple flat is the standard way these plots go wrong, and it puts electrodes on the wrong
+side of the window.
+
+**And the panel says what it does not mean.** Lead-acid sits outside the window at *both* ends — negative
+below the hydrogen line, positive 0.46 V above the oxygen line — and has been in production since the 1860s.
+Outside the window means thermodynamically able to destroy the solvent, with only kinetics preventing it. It
+gasses because those kinetics are slow rather than infinite. Never read the plot as a prediction.
+
+### 21.3 Your measurement, not ours
+
+EDMGLAB supplies no operating potentials, because none could be verified against a source in the session
+that built this. Instead the panel converts yours: enter a potential measured against Li/Li⁺, Na/Na⁺, K/K⁺
+or Zn²⁺/Zn and it lands on the plot, using the cited standard potential as the offset — and carrying a loud
+caveat that standard potentials are defined against SHE **in water**, that a potential measured against
+lithium in a carbonate electrolyte is on a different scale, and that the two are not strictly
+interconvertible. It is an orientation, never a number to report.
+
+### 21.4 Aqueous and non-aqueous, per material
+
+Every one of the 24 records carries an `electrolyteContext` block with an entry for each system: whether it
+works there, the electrolyte it is normally run in, what the solvent changes about the chemistry, and what
+to watch. The "does not work" entries are the more useful half — *why* a material fails in water is a
+transferable piece of reasoning, and a student can apply it to a material that is not in the file.
+
+The range now spans lithium, sodium, potassium, magnesium, zinc, lead and nickel; carbonate and ether
+non-aqueous systems; and neutral, mildly acidic and strongly alkaline aqueous systems. Eight records were
+added for the aqueous side specifically:
+
+| Record | Why it is here |
+|---|---|
+| `material.ltp`, `material.ntp` | The NASICON titanium phosphates — the anodes that made aqueous Li and Na cells possible, because their insertion potential is *inside* the window when nothing else's is |
+| `material.pba_nafe` | Prussian blue analogue: works in aqueous **and** non-aqueous, with Na, K and Zn. Its channels pass hydrated ions |
+| `material.ni_oh2` | Alkaline nickel — a chemistry where the reaction transfers a **proton**, consumes OH⁻, and therefore has no non-aqueous version at all |
+| `material.pb`, `material.pbo2` | Lead-acid, the clearest deployed case of a cell surviving on kinetics. Its theoretical capacity must count the sulfuric acid, because both electrodes consume it |
+| `material.v2o5` | The record whose theoretical capacity depends most on a choice the calculator makes |
+| `material.sulfur` | Where the half-cell/full-cell distinction does the most damage: polysulfide shuttle to a large lithium foil reads as high capacity and poor efficiency, not as failure |
+
+Note what `material.nnfm` says: layered sodium oxides are inside the window and still unusable in water,
+because water intercalates and sodium exchanges out. Thermodynamic window and chemical stability are two
+separate tests and both have to pass — a distinction the panel would otherwise flatten.
+
+### 21.5 Four defects found while wiring it up
+
+**The specific energy printed 0 Wh/kg.** `wh = qCell * voltage / 1000` — but mAh/g × V is mWh/g, and
+1 mWh/g *is* 1 Wh/kg; the milli and the kilo cancel exactly. An ordinary LFP/graphite cell was reading zero.
+Caught by looking at the number, which is the useful property of a demonstration whose output a reader can
+sanity-check.
+
+**A sixth shared-class defect, this time self-inflicted.** The index and the detail page each carried their
+own `<style>` block, and both defined `.mt-grid`, `.mt-num`, `.mt-sub` and `.mt-deriv` — with *different*
+values. It works only because one view is ever on screen at a time, which is a coincidence rather than a
+design. Consolidated into one `STYLE` constant, with the two genuine differences scoped under `.mt-detail`.
+The new `.chip-ok` / `.chip-warn` went straight into `css/style.css`, not into a view.
+
+**`PENDING` was a hand-maintained list nothing checked.** `data.js` keeps a set of registered-but-unwritten
+files that the offline warm-up skips. Writing `materials.json` without removing it from that set would have
+excluded the new file from the offline cache silently — the app perfect on a desk and holed in the lab. The
+health check now reports a PENDING key whose file actually loads. Fourth instance of that defect class.
+
+**`tools/analysis-test.mjs` imported `../EDMGLAB/js/…`**, which only resolved when run from the directory
+*above* the repo. The one audit needing no browser was the one that failed the moment somebody ran it from
+inside the repo, which is where everybody runs it from. Now relative to the script's own location, and the
+duplicate scratch copy of `tools/` has been deleted so the two cannot drift again.
+
+### 21.6 Two standing requirements, one real fix
+
+Text inside a scaled `viewBox` is not the size it is declared: a 15 px label in a 760-unit viewBox rendered
+into a 364 px phone column comes out at **7 px**, and no stylesheet edit fixes it because the browser scales
+the whole drawing. The standing audit caught it at 6.4–7.3 px on phone and 11.1 px on desktop.
+
+The fix inverts the calculation — pick the size the reader should *see*, measure the container, and convert
+to viewBox units. A `ResizeObserver` redraws on rotation or resize. Below 520 px the per-couple labels are
+dropped rather than drawn huge, because the table beside the plot already lists every couple with its value
+and its verdict, so nothing is lost. Rendered text is now 13.1–14.7 px at all three widths.
+
+The audit's other rule — a diagram whose in-column labels get small must offer a way *out* of the column —
+is met with the existing `addEnlargeControl`, re-attached after each redraw. `scenesWithoutAnEnlargeControl`
+is now **none across the whole application**, where it previously flagged three.
+
+### 21.7 Verification
+
+| Check | Result |
+|---|---|
+| Materials data and the water window | **51/51 assertions** · no stored capacity · every citation resolves · 1.229 V three ways |
+| Analysis engine | 41/41 assertions |
+| Routes | 157 · 0 thin views · 0 sidebar placeholders |
+| Charts drawn | 22/22 |
+| Accessibility, 157 routes × 2 themes | 0 findings across all six checks |
+| Standing requirements, 157 routes × 3 widths | clean · `scenesWithoutAnEnlargeControl` none |
+| Offline, cold start, home page only | 157/157 routes · 22 canvases · 0 failures · 0 non-OK responses |
+| Performance budget | 7/7 · shell 146.1 KB against 150 |
+| PWA install criteria | 14/14 · 6/6 quality |
+| Data health check | 20 files · 221 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v24`.
+
+**What the group still has to supply.** Operating potentials for these materials in your electrolytes, from
+your own measurements or a source you have read — the panel is built to take them. The Ni(OH)₂/NiOOH couple,
+which is genuinely the one a nickel positive electrode uses and is not in the file because it was not on the
+cited page. And, as ever, `instruments.json`: the OrigaLys model and the OrigaMaster version.
+
+---
+
+## 22. The pathway
+
+Every numbered phase was built. None of them was the thing the platform was originally described as.
+
+The brief did not ask for a set of modules. It asked for a route:
+
+> CONCEPT → CHEMISTRY/PHYSICS → MATERIAL → PREPARATION → CHARACTERIZATION → ELECTRODE FABRICATION →
+> ELECTROCHEMICAL TESTING → CALCULATION → DATA ANALYSIS → INTERPRETATION → TROUBLESHOOTING
+
+What got built was fifteen modules and a sidebar that sorts them by *what they are* — Learn, Laboratory,
+Analysis. That is how you find something whose name you already know. It is not how anyone actually moves
+from "what am I even measuring" to "why does my curve look like that".
+
+### 22.1 The finding that made this necessary
+
+After P7 shipped, a check of the knowledge graph found that **nothing outside `materials.json` pointed at a
+single material**. Twenty-four records, and the only inbound references came from `potentials.json`, written
+in the same session. The pathway's MATERIAL stage — the middle of the route, the thing the whole platform is
+for — was an island.
+
+That is a failure the health check cannot see. Every `relatedIds` entry resolved; there simply were not any.
+A validator that checks whether links are *broken* says nothing about whether links *exist*.
+
+### 22.2 What the pathway page is, and what stopped it being a flowchart
+
+Eleven boxes linking to eleven module home pages would have been decoration. So the spine takes a
+**material**, and every stage then shows what the platform actually holds for that material — and, in the
+same typeface and just as prominently, where it holds nothing specific and is offering only the generic
+module.
+
+That distinction does the teaching. A generic stage is not empty: the module behind it is written and
+applies. What "generic" means here is narrower and more useful — *nothing in this platform is written about
+this material at this stage*, so that question goes to the literature or to the bench.
+
+Nothing on the page is authored content. Every stage reads from records that already exist and are already
+validated; `js/views/pathway.js` holds the stage definitions and the rule for deciding specific-versus-
+generic, and makes no scientific claim of its own.
+
+### 22.3 The coverage figure is deliberately unflattering
+
+Each material gets a count: how many of the eleven stages hold something specific to it. The first run
+returned **4 of 11 for almost everything**, and the page said so.
+
+That number is a content map, not a score. It drove the next four hours of work, and the temptation it
+creates is precisely why one rule was written into the code: **three fundamentals apply to every material
+equally** — normalisation, capacitance-versus-capacity, provenance — and linking them from all 24 records
+would have lifted every score by one without adding a single piece of information. They are named in the
+Concept stage's *generic* branch instead. A metric that can be raised without writing anything is a metric
+that has stopped meaning anything.
+
+The overview also carries a **gap analysis across all 24 materials**, which is the most useful thing the page
+does for the group rather than for a student. Three stages are marked *generic by nature* — one preparation
+chain serves every material, and the analysis tools do not know what produced the file — so nobody spends a
+weekend "fixing" them. The rest is the real list, ordered by how many materials each gap affects.
+
+| Stage | Before | After |
+|---|---|---|
+| Chemistry / physics | 8 / 24 | **24 / 24** |
+| Characterisation | 0 / 24 | 12 / 24 |
+| Calculation | 1 / 24 | 15 / 24 |
+| Troubleshooting | 0 / 24 | 18 / 24 |
+| Concept | 0 / 24 | 13 / 24 |
+
+Median coverage went from 4/11 to 6/11, and the page now names characterisation as the next thing worth
+writing — because it is.
+
+### 22.4 The rule that keeps the new links from being fiction
+
+Sixty-two cross-references were added. Every one obeys a single rule, stated in the scripts that wrote them
+and enforced by the test:
+
+> **A material is linked to a technique, a symptom or a concept only where that material's own record names
+> the thing.** Not where it would usually be done. Not where it would look complete.
+
+So XRD links to `material.nafepo4` because that record already says the olivine polymorph cycles and
+maricite does not — same formula, different structure. BET links to `material.hard_carbon` because that
+record already attributes capacity to *closed* pores, which is exactly the porosity nitrogen cannot enter:
+a technique whose limitation is the point. Each link carries the reason with it, stored on the technique or
+the symptom rather than restated in the view, so there is one wording to maintain.
+
+And the framing is fixed in the data file's own header: **these are reasons to run an experiment, never
+results of one.** Nothing in the platform says what a measurement showed. On the troubleshooting side the
+page repeats it: a material being a plausible cause does not make it the cause — open the entry and run the
+diagnostic that separates them.
+
+### 22.5 A missing mechanism, found by trying to assign one
+
+Giving every material an explicit `mechanismId` — read off the reaction the record declares, not recalled —
+turned up something the platform had been missing since P8. Lithium, sodium and zinc metal anodes store
+charge by **plating and stripping**, and none of the six mechanism records described it. Intercalation,
+alloying and conversion all have a host; plating has none.
+
+`mechanism.plating` is now the seventh record, and its `distinguishFrom` block is the reason it earns its
+place: the CV nucleation crossover that identifies it, why a symmetric M‖M cell is not a capacity
+measurement of any kind, and why Coulombic efficiency per cycle *with the areal capacity it was measured at*
+is the only figure that means anything.
+
+One material still has **no** mechanism, on purpose. `material.ni_oh2` transfers a proton, not a metal ion,
+and consumes hydroxide from the electrolyte. Calling that intercalation imports vocabulary that does not
+apply, so `mechanismId` is `null` with a `mechanismNote` saying why, and the pathway renders that as a
+stated gap rather than a silent one. The test requires a null mechanism to carry its reason.
+
+### 22.6 Verification
+
+| Check | Result |
+|---|---|
+| Materials, potentials and pathway inputs | **77/77 assertions** (was 51) · every mechanismId resolves · 34 material notes all cross-linked |
+| Analysis engine | 41/41 assertions |
+| Routes | **194** · 0 thin views · 0 sidebar placeholders |
+| Accessibility, 194 routes × 2 themes | 0 findings — one 22 px target in the pathway rows found and fixed |
+| Standing requirements, 194 routes × 3 widths | clean · sidebar still fits at every width with a twelfth entry |
+| Offline, cold start, home page only | 194/194 routes · 0 failures · 0 non-OK responses |
+| Performance budget | 7/7 · shell 146.8 KB against 150 |
+| PWA install criteria | 14/14 · 6/6 quality |
+| Data health check | 20 files · 222 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v25`.
+
+**The gap this page now measures is the honest description of where the platform stands.** Characterisation
+content exists for 12 of 24 materials, concept links for 13, and none of that is a defect in the code. It is
+the next thing to write, and for the first time the platform says so itself rather than leaving somebody to
+notice.
+
+---
+
+## 23. Closing the gaps the pathway found
+
+§22 built a page that measures its own coverage and then reported a median of 4 of 11 stages. This section
+is what happened when that list was worked through. It is short because the interesting decisions were about
+what *not* to do.
+
+### 23.1 The nickel couple, and why the answer was more useful than the number
+
+The one value §21 recorded as missing was Ni(OH)₂/NiOOH — the couple a nickel positive electrode actually
+runs. Checking it produced a better outcome than finding it would have.
+
+The Bard-derived table this file is built on carries **exactly three** nickel entries — Ni²⁺/Ni,
+Ni(OH)₂/Ni, and the hexammine — and none of them is it. What is widely quoted as "the nickel electrode
+potential", **+0.49 V**, turns out on inspection to belong to a different reaction:
+
+```
+NiO₂(s) + 2 H₂O + 2 e⁻  ⇌  Ni(OH)₂(s) + 2 OH⁻        Ni(IV) → Ni(II), TWO electrons
+Ni(OH)₂ + OH⁻           ⇌  NiOOH + H₂O + e⁻          Ni(II) → Ni(III), ONE electron
+```
+
+The second is the electrode. The first is what the tables have. They are conflated constantly, and +0.49 V is
+quoted for the practical electrode far more often than for the couple it belongs to.
+
+So `potential.nio2_ni_oh2` is now in the file **as the NiO₂ couple it actually is**, with a note that says so
+in the first line, and the omission note for the real couple was rewritten from "not verified" to what was
+actually established. The row still earns its place: at pH 14 it sits just above the oxygen line at
++0.401 V, which is exactly why these cells gas on charge and why charge efficiency falls at high state of
+charge.
+
+**It also forced a new rule.** The only source carrying that value is a course handout that cites nothing
+upstream. A file whose premise is "every row can be chased" cannot quietly accept a row that cannot be, so
+sources now carry `unsourced: true`, every row using one carries a `caution`, the caution **renders in the
+table beside the value** rather than sitting in the data file being technically present, and
+`materials-test.mjs` fails if a weak-source row lacks one.
+
+### 23.2 Sixty more links, and the one that was refused
+
+Every non-generic stage is now 24/24. The rule did not move: **a material links to a technique, a symptom, a
+concept or a formula only where that material's own record names the thing.** A few worked examples:
+
+- **TGA → LFP**, because that record already says carbon coating and particle-size reduction exist to solve a
+  conductivity problem and that those additions lower capacity per gram of *electrode* while leaving the
+  theoretical figure untouched. How much carbon is present is the measurement.
+- **XPS → LTO**, because that record attributes LTO's cycle life to forming *little or no* interphase. That
+  is a surface claim, and it should be tested rather than assumed.
+- **ICP → LTP**, because that record warns titanium phosphates dissolve slowly in acid and a short
+  experiment will not reveal it.
+- **Low capacity → LCO**, because that record already calls roughly half the theoretical capacity the
+  accessible amount. A number near half of theory is the expected result there, not a fault to chase.
+
+The script that wrote the concept links carries a **guard that refuses** `concept.normalisation`,
+`concept.capacitance_vs_capacity` and `concept.provenance` on any material and logs the refusal. Those three
+apply to every material equally; linking them from all 24 records would have lifted every score by one
+without adding a single piece of information, and it would have been the easiest possible way to make the
+metric meaningless. They are named in the Concept stage's generic branch instead.
+
+### 23.3 What a full bar now means, said on the page
+
+With every countable stage at 24/24 the bars have stopped being informative, and the page says so rather
+than reading as a completion badge:
+
+> Every material now has at least one record-grounded link at every stage that can have one — **and that is
+> a floor, not a ceiling.** A full bar means each material has somewhere specific to go from each stage. It
+> does not mean the coverage is deep, that the most useful technique was the one linked, or that the content
+> has been reviewed. The bars stop being informative at this point; what replaces them is reading the pages.
+
+A metric that has been satisfied should say what it did not measure. This one now does.
+
+### 23.4 Verification
+
+| Check | Result |
+|---|---|
+| Materials, potentials and pathway inputs | **80/80 assertions** · 60 material notes all resolve and are cross-linked · weak-source rows all carry a caution |
+| Analysis engine | 41/41 assertions |
+| Routes | **206** · 0 thin views · 0 sidebar placeholders |
+| Accessibility, 206 routes × 2 themes | 0 findings across all six checks |
+| Standing requirements, 206 routes × 3 widths | clean |
+| Offline, cold start, home page only | 206/206 routes · 0 failures · 0 non-OK responses |
+| Performance budget | 7/7 · shell 146.8 KB against 150 |
+| PWA install criteria | 14/14 · 6/6 quality |
+| Data health check | 20 files · 223 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v26`.
+
+**What remains is not something code can finish.** The specifications and quirks in `instruments.json` come
+from your manuals and your benches. The 76,000 words are draft until the group reads them. The safety
+section needs your safety officer. And the one number this module would still like — a real Ni(OH)₂/NiOOH
+potential — needs somebody with Bard open, not another search.
+
+---
+
+## 24. Giving people access without a git commit
+
+The group asked for a login page and an admin page with a 4-digit PIN. **Both already existed** — §K.3 and
+`js/views/admin.js`, shipping disabled, which is very likely why they had not been seen. The four-digit
+gate, the per-person PIN mode, PBKDF2 hashing, the lockout and the add/remove-people admin panel were all
+in place.
+
+So the honest answer was not to build a second one. It was to find what the existing one actually could not
+do, and the group confirmed it: **the admin panel generates a configuration a human then has to commit.**
+Giving one new student a PIN meant a supervisor making a git commit — fine for a developer, a real obstacle
+for everyone else.
+
+### 24.1 The security question this raised, and why it has a real answer
+
+A write endpoint reachable from a static page is normally indefensible: anyone who finds the URL can call
+it. `Code.gs`, the correction inbox, accepts that trade because the worst case is a junk row in a Sheet.
+The same trade here would let anyone on the internet grant themselves access or lock the group out — **worse
+than the commit flow it replaces**, which at least requires push rights.
+
+The resolution is the one thing a static site cannot do and Apps Script can: **hold a secret.**
+
+```
+ADMIN_KEY  →  Script Properties, on Google's servers
+           →  never in the repository
+           →  never in data/access.json
+           →  never in any JavaScript the browser downloads
+```
+
+The admin types it for each change; the script verifies it; every attempt is logged. **Reads stay public**
+because the config contains only names, salts and PBKDF2 hashes — exactly what already sits in a public
+repository, so publishing it changes nothing.
+
+This is the only place in EDMGLAB where something can genuinely refuse a request. Architecture §J predicted
+it in the abstract ("if you ever need real access control, it has to come from a server that can refuse the
+request"); this is that, scoped to administration rather than to content.
+
+Two details in `AccessControl.gs` are worth keeping when somebody edits it:
+
+- **The key comparison walks the whole string** regardless of where it first differs. A plain `===` returns
+  as soon as it finds a mismatch, and how long that takes leaks how much of the key was right.
+- **Every attempt sleeps 250 ms.** An admin never notices; a million-guess campaign becomes weeks, and shows
+  up as a run of `REFUSED` rows in the audit tab.
+
+### 24.2 The PIN never crosses the network
+
+PBKDF2 runs in the admin's browser and only `{ salt, hash, iterations }` is sent. A PIN never reaches
+Google, never appears in an execution log, and never appears in the audit tab. **The server could not reveal
+a PIN if it were compelled to, because it was never told one.** The consequence is stated on the page: it
+cannot show an existing PIN back to you either.
+
+The admin key is likewise never stored — not in `localStorage`, not in `sessionStorage`, not in a variable
+that outlives the call. It is typed for each action. The friction is the feature, and two assertions in
+`tools/access-live-test.mjs` exist to keep it that way.
+
+### 24.3 Failing open, with one refinement
+
+`loadConfig()` still fails open — a missing or unreachable config means the gate is OFF — for the reason it
+always did: failing closed would lock the group out of a site whose content is public anyway.
+
+The endpoint adds one wrinkle. If it cannot be reached **but a previous answer is cached**, the cached list
+is used rather than falling all the way open: a lab losing its wifi keeps the gate it had this morning. The
+consequence is spelled out on the admin page rather than buried — *a device that is offline keeps the last
+list it saw, so somebody you suspend keeps access on that device until it reconnects.* That is a soft gate
+behaving like a soft gate.
+
+One related fix: `verify()` now skips a suspended person **after** deriving their hash rather than filtering
+the list first. Filtering early would make "suspended" reject measurably faster than "wrong PIN", which
+tells the person at the keyboard that their PIN was right — the one thing suspending them was meant to stop.
+
+### 24.4 The budget fired, for the second time
+
+`tools/README.md` predicted which audit would fail first, and it was right again. Adding the endpoint logic
+to `access.js` — which `app.js` imports statically, so it downloads on **every** visit — took the shell
+payload from 146.8 KB to **150.4 KB against a 150 KB budget**.
+
+The fix was the one that created `access-gate.js` in the first place: `js/lib/access-remote.js` now holds
+the fetch-and-cache code, and `access.js` imports it only when `data/access.json` actually names an
+endpoint. A group that has not deployed the script downloads none of it. Shell is back to 149.1 KB.
+
+That is twice this row has caught a regression that nothing else would have. It stays.
+
+### 24.5 Verification
+
+| Check | Result |
+|---|---|
+| Live access endpoint, end to end | **27/27 assertions** · mock endpoint, real admin page, real browser |
+| Materials, potentials and pathway inputs | 80/80 |
+| Analysis engine | 41/41 |
+| Routes | 206 · 0 console errors |
+| Accessibility, 206 routes × 2 themes | 0 findings |
+| Offline, cold start | 206/206 routes · 0 failures |
+| Performance budget | **7/7 · shell 149.1 KB against 150** |
+| PWA install criteria | 14/14 · 6/6 |
+| Data health check | 20 files · 223 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v27`. Deployment steps: `docs/apps-script/ACCESS-CONTROL.md`.
+
+**What this still is not.** It does not protect the site. EDMGLAB is static: anyone with the URL can open
+`data/formulas.json` without meeting the PIN, and a four-digit PIN whose hash is public is recoverable by
+anyone willing to try ten thousand of them. It makes *administration* safe and immediate. The two-tier rule
+is unchanged: everything in this repository must still be safe to be public.
+
+---
+
+## 25. Getting the draft content reviewed
+
+Every page in EDMGLAB says its content is draft. That has been true since the first record was written and
+it stays true until somebody who knows the field says otherwise — which nothing in the platform made
+possible. This is the machinery for it.
+
+### 25.1 One definition of "a thing to review"
+
+`js/lib/review-units.js` is imported by both the Word export (in Node) and the review page (in the browser).
+Two copies of that logic would drift within a week, and the symptom would be the worst kind: a reviewer
+approves 285 entries, the export lists 291, and nobody can tell which set is right.
+
+It turns up **285 units, about 59,000 words** — more than the 223 records, because eight files are not
+collections. They declare `_kind` and hold a document: the preparation chain, the cell formats, the decision
+trees, and the **safety notes**. Their prose needs reviewing more than most, so those are broken into units
+too, with synthesised ids prefixed `doc.` so they can never be mistaken for a record id.
+
+Two things are deliberately excluded. `import-profiles` is a table of instrument column names — putting
+twenty-three rows of configuration in front of somebody checking scientific claims wastes the attention of
+the one reviewer whose time is scarcest, and it is the one file where being wrong shows up immediately as a
+failed import. And underscore keys are notes to whoever edits the file, not content anyone should read.
+
+### 25.2 Two halves, because reading and judging are different activities
+
+**`node tools/export-review.mjs`** writes a cover sheet and one Word document per module, in the order worth
+doing them. Every entry carries its full text, its id, and a box with three tick options and room to write.
+People read long arguments better away from a screen, and the person best placed to check the safety section
+may never open the app at all.
+
+**`#/review`** records the verdict. Same 285 entries, grouped by module, with a running count of what is
+still unchecked. The two use the same ids, so a reviewer can read on paper and record in the app.
+
+### 25.3 The third button
+
+    Correct as written · Needs a change · I cannot judge this
+
+The third is not a cop-out and it is the reason there are three buttons rather than two. A postgraduate who
+knows electrochemistry and not X-ray diffraction, marking a diffraction entry "I cannot judge this", tells
+the group that entry needs a different reviewer. **That is information nobody has otherwise**, and a
+two-button interface destroys it silently by forcing a guess.
+
+### 25.4 Nothing is overwritten, and disagreement is shown
+
+`Review.gs` **appends** a row per verdict; the current state is the latest row per entry per reviewer, worked
+out on read. So a mistake is corrected by voting again, the whole history stays readable by a human in the
+Sheet, and where two reviewers disagree the page shows a **reviewers disagree** flag rather than letting
+whoever clicked last win.
+
+A disagreement about content is the most useful thing this exercise can surface. It is the last thing the
+tool should hide.
+
+### 25.5 Three scripts, three security models
+
+| Script | Protects | Key | Worst case if the key leaks |
+|---|---|---|---|
+| `Code.gs` | a correction inbox | none | a junk row somebody deletes |
+| `AccessControl.gs` | who can log in | `ADMIN_KEY`, never shared | the group is locked out |
+| `Review.gs` | review verdicts | `REVIEW_KEY`, **shared with everyone** | junk verdicts, which are appended and can be voted over |
+
+The review key is meant to end up in a group chat — every reviewer needs it — and should be chosen on that
+assumption. `selfTest` errors if it has been set to the same string as the admin key.
+
+Why a key at all, when the worst case is only junk: without one, the URL sitting in `data/review.json` lets
+anyone mark all 285 entries "correct as written". That is not a junk row. It is a false claim that the group
+has checked its own safety section.
+
+The two keys are also treated differently in the browser, and the difference follows from the consequence.
+The review key **is** remembered on the device — a reviewer working through ninety entries should not retype
+it ninety times. The admin key is never stored anywhere.
+
+### 25.6 Signing off is a commit, on purpose
+
+A record listed in `finalised` in `data/review.json` stops saying *draft* in its page footer and says
+**checked**, with who and when. Everything else stays draft.
+
+That one step is deliberately not an endpoint write. A verdict is one person's opinion and there will be
+hundreds of them, so those go to the endpoint with no ceremony. *"The group has checked this"* is a
+different kind of statement — the platform makes it to every future student who opens that page — and it
+belongs in the same reviewable history as the content it is about.
+
+The review page is likewise **not an editor**. A verdict is recorded there; the change is made in the JSON
+and committed. Letting a web page rewrite scientific claims would put them outside the commit history that
+is the whole reason the content lives in git, and this is the one place where the friction is worth keeping.
+
+### 25.7 The budget failed a third time, and taught something
+
+Adding the review page put the shell at **152.3 KB against 150**. Two moves brought it back: the
+sign-off lookup left `router.js` for `js/lib/finalised.js`, loaded only on a record detail page; and
+`offline.js` came off the critical path.
+
+The second took three attempts, and the failures are the interesting part:
+
+1. A **static import** put 5 KB on the critical path for code whose every line runs three seconds later.
+2. A **top-level dynamic import** barely improved on it — that still fires during boot.
+3. **`requestIdleCallback`** fired *inside* the measurement window: "when idle" is almost immediately on a
+   page that has finished painting.
+
+Only scheduling the fetch on the same clock as the work — three seconds after load — actually deferred it.
+Reading the code would not have separated those three; the budget did. Shell is back to **146.9 KB**, lower
+than before this section's work began.
+
+### 25.8 Verification
+
+| Check | Result |
+|---|---|
+| Routes | **207** · 0 console errors |
+| Live access endpoint | 27/27 |
+| Materials, potentials, pathway inputs | 80/80 |
+| Analysis engine | 41/41 |
+| Accessibility, 207 routes × 2 themes | 0 findings |
+| Standing requirements, 3 widths | clean |
+| Offline, cold start | 207/207 routes · 0 failures |
+| Performance budget | **7/7 · shell 146.9 KB against 150** |
+| PWA install criteria | 14/14 · 6/6 |
+| Data health check | 20 files · 223 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v28`. Steps: `docs/apps-script/REVIEW.md`.
+
+**285 entries are now addressable, exportable and recordable. None of them is reviewed.** That is the one
+thing in this project no amount of code can do, and it is now the only thing standing between the platform
+and being finished.

@@ -70,21 +70,71 @@ const { SESSION_KEY, ACTIVE_USER_KEY } = CONFIG_KEYS;
 /**
  * Load the access configuration.
  *
- * FAILS OPEN. A missing, malformed or unreachable config means the gate is
- * OFF. That is the correct behaviour here precisely BECAUSE this is not
- * security: failing closed would lock the group out of a site whose content
- * is public anyway, trading real usability for imaginary protection.
+ * TWO SOURCES, IN ORDER:
+ *   1. data/access.json — committed, always present. If it names an
+ *      `endpoint`, it is a POINTER rather than the answer.
+ *   2. That endpoint — the live list, which an admin can change from #/admin
+ *      without a git commit. See docs/apps-script/AccessControl.gs.
+ *
+ * FAILS OPEN, and the reasoning has not changed: a missing, malformed or
+ * unreachable config means the gate is OFF. That is correct here precisely
+ * BECAUSE this is not security — failing closed would lock the group out of a
+ * site whose content is public anyway, trading real usability for imaginary
+ * protection.
+ *
+ * The endpoint gets one refinement on that rule. If it cannot be reached but a
+ * previous answer is cached, the CACHED one is used rather than falling all
+ * the way open: a lab losing its wifi should keep the gate it had this
+ * morning. The consequence is stated plainly on the admin page — someone
+ * removed from the list keeps access on a device that is offline until it
+ * reconnects, which is a soft gate behaving like a soft gate.
  */
 export async function loadConfig() {
+  let file = {};
   try {
     const res = await fetch(CONFIG_URL, { cache: 'no-cache' });
     if (!res.ok) return { enabled: false, _reason: `no config (HTTP ${res.status})` };
-    const cfg = await res.json();
-    if (!cfg || cfg.enabled !== true) return { enabled: false, _reason: 'disabled in config' };
-    return cfg;
+    file = await res.json();
   } catch (e) {
     return { enabled: false, _reason: 'config unreachable: ' + e.message };
   }
+
+  const endpoint = String(file.endpoint || '').trim();
+  if (endpoint) {
+    /* Loaded ONLY when an endpoint is configured. access.js is on the boot
+       path of every visit; the endpoint code is useful to a minority of
+       deployments, and inlining it broke the shell-payload budget once
+       already. js/lib/access-remote.js has the full reasoning. */
+    const { fetchLive, cacheLive, readCachedLive } = await import('./access-remote.js');
+    const live = await fetchLive(endpoint);
+    if (live) {
+      cacheLive(live);
+      return live.enabled === true ? { ...live, _source: 'endpoint' }
+                                   : { enabled: false, _reason: 'disabled at the endpoint', _source: 'endpoint' };
+    }
+    const cached = readCachedLive();
+    if (cached) {
+      return cached.enabled === true
+        ? { ...cached, _source: 'cache', _reason: 'endpoint unreachable — using the last known list' }
+        : { enabled: false, _reason: 'endpoint unreachable; last known list had the gate off', _source: 'cache' };
+    }
+    // No live answer and nothing cached: fall through to the committed file,
+    // which is the honest last resort rather than an invented state.
+  }
+
+  if (!file || file.enabled !== true) return { enabled: false, _reason: 'disabled in config' };
+  return { ...file, _source: 'file' };
+}
+
+/** Read the endpoint URL without loading the whole config. Used by the admin
+ *  page, which needs to know whether live management is even possible. */
+export async function endpointUrl() {
+  try {
+    const res = await fetch(CONFIG_URL, { cache: 'no-cache' });
+    if (!res.ok) return '';
+    const file = await res.json();
+    return String(file.endpoint || '').trim();
+  } catch { return ''; }
 }
 
 export function signOut() {
