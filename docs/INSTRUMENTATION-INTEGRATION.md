@@ -2068,3 +2068,68 @@ been sitting in the file the whole time.
 | Data health check | 20 files · 223 records · 0 errors · 0 warnings |
 
 Cache version `edmglab-v29`.
+
+---
+
+## 27. The landing page was the last thing anyone looked at
+
+The group opened the dashboard and found it still saying this:
+
+> **Coming next** — *from the development roadmap*
+> P1 Fundamentals + Formula Library · P2 Calculator engine · P3 Battery Tester ·
+> P4 Data import + charting · P5 Electrochemical Workstation
+
+All five had been finished for weeks. And they were not the only thing wrong.
+
+### 27.1 Three failures, one cause
+
+| What it said | Reality |
+|---|---|
+| "**Phase 0 build.** Scientific content arrives module by module." | Every module built. |
+| A *Coming next* table of five modules | All five shipped long ago. |
+| **"Phase undefined"** on fourteen module cards | The card printed `'Phase ' + m.phase`, and a module's phase number is *deleted* from the nav model the moment it ships. |
+| Twenty modules with a blank subtitle | `DESCRIPTIONS` covered four of twenty-four. |
+
+Every one is the same defect this project keeps meeting: **a hand-maintained list that nothing checks.** It is the fifth or sixth instance, and by far the most visible — it was the first thing anyone saw.
+
+**And every audit passed the whole time.** The health check validates content files. The accessibility, offline, performance and standing audits all walk every route, and the dashboard is on all of them. None of them caught this, because **a page can be accessible, fast, offline-capable and completely wrong.** Those audits check that a page *works*; nothing was checking that it was *true*.
+
+### 27.2 The fix is not to correct the lists
+
+Correcting them would leave them free to rot again in exactly the same way. So:
+
+- **The roadmap table is gone.** In its place, *What still needs doing* — derived. Unbuilt modules come from the nav model, and two rows are read from the data files at render time: how many entries are signed off in `review.json`, and whether `instruments.json` still has no model and no specifications. **Fill in your instruments and that row disappears on its own.** Nobody has to remember to delete it.
+- **The phase chip is gone from the cards.** It printed nonsense on fourteen of them, and on the ten where it worked it answered a question nobody asks about a finished platform. The badge still exists in the sidebar for a module that genuinely is unbuilt — the concept was not removed, only the place it was wrong.
+- **The Phase 0 callout is replaced by a derived one.** With modules pending it says how many; with none pending it says the thing that is actually true and actually next — every module is built, none of the content has been reviewed, start with the safety section.
+- **Descriptions are written for all twenty-four modules**, because that is the one thing here that cannot be derived. A description is authored, not computed.
+
+### 27.3 So something checks the part that cannot be derived
+
+`tools/dashboard-test.mjs` — 13 assertions, no browser, no server:
+
+- Every built module in the nav model has a description, **and** no description names a module that no longer exists.
+- No "Phase 0 build", no "Coming next", no `NEXT_UP`, no phase chip on a built card.
+- The remaining-work rows are derived: they read `review.json` and `instruments.json`, and unbuilt modules come from `MODULES.filter(m => !m.view)`.
+- A phase badge is *still possible* for a module that genuinely is unbuilt — the check confirms the concept survived the deletion.
+
+**The first run failed on its own explanation.** The header comment in `dashboard.js` describes what went stale, quoting the exact phrases, and the staleness check matched the comment. That is worth recording, because the obvious way to make it pass would have been to delete the explanation — the opposite of useful. Comments are stripped before the scan now: what matters is what the page *renders*, not what the comments *discuss*.
+
+### 27.4 Verification
+
+| Check | Result |
+|---|---|
+| Dashboard | **13/13** · no stale claim, every module described, remaining work derived |
+| Live access endpoint | 27/27 |
+| Materials, potentials, pathway inputs | 80/80 |
+| Analysis engine | 41/41 |
+| Routes | 207 · 0 console errors |
+| Accessibility, 207 routes × 2 themes | 0 findings |
+| Standing requirements, 3 widths | clean |
+| Offline, cold start | 207/207 routes · 0 failures |
+| Performance budget | 7/7 · shell 149.2 KB against 150 |
+| PWA install criteria | 14/14 · 6/6 |
+| Data health check | 20 files · 223 records · 0 errors · 0 warnings |
+
+Cache version `edmglab-v31`.
+
+**The lesson worth keeping.** Ten audits, all passing, and the front page was telling every visitor the platform was unfinished. Automated checks verify what they were pointed at. This one was pointed at everything except the first thing anyone reads.
